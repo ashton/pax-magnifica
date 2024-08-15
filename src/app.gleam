@@ -1,60 +1,42 @@
 import actors/session_manager
-import events/game as game_events
-import game/factions
-import game/systems
-import gleam/io.{debug, println}
-import gleam/list
-import models/common.{Black, Blue}
-import models/event.{NoSource}
-import models/game
-import models/map.{Tile}
+import commands/game as game_commmands
+import commands/player as player_commands
+import gleam/io.{debug}
+import models/command
 import models/player.{User}
 
 pub fn main() {
-  println("creating map")
-  let map =
-    systems.all_systems
-    |> list.index_map(fn(system, index) { Tile(index, system) })
-    |> map.init()
-
-  println("creating player 1")
-  let player1 =
-    player.setup_player(player.User(name: "Player 1"), factions.make_arborec())
-
-  println("creating player 2")
-  let player2 =
-    player.setup_player(player.User(name: "Player 2"), factions.make_saar())
-
-  let game =
-    game.setup_game(players: [#(Black, player1), #(Blue, player2)], map: map)
-
-  let game2 =
-    game.setup_game(players: [#(Blue, player1), #(Black, player2)], map: map)
-
   // Start the live sessions registry.
   let assert Ok(session_store) = session_manager.start()
-  let assert Ok(game_session) = session_manager.new_session(session_store)
 
-  println("game session")
-  session_manager.fetch_session_details(game_session)
-  |> debug
+  let game1_actor_id = session_manager.new_game(session_store)
 
-  //game created event
-  let game_created_event =
-    game_events.game_created() |> event.game_event(NoSource)
+  let create_game_command =
+    game_commmands.init_game(game1_actor_id)
+    |> command.game_action()
+    |> command.new(issuer: "")
 
-  let player1 =
-    player.setup_player(
-      User(name: "Player 1"),
-      faction: factions.make_yssaril(),
+  let join_user1 =
+    player_commands.join_lobby(User(name: "player1"))
+    |> command.player_action()
+    |> command.new(issuer: "")
+
+  let join_user2 =
+    player_commands.join_lobby(User(name: "player2"))
+    |> command.player_action()
+    |> command.new(issuer: "")
+
+  let _ =
+    session_manager.update_game(
+      session_store,
+      game1_actor_id,
+      create_game_command,
     )
-  let player1_joined_event =
-    game_events.player_joined("game_id", player1)
-    |> event.game_event(NoSource)
 
-  session_manager.update_session_details(game_session, [game_created_event])
+  let _ = session_manager.update_game(session_store, game1_actor_id, join_user1)
 
-  println("updated game session")
-  session_manager.fetch_session_details(game_session)
+  let _ = session_manager.update_game(session_store, game1_actor_id, join_user2)
+
+  session_manager.game_state(session_store, game1_actor_id)
   |> debug
 }

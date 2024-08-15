@@ -1,21 +1,23 @@
-import events/game as game_events
+import events/game.{GameCreated}
 import models/event.{type Event, NoSource, game_event}
 import models/map.{type Map}
 import models/player.{type Player}
 
-pub type GameCommand {
-  CreateGame
-  SetGameMap(game_id: String, map: Map)
-  AddPlayerToGame(game_id: String, player: Player)
+pub opaque type GameCommand {
+  InitGame(id: String)
+  SetGameMap(map: Map)
+  AddPlayerToGame(player: Player)
+}
+
+pub fn init_game(id: String) {
+  InitGame(id)
 }
 
 pub fn handle_game_action(action: GameCommand) -> Event {
   case action {
-    CreateGame -> {
-      game_events.game_created()
-    }
-    AddPlayerToGame(game_id, player) -> todo
-    SetGameMap(game_id, map) -> todo
+    InitGame(id) -> GameCreated(id)
+    AddPlayerToGame(player) -> todo
+    SetGameMap(map) -> todo
   }
   |> game_event(NoSource)
 }

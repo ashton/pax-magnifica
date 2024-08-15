@@ -1,116 +1,30 @@
+import actors/game_manager
 import chip
-import gleam/erlang/process.{type Subject, Normal}
-import gleam/function.{identity}
-import gleam/option.{None}
-import gleam/otp/actor.{Continue, Ready, Spec, Stop}
 import gleam/result
-import ids/uuid
-import models/event.{type Event}
-
-pub type SessionId =
-  String
-
-pub type SessionManagerTopic {
-  Session
-  Game
-}
-
-pub type SessionManagerError {
-  StartError
-  NotFound
-}
-
-pub type Registry =
-  chip.Registry(SessionManagerMessage, SessionId, SessionManagerTopic)
-
-pub type Record {
-  Record(id: String, events: List(Event))
-}
-
-pub type SessionManagerState {
-  SessionManagerState(subject: Subject(SessionManagerMessage), record: Record)
-}
-
-pub opaque type SessionManagerMessage {
-  GetSessionDetails(caller: Subject(Record))
-  UpdateSessionDetails(List(Event))
-  AppendState(caller: Subject(Result(List(Event), String)), Event)
-  Halt
-}
+import models/command.{type Command}
 
 pub fn start() {
   chip.start()
 }
 
-fn handle_init(session_id: SessionId) {
-  let subject = process.new_subject()
-  let state =
-    SessionManagerState(
-      subject: subject,
-      record: Record(id: session_id, events: []),
-    )
-  let selector = process.new_selector() |> process.selecting(subject, identity)
+pub fn new_game(registry) {
+  let #(actor_id, game_actor) = game_manager.new_game_actor()
 
-  Ready(state, selector)
+  game_actor
+  |> chip.new()
+  |> chip.tag(actor_id)
+  |> chip.register(registry, _)
+
+  actor_id
 }
 
-fn handle_message(message: SessionManagerMessage, state: SessionManagerState) {
-  case message {
-    GetSessionDetails(caller) -> {
-      actor.send(caller, state.record)
-      Continue(state, None)
-    }
-
-    UpdateSessionDetails(events) -> {
-      let record = Record(..state.record, events: events)
-      let state = SessionManagerState(..state, record: record)
-      Continue(state, None)
-    }
-
-    AppendState(caller, event) -> todo
-
-    Halt -> Stop(Normal)
-  }
+pub fn update_game(registry, id: String, command: Command) {
+  chip.find(registry, id)
+  |> result.map(game_manager.update_game(_, command))
 }
 
-pub fn new_session(
-  registry: Registry,
-) -> Result(Subject(SessionManagerMessage), SessionManagerError) {
-  let session_id = uuid.generate_v4()
-  let subject =
-    session_id
-    |> result.then(fn(session_id) {
-      actor.start_spec(Spec(
-        init: fn() { handle_init(session_id) },
-        init_timeout: 10,
-        loop: handle_message,
-      ))
-      |> result.replace_error("StartError")
-    })
-
-  subject
-  |> result.map(chip.new)
-  |> result.map(chip.tag(_, session_id |> result.unwrap("")))
-  |> result.map(chip.register(registry, _))
-  |> result.map(fn(_) { subject })
-  |> result.flatten()
-  |> result.map_error(fn(_) { StartError })
-}
-
-pub fn get_session(
-  registry: Registry,
-  session_id: String,
-) -> Result(Subject(SessionManagerMessage), Nil) {
-  chip.find(registry, session_id)
-}
-
-pub fn fetch_session_details(subject: Subject(SessionManagerMessage)) -> Record {
-  actor.call(subject, GetSessionDetails(_), 100)
-}
-
-pub fn update_session_details(
-  subject: Subject(SessionManagerMessage),
-  events: List(Event),
-) {
-  actor.send(subject, UpdateSessionDetails(events))
+pub fn game_state(registry, game_id: String) {
+  chip.find(registry, game_id)
+  |> result.replace_error("Not found")
+  |> result.then(game_manager.game_state)
 }

@@ -1,7 +1,10 @@
 import birl.{type Time, now}
 import events/game.{type GameEvent}
-import events/session.{type SessionEvent}
+import events/player.{type PlayerEvent}
+import gleam/list
+import gleam/option.{type Option}
 import models/common.{type Color}
+import models/state.{type State, Initial}
 import utils/uuid
 
 pub type EventSource {
@@ -11,7 +14,7 @@ pub type EventSource {
 
 pub type EventData {
   GameEvent(GameEvent)
-  SessionEvent(SessionEvent)
+  PlayerEvent(PlayerEvent)
 }
 
 pub opaque type Event {
@@ -26,11 +29,29 @@ pub fn game_event(event: GameEvent, source: EventSource) {
   event |> GameEvent |> create(source)
 }
 
-pub fn session_event(event: SessionEvent, source: EventSource) {
-  event |> SessionEvent |> create(source)
+pub fn player_event(event: PlayerEvent, source: EventSource) {
+  event |> PlayerEvent |> create(source)
 }
 
 pub fn data(event: Event) -> EventData {
   let Event(_, data, ..) = event
   data
+}
+
+pub fn reduce(
+  events: List(Event),
+  initial_state: Option(State),
+) -> Result(State, String) {
+  let state = initial_state |> option.unwrap(Initial)
+  events |> list.fold(from: Ok(state), with: event_handler)
+}
+
+fn event_handler(
+  state: Result(State, String),
+  event: Event,
+) -> Result(State, String) {
+  case event |> data() {
+    PlayerEvent(event) -> player.event_handler(event, state)
+    GameEvent(event) -> game.event_handler(event, state)
+  }
 }
