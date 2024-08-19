@@ -1,8 +1,9 @@
 import game/factions
 import game/systems
+import gleam/bool
 import gleam/list
 import gleam/option.{type Option, None}
-import models/draft.{type Draft, Milty, MiltyDraft}
+import models/draft.{type Draft, DraftRunning, MiltyDraft}
 import models/drafts/milty.{MiltyDraftPool, MiltyDraftResult, MiltySlice}
 import models/game
 import models/player.{type User}
@@ -53,7 +54,7 @@ pub fn setup(
   let participants = participants |> option.unwrap([])
 
   MiltyDraft(
-    kind: Milty,
+    state: DraftRunning,
     participants:,
     pool: MiltyDraftPool(
       available_factions: generate_faction_pool(player_count),
@@ -80,4 +81,17 @@ pub fn setup(
         )
       }),
   )
+}
+
+pub fn finished(draft: Draft) {
+  draft.result
+  |> list.all(fn(draft_result) {
+    draft_result.faction
+    |> option.is_some()
+    |> bool.and(draft_result.slice.home |> option.is_some())
+    |> bool.and(
+      draft_result.slice.neighbors |> list.is_empty() |> bool.negate(),
+    )
+    |> bool.and(draft_result.position |> option.is_some())
+  })
 }

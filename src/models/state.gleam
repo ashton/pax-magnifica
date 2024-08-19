@@ -1,8 +1,5 @@
-import gleam/option.{type Option}
 import models/draft.{type Draft}
-import models/faction.{type FactionIdentifier}
-import models/game.{type Game, type Position}
-import models/planetary_system.{type System}
+import models/game.{type Game}
 import models/player.{type Player, type User}
 
 pub type State {

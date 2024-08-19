@@ -1,6 +1,8 @@
 import game/drafts/milty as milty_draft
 import gleam/option.{None, Some}
-import models/draft.{type Draft, type DraftType, Milty, MiltyDraft}
+import models/draft.{
+  type Draft, type DraftType, DraftCompleted, Milty, MiltyDraft,
+}
 import models/drafts/milty
 import models/faction.{type FactionIdentifier}
 import models/game.{type Position}
@@ -18,8 +20,8 @@ pub fn set_faction(
   user user: User,
   faction faction_identifier: FactionIdentifier,
 ) {
-  case draft.kind {
-    Milty -> {
+  case draft {
+    MiltyDraft(..) -> {
       let result =
         milty.select_faction(
           draft: draft.result,
@@ -30,16 +32,18 @@ pub fn set_faction(
       MiltyDraft(..draft, result:)
     }
   }
+  |> complete_if_needed()
 }
 
 pub fn set_system(draft draft: Draft, user user: User, system system: System) {
-  case draft.kind {
-    Milty -> {
+  case draft {
+    MiltyDraft(..) -> {
       let result = milty.select_system(draft: draft.result, user:, system:)
 
       MiltyDraft(..draft, result:)
     }
   }
+  |> complete_if_needed()
 }
 
 pub fn set_position(
@@ -47,11 +51,31 @@ pub fn set_position(
   user user: User,
   position position: Position,
 ) {
-  case draft.kind {
-    Milty -> {
+  case draft {
+    MiltyDraft(..) -> {
       let result = milty.select_position(draft: draft.result, user:, position:)
 
       MiltyDraft(..draft, result:)
     }
+  }
+  |> complete_if_needed()
+}
+
+pub fn finished(draft: Draft) {
+  case draft {
+    MiltyDraft(..) -> milty_draft.finished(draft)
+  }
+}
+
+pub fn complete(draft: Draft) {
+  case draft {
+    MiltyDraft(..) -> MiltyDraft(..draft, state: DraftCompleted)
+  }
+}
+
+fn complete_if_needed(draft: Draft) {
+  case draft |> finished() {
+    True -> draft |> complete()
+    False -> draft
   }
 }

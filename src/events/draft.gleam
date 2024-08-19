@@ -1,5 +1,4 @@
 import game/draft
-import gleam/result
 import models/draft.{type Draft, type DraftType} as _
 import models/faction.{type FactionIdentifier}
 import models/game.{type Position}
@@ -24,17 +23,19 @@ fn lobby_phase_event_handler(
   }
 }
 
-fn draft_phase_event_handler(event: DraftEvent, draft: Draft) {
+fn draft_phase_event_handler(
+  event: DraftEvent,
+  draft: Draft,
+) -> Result(State, String) {
   case event {
-    FactionSelected(faction, user) ->
-      draft.set_faction(draft:, user:, faction:) |> Ok
-    SystemSelected(system, user) ->
-      draft.set_system(draft:, user:, system:) |> Ok
+    FactionSelected(faction, user) -> draft.set_faction(draft:, user:, faction:)
+    SystemSelected(system, user) -> draft.set_system(draft:, user:, system:)
     PositionSelected(position, user) ->
-      draft.set_position(draft:, user:, position:) |> Ok
-    _ -> draft |> Ok
+      draft.set_position(draft:, user:, position:)
+    _ -> draft
   }
-  |> result.map(DraftPhase)
+  |> DraftPhase
+  |> Ok
 }
 
 pub fn event_handler(
