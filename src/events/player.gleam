@@ -1,4 +1,3 @@
-import gleam/list
 import models/player.{type User}
 import models/state.{
   type State, DraftPhase, EndGamePhase, Initial, LobbyPhase, PlayingPhase,
@@ -38,7 +37,7 @@ pub fn event_handler(
   case state {
     Ok(Initial) -> initial_state_handler()
     Ok(LobbyPhase(_)) -> lobby_phase_handler(event, state)
-    Ok(DraftPhase(_, _)) -> draft_phase_handler(event, state)
+    Ok(DraftPhase(_)) -> draft_phase_handler(event, state)
     Ok(PlayingPhase(_)) -> playing_phase_handler(event, state)
     Ok(EndGamePhase(_)) -> end_game_phase_handler(event, state)
     _ -> state

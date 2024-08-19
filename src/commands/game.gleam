@@ -13,9 +13,9 @@ pub fn init_game(id: String) {
   InitGame(id)
 }
 
-pub fn handle_game_action(action: GameCommand) -> Event {
-  case action {
-    InitGame(id) -> GameCreated(id)
+pub fn handle_game_command(command: GameCommand) -> Event {
+  case command {
+    InitGame(id) -> GameCreated(id:)
     AddPlayerToGame(player) -> todo
     SetGameMap(map) -> todo
   }

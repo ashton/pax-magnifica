@@ -10,8 +10,8 @@ pub fn join_lobby(user: User) -> PlayerCommand {
   JoinLobby(user)
 }
 
-pub fn handle_player_action(action: PlayerCommand) -> Event {
-  case action {
+pub fn handle_player_command(command: PlayerCommand) -> Event {
+  case command {
     JoinLobby(user) -> UserJoined(user) |> event.player_event(NoSource)
   }
 }

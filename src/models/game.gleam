@@ -12,6 +12,17 @@ pub type Score {
   Score(objective: Objective, color: Color)
 }
 
+pub type Position {
+  Speaker
+  Second
+  Third
+  Fourth
+  Fifth
+  Sixth
+  Seventh
+  Eighth
+}
+
 pub type Game {
   Game(
     id: String,

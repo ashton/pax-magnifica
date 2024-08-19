@@ -219,6 +219,35 @@ pub const empty_system_4 = EmptySystem
 
 pub const empty_system_5 = EmptySystem
 
+pub const home_systems = [
+  arborec_home_system, creuss_home_system, hacan_home_system,
+  jol_nar_home_system, letnev_home_system, lizix_home_system, mentak_home_system,
+  muaat_home_system, naalu_home_system, nekro_home_system, saar_home_system,
+  sardakk_home_system, sol_home_system, winnu_home_system, xxcha_home_system,
+  yin_home_system, yssaril_home_system,
+]
+
+pub const planetary_systems = [
+  planetary_system_1, planetary_system_2, planetary_system_3, planetary_system_4,
+  planetary_system_5, planetary_system_6, planetary_system_7, planetary_system_8,
+  planetary_system_9, planetary_system_10, planetary_system_11,
+  planetary_system_12, planetary_system_13, planetary_system_14,
+  planetary_system_15, planetary_system_16, planetary_system_17,
+  planetary_system_18, planetary_system_19, planetary_system_20,
+  planetary_system_21,
+]
+
+pub const wormhole_systems = [wormhole_system_1, wormhole_system_2]
+
+pub const anomaly_systems = [
+  anomaly_system_1, anomaly_system_2, anomaly_system_3, anomaly_system_4,
+  anomaly_system_5,
+]
+
+pub const empty_systems = [
+  empty_system_1, empty_system_2, empty_system_3, empty_system_4, empty_system_5,
+]
+
 pub const all_systems = [
   sol_home_system, mentak_home_system, yin_home_system, muaat_home_system,
   arborec_home_system, lizix_home_system, winnu_home_system, nekro_home_system,

@@ -1,4 +1,5 @@
 import birl.{type Time, now}
+import events/draft.{type DraftEvent}
 import events/game.{type GameEvent}
 import events/player.{type PlayerEvent}
 import gleam/list
@@ -9,12 +10,14 @@ import utils/uuid
 
 pub type EventSource {
   NoSource
+  Draft
   PlayerSource(Color)
 }
 
 pub type EventData {
   GameEvent(GameEvent)
   PlayerEvent(PlayerEvent)
+  DraftEvent(DraftEvent)
 }
 
 pub opaque type Event {
@@ -31,6 +34,10 @@ pub fn game_event(event: GameEvent, source: EventSource) {
 
 pub fn player_event(event: PlayerEvent, source: EventSource) {
   event |> PlayerEvent |> create(source)
+}
+
+pub fn draft_event(event: DraftEvent) {
+  event |> DraftEvent |> create(Draft)
 }
 
 pub fn data(event: Event) -> EventData {
@@ -53,5 +60,6 @@ fn event_handler(
   case event |> data() {
     PlayerEvent(event) -> player.event_handler(event, state)
     GameEvent(event) -> game.event_handler(event, state)
+    DraftEvent(event) -> draft.event_handler(event, state)
   }
 }

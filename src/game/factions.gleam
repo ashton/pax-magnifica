@@ -1,4 +1,5 @@
 import game/planets
+import game/systems
 import game/technologies
 import game/units
 import gleam/list
@@ -7,7 +8,7 @@ import models/common.{
   type Color, Black, Blue, Green, Hit, Orange, Purple, Red, Yellow,
 }
 import models/faction
-import models/planetary_system.{type Planet}
+import models/planetary_system.{type Planet, type System}
 import models/technology.{
   type Technology, Biotic, Cybernetic, PreReq, Propulsion, Technology,
   UnitUpgrade, Warfare,
@@ -148,7 +149,7 @@ pub fn make_arborec() -> faction.Faction {
     )
 
   faction.FactionData(..data, ground_forces: [custom_infantry])
-  |> faction.Arborec
+  |> faction.ArborecFaction
 }
 
 pub fn make_letnev() -> faction.Faction {
@@ -178,7 +179,7 @@ pub fn make_letnev() -> faction.Faction {
       SpaceDockAmount(1),
     ],
   )
-  |> faction.Letnev
+  |> faction.LetnevFaction
 }
 
 pub fn make_saar() -> faction.Faction {
@@ -227,7 +228,7 @@ pub fn make_saar() -> faction.Faction {
     )
 
   faction.FactionData(..data, structures: [custom_space_dock, pds])
-  |> faction.Saar
+  |> faction.SaarFaction
 }
 
 pub fn make_muaat() -> faction.Faction {
@@ -280,7 +281,7 @@ pub fn make_muaat() -> faction.Faction {
     ..data,
     ships: data.ships |> list.append([custom_war_sun]),
   )
-  |> faction.Muaat
+  |> faction.MuaatFaction
 }
 
 pub fn make_hacan() -> faction.Faction {
@@ -309,7 +310,7 @@ pub fn make_hacan() -> faction.Faction {
       SpaceDockAmount(1),
     ],
   )
-  |> faction.Hacan
+  |> faction.HacanFaction
 }
 
 pub fn make_sol() -> faction.Faction {
@@ -402,7 +403,7 @@ pub fn make_sol() -> faction.Faction {
     })
 
   faction.FactionData(..data, ground_forces: [custom_infantry], ships: ships)
-  |> faction.Sol
+  |> faction.SolFaction
 }
 
 pub fn make_creuss() -> faction.Faction {
@@ -428,7 +429,7 @@ pub fn make_creuss() -> faction.Faction {
       SpaceDockAmount(1),
     ],
   )
-  |> faction.Creuss
+  |> faction.CreussFaction
 }
 
 pub fn make_lizix() -> faction.Faction {
@@ -509,7 +510,7 @@ pub fn make_lizix() -> faction.Faction {
     })
 
   faction.FactionData(..data, ships: ships)
-  |> faction.Lizix
+  |> faction.LizixFaction
 }
 
 pub fn make_mentak() -> faction.Faction {
@@ -539,7 +540,7 @@ pub fn make_mentak() -> faction.Faction {
       PDSAmount(1),
     ],
   )
-  |> faction.Mentak
+  |> faction.MentakFaction
 }
 
 pub fn make_naalu() -> faction.Faction {
@@ -616,7 +617,7 @@ pub fn make_naalu() -> faction.Faction {
     })
 
   faction.FactionData(..data, ships: ships)
-  |> faction.Naalu
+  |> faction.NaaluFaction
 }
 
 pub fn make_nekro() -> faction.Faction {
@@ -636,7 +637,7 @@ pub fn make_nekro() -> faction.Faction {
       SpaceDockAmount(1),
     ],
   )
-  |> faction.Nekro
+  |> faction.NekroFaction
 }
 
 pub fn make_sardakk() -> faction.Faction {
@@ -718,10 +719,10 @@ pub fn make_sardakk() -> faction.Faction {
     })
 
   faction.FactionData(..data, ships: ships)
-  |> faction.Sardakk
+  |> faction.SardakkFaction
 }
 
-pub fn make_jolnar() -> faction.Faction {
+pub fn make_jol_nar() -> faction.Faction {
   make_faction_data(
     name: "The Universities of Jol-Nar",
     commodities: 6,
@@ -752,7 +753,7 @@ pub fn make_jolnar() -> faction.Faction {
       PDSAmount(1),
     ],
   )
-  |> faction.JolNar
+  |> faction.JolNarFaction
 }
 
 pub fn make_winnu() -> faction.Faction {
@@ -782,7 +783,7 @@ pub fn make_winnu() -> faction.Faction {
       PDSAmount(1),
     ],
   )
-  |> faction.Winnu
+  |> faction.WinnuFaction
 }
 
 pub fn make_xxcha() -> faction.Faction {
@@ -809,7 +810,7 @@ pub fn make_xxcha() -> faction.Faction {
       PDSAmount(1),
     ],
   )
-  |> faction.Xxcha
+  |> faction.XxchaFaction
 }
 
 pub fn make_yin() -> faction.Faction {
@@ -835,7 +836,7 @@ pub fn make_yin() -> faction.Faction {
       SpaceDockAmount(1),
     ],
   )
-  |> faction.Yin
+  |> faction.YinFaction
 }
 
 pub fn make_yssaril() -> faction.Faction {
@@ -861,5 +862,56 @@ pub fn make_yssaril() -> faction.Faction {
       SpaceDockAmount(1),
     ],
   )
-  |> faction.Yssaril
+  |> faction.YssarilFaction
+}
+
+pub const all: List(faction.FactionIdentifier) = [
+  faction.Arborec, faction.Creuss, faction.Hacan, faction.JolNar, faction.Letnev,
+  faction.Lizix, faction.Mentak, faction.Muaat, faction.Naalu, faction.Nekro,
+  faction.Saar, faction.Sardakk, faction.Sol, faction.Winnu, faction.Xxcha,
+  faction.Yin, faction.Yssaril,
+]
+
+pub fn make(identifier: faction.FactionIdentifier) -> faction.Faction {
+  case identifier {
+    faction.Arborec -> make_arborec()
+    faction.Creuss -> make_creuss()
+    faction.Hacan -> make_hacan()
+    faction.JolNar -> make_jol_nar()
+    faction.Letnev -> make_letnev()
+    faction.Lizix -> make_lizix()
+    faction.Mentak -> make_mentak()
+    faction.Muaat -> make_muaat()
+    faction.Naalu -> make_naalu()
+    faction.Nekro -> make_nekro()
+    faction.Saar -> make_saar()
+    faction.Sardakk -> make_sardakk()
+    faction.Sol -> make_sol()
+    faction.Winnu -> make_winnu()
+    faction.Xxcha -> make_xxcha()
+    faction.Yin -> make_yin()
+    faction.Yssaril -> make_yssaril()
+  }
+}
+
+pub fn home_system(identifier: faction.FactionIdentifier) -> System {
+  case identifier {
+    faction.Arborec -> systems.arborec_home_system
+    faction.Creuss -> systems.creuss_home_system
+    faction.Hacan -> systems.hacan_home_system
+    faction.JolNar -> systems.jol_nar_home_system
+    faction.Letnev -> systems.letnev_home_system
+    faction.Lizix -> systems.lizix_home_system
+    faction.Mentak -> systems.mentak_home_system
+    faction.Muaat -> systems.muaat_home_system
+    faction.Naalu -> systems.naalu_home_system
+    faction.Nekro -> systems.nekro_home_system
+    faction.Saar -> systems.saar_home_system
+    faction.Sardakk -> systems.sardakk_home_system
+    faction.Sol -> systems.sol_home_system
+    faction.Winnu -> systems.winnu_home_system
+    faction.Xxcha -> systems.xxcha_home_system
+    faction.Yin -> systems.yin_home_system
+    faction.Yssaril -> systems.yssaril_home_system
+  }
 }

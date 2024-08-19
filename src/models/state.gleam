@@ -1,11 +1,14 @@
-import models/game.{type Game}
-import models/map.{type Map}
+import gleam/option.{type Option}
+import models/draft.{type Draft}
+import models/faction.{type FactionIdentifier}
+import models/game.{type Game, type Position}
+import models/planetary_system.{type System}
 import models/player.{type Player, type User}
 
 pub type State {
   Initial
   LobbyPhase(users: List(User))
-  DraftPhase(players: List(Player), map: Map)
+  DraftPhase(draft: Draft)
   PlayingPhase(game: Game)
   EndGamePhase(winner: Player)
 }
@@ -32,10 +35,10 @@ pub fn map_lobby_phase(
 
 pub fn map_draft_phase(
   state: Result(State, String),
-  mapper: fn(List(Player), Map) -> Result(State, String),
+  mapper: fn(Draft) -> Result(State, String),
 ) {
   case state {
-    Ok(DraftPhase(players, map)) -> mapper(players, map)
+    Ok(DraftPhase(draft)) -> mapper(draft)
     _ -> state
   }
 }

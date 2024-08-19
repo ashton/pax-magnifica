@@ -19,21 +19,41 @@ pub type FactionData {
 }
 
 pub type Faction {
-  Arborec(data: FactionData)
-  Letnev(data: FactionData)
-  Saar(data: FactionData)
-  Muaat(data: FactionData)
-  Hacan(data: FactionData)
-  Sol(data: FactionData)
-  Creuss(data: FactionData)
-  Lizix(data: FactionData)
-  Mentak(data: FactionData)
-  Naalu(data: FactionData)
-  Nekro(data: FactionData)
-  Sardakk(data: FactionData)
-  JolNar(data: FactionData)
-  Winnu(data: FactionData)
-  Xxcha(data: FactionData)
-  Yin(data: FactionData)
-  Yssaril(data: FactionData)
+  ArborecFaction(data: FactionData)
+  LetnevFaction(data: FactionData)
+  SaarFaction(data: FactionData)
+  MuaatFaction(data: FactionData)
+  HacanFaction(data: FactionData)
+  SolFaction(data: FactionData)
+  CreussFaction(data: FactionData)
+  LizixFaction(data: FactionData)
+  MentakFaction(data: FactionData)
+  NaaluFaction(data: FactionData)
+  NekroFaction(data: FactionData)
+  SardakkFaction(data: FactionData)
+  JolNarFaction(data: FactionData)
+  WinnuFaction(data: FactionData)
+  XxchaFaction(data: FactionData)
+  YinFaction(data: FactionData)
+  YssarilFaction(data: FactionData)
+}
+
+pub type FactionIdentifier {
+  Arborec
+  Letnev
+  Saar
+  Muaat
+  Hacan
+  Sol
+  Creuss
+  Lizix
+  Mentak
+  Naalu
+  Nekro
+  Sardakk
+  JolNar
+  Winnu
+  Xxcha
+  Yin
+  Yssaril
 }
