@@ -1,6 +1,7 @@
 import game/factions
 import gleam/list
 import gleam/option.{type Option, Some}
+import models/common.{type Color}
 import models/faction.{type FactionIdentifier}
 import models/game.{type Position}
 import models/planetary_system.{type System}
@@ -21,9 +22,10 @@ pub type MiltyDraftPool {
 pub type MiltyDraftResult {
   MiltyDraftResult(
     user: User,
-    faction: Option(FactionIdentifier),
     slice: MiltySlice,
+    faction: Option(FactionIdentifier),
     position: Option(Position),
+    color: Option(Color),
   )
 }
 
@@ -71,9 +73,7 @@ pub fn select_system(
 ) -> List(MiltyDraftResult) {
   draft
   |> list.map(fn(result) {
-    let MiltyDraftResult(user: current_user, ..) = result
-
-    case current_user == user {
+    case result.user == user {
       True ->
         MiltyDraftResult(
           ..result,
@@ -91,10 +91,22 @@ pub fn select_position(
 ) -> List(MiltyDraftResult) {
   draft
   |> list.map(fn(result) {
-    let MiltyDraftResult(user: current_user, ..) = result
-
-    case current_user == user {
+    case result.user == user {
       True -> MiltyDraftResult(..result, position: position |> Some)
+      False -> result
+    }
+  })
+}
+
+pub fn select_color(
+  draft draft: List(MiltyDraftResult),
+  user user: User,
+  color color: Color,
+) {
+  draft
+  |> list.map(fn(result) {
+    case result.user == user {
+      True -> MiltyDraftResult(..result, color: color |> Some)
       False -> result
     }
   })

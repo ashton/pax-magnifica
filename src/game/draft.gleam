@@ -1,5 +1,6 @@
 import game/drafts/milty as milty_draft
 import gleam/option.{None, Some}
+import models/common.{type Color}
 import models/draft.{
   type Draft, type DraftType, DraftCompleted, Milty, MiltyDraft,
 }
@@ -32,7 +33,6 @@ pub fn set_faction(
       MiltyDraft(..draft, result:)
     }
   }
-  |> complete_if_needed()
 }
 
 pub fn set_system(draft draft: Draft, user user: User, system system: System) {
@@ -43,7 +43,6 @@ pub fn set_system(draft draft: Draft, user user: User, system system: System) {
       MiltyDraft(..draft, result:)
     }
   }
-  |> complete_if_needed()
 }
 
 pub fn set_position(
@@ -57,6 +56,12 @@ pub fn set_position(
 
       MiltyDraft(..draft, result:)
     }
+  }
+}
+
+pub fn set_color(draft draft: Draft, user user: User, color color: Color) {
+  case draft {
+    MiltyDraft(..) -> milty_draft.select_color(draft:, user:, color:)
   }
   |> complete_if_needed()
 }

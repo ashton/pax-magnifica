@@ -1,16 +1,21 @@
 import game/draft
+import gleam/result
+import models/common.{type Color}
 import models/draft.{type Draft, type DraftType} as _
 import models/faction.{type FactionIdentifier}
 import models/game.{type Position}
 import models/planetary_system.{type System}
 import models/player.{type User}
-import models/state.{type State, DraftPhase, map_draft_phase, map_lobby_phase}
+import models/state.{
+  type State, DraftPhase, EndGamePhase, Initial, LobbyPhase, PlayingPhase,
+}
 
 pub type DraftEvent {
   DraftInitiated(kind: DraftType)
   FactionSelected(faction: FactionIdentifier, user: User)
   SystemSelected(system: System, user: User)
   PositionSelected(position: Position, user: User)
+  ColorSelected(color: Color, user: User)
 }
 
 fn lobby_phase_event_handler(
@@ -28,21 +33,28 @@ fn draft_phase_event_handler(
   draft: Draft,
 ) -> Result(State, String) {
   case event {
-    FactionSelected(faction, user) -> draft.set_faction(draft:, user:, faction:)
-    SystemSelected(system, user) -> draft.set_system(draft:, user:, system:)
+    DraftInitiated(..) -> Error("Draft was alredy initiated!")
+    FactionSelected(faction, user) ->
+      draft.set_faction(draft:, user:, faction:) |> Ok
+    SystemSelected(system, user) ->
+      draft.set_system(draft:, user:, system:) |> Ok
     PositionSelected(position, user) ->
-      draft.set_position(draft:, user:, position:)
-    _ -> draft
+      draft.set_position(draft:, user:, position:) |> Ok
+    ColorSelected(user, color) -> draft.set_color(draft:, user:, color:)
   }
-  |> DraftPhase
-  |> Ok
+  |> result.map(DraftPhase)
 }
 
 pub fn event_handler(
   event: DraftEvent,
   state: Result(State, String),
 ) -> Result(State, String) {
-  state
-  |> map_lobby_phase(lobby_phase_event_handler(event, _))
-  |> map_draft_phase(draft_phase_event_handler(event, _))
+  case state {
+    Ok(Initial) -> Error("You need to create a game first")
+    Ok(LobbyPhase(users)) -> lobby_phase_event_handler(event, users)
+    Ok(DraftPhase(draft)) -> draft_phase_event_handler(event, draft)
+    Ok(PlayingPhase(..)) -> Error("This game already started!")
+    Ok(EndGamePhase(..)) -> Error("This game already finished!")
+    error -> error
+  }
 }
