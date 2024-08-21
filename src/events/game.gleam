@@ -1,12 +1,28 @@
-import models/state.{type State, LobbyPhase, map_initial_phase}
+import models/draft.{type Draft}
+import models/game
+import models/map
+import models/state.{
+  type State, DraftPhase, LobbyPhase, PlayingPhase, map_draft_phase,
+  map_initial_phase,
+}
 
 pub type GameEvent {
   GameCreated(id: String)
+  GameStarted(id: String)
 }
 
-fn initial_phase_event_handler(event: GameEvent) {
+fn initial_phase_event_handler(event: GameEvent, state: Result(State, String)) {
   case event {
     GameCreated(_) -> LobbyPhase(users: []) |> Ok
+    GameStarted(_) -> state
+  }
+}
+
+fn draft_phase_event_handler(event: GameEvent, draft: Draft) {
+  let assert Ok(game) = game.setup_game(map: map.init([]), players: [])
+  case event {
+    GameStarted(_) -> PlayingPhase(game:) |> Ok
+    _ -> draft |> DraftPhase |> Ok
   }
 }
 
@@ -15,5 +31,6 @@ pub fn event_handler(
   state: Result(State, String),
 ) -> Result(State, String) {
   state
-  |> map_initial_phase(fn() { initial_phase_event_handler(event) })
+  |> map_initial_phase(fn() { initial_phase_event_handler(event, state) })
+  |> map_draft_phase(draft_phase_event_handler(event, _))
 }

@@ -4,7 +4,6 @@ import models/common.{type Color}
 import models/draft.{
   type Draft, type DraftType, DraftCompleted, Milty, MiltyDraft,
 }
-import models/drafts/milty
 import models/faction.{type FactionIdentifier}
 import models/game.{type Position}
 import models/planetary_system.{type System}
@@ -24,7 +23,7 @@ pub fn set_faction(
   case draft {
     MiltyDraft(..) -> {
       let result =
-        milty.select_faction(
+        milty_draft.select_faction(
           draft: draft.result,
           user:,
           faction: faction_identifier,
@@ -38,7 +37,8 @@ pub fn set_faction(
 pub fn set_system(draft draft: Draft, user user: User, system system: System) {
   case draft {
     MiltyDraft(..) -> {
-      let result = milty.select_system(draft: draft.result, user:, system:)
+      let result =
+        milty_draft.select_system(draft: draft.result, user:, system:)
 
       MiltyDraft(..draft, result:)
     }
@@ -52,7 +52,8 @@ pub fn set_position(
 ) {
   case draft {
     MiltyDraft(..) -> {
-      let result = milty.select_position(draft: draft.result, user:, position:)
+      let result =
+        milty_draft.select_position(draft: draft.result, user:, position:)
 
       MiltyDraft(..draft, result:)
     }
@@ -60,15 +61,18 @@ pub fn set_position(
 }
 
 pub fn set_color(draft draft: Draft, user user: User, color color: Color) {
-  case draft {
-    MiltyDraft(..) -> milty_draft.select_color(draft:, user:, color:)
+  let result = case draft {
+    MiltyDraft(..) ->
+      milty_draft.select_color(draft: draft.result, user:, color:)
   }
+
+  MiltyDraft(..draft, result:)
   |> complete_if_needed()
 }
 
 pub fn finished(draft: Draft) {
   case draft {
-    MiltyDraft(..) -> milty_draft.finished(draft)
+    MiltyDraft(..) -> milty_draft.finished(draft.result)
   }
 }
 

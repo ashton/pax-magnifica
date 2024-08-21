@@ -1,4 +1,5 @@
 import game/draft
+import gleam/io
 import gleam/result
 import models/common.{type Color}
 import models/draft.{type Draft, type DraftType} as _
@@ -40,7 +41,8 @@ fn draft_phase_event_handler(
       draft.set_system(draft:, user:, system:) |> Ok
     PositionSelected(position, user) ->
       draft.set_position(draft:, user:, position:) |> Ok
-    ColorSelected(user, color) -> draft.set_color(draft:, user:, color:)
+    ColorSelected(user: user, color: color) ->
+      draft.set_color(draft:, user:, color:) |> Ok
   }
   |> result.map(DraftPhase)
 }
@@ -49,10 +51,10 @@ pub fn event_handler(
   event: DraftEvent,
   state: Result(State, String),
 ) -> Result(State, String) {
-  case state {
+  case io.debug(state) {
     Ok(Initial) -> Error("You need to create a game first")
-    Ok(LobbyPhase(users)) -> lobby_phase_event_handler(event, users)
-    Ok(DraftPhase(draft)) -> draft_phase_event_handler(event, draft)
+    Ok(LobbyPhase(users)) -> lobby_phase_event_handler(io.debug(event), users)
+    Ok(DraftPhase(draft)) -> draft_phase_event_handler(io.debug(event), draft)
     Ok(PlayingPhase(..)) -> Error("This game already started!")
     Ok(EndGamePhase(..)) -> Error("This game already finished!")
     error -> error

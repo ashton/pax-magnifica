@@ -5,6 +5,7 @@ import commands/player as player_commands
 import game/systems
 import gleam/io.{debug}
 import models/command
+import models/common
 import models/draft.{Milty}
 import models/faction
 import models/game.{Second, Speaker}
@@ -62,6 +63,14 @@ pub fn main() {
     )
     |> command.draft_action(issuer: "player2")
 
+  let pick_color1_command =
+    draft_commands.pick_color(User(name: "player1"), common.Blue)
+    |> command.draft_action(issuer: "player1")
+
+  let pick_color2_command =
+    draft_commands.pick_color(User(name: "player1"), common.Yellow)
+    |> command.draft_action(issuer: "player2")
+
   let _ =
     session_manager.update_game(
       session_store,
@@ -73,18 +82,6 @@ pub fn main() {
 
   let _ = session_manager.update_game(session_store, game1_actor_id, join_user2)
 
-  let _ =
-    session_manager.update_game(
-      session_store,
-      game1_actor_id,
-      start_draft_command,
-    )
-  let _ =
-    session_manager.update_game(
-      session_store,
-      game1_actor_id,
-      pick_faction1_command,
-    )
   let _ =
     session_manager.update_game(
       session_store,
@@ -127,7 +124,18 @@ pub fn main() {
       game1_actor_id,
       pick_system2_command,
     )
-
+  let _ =
+    session_manager.update_game(
+      session_store,
+      game1_actor_id,
+      pick_color1_command,
+    )
+  let _ =
+    session_manager.update_game(
+      session_store,
+      game1_actor_id,
+      pick_color2_command,
+    )
   session_manager.game_state(session_store, game1_actor_id)
   |> debug
 }
