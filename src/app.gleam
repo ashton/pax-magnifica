@@ -68,8 +68,11 @@ pub fn main() {
     |> command.draft_action(issuer: "player1")
 
   let pick_color2_command =
-    draft_commands.pick_color(User(name: "player1"), common.Yellow)
+    draft_commands.pick_color(User(name: "player2"), common.Yellow)
     |> command.draft_action(issuer: "player2")
+
+  let start_game_command =
+    game_commmands.start_game(game1_actor_id) |> command.game_action(issuer: "")
 
   let _ =
     session_manager.update_game(
@@ -136,6 +139,13 @@ pub fn main() {
       game1_actor_id,
       pick_color2_command,
     )
+  let _ =
+    session_manager.update_game(
+      session_store,
+      game1_actor_id,
+      start_game_command,
+    )
+
   session_manager.game_state(session_store, game1_actor_id)
   |> debug
 }

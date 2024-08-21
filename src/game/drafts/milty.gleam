@@ -1,20 +1,50 @@
 import game/factions
 import game/systems
 import gleam/bool
+import gleam/io
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/pair
 import models/common.{type Color}
 import models/draft.{type Draft, DraftRunning, MiltyDraft}
 import models/drafts/milty.{
   type MiltyDraftResult, type MiltySlice, MiltyDraftPool, MiltyDraftResult,
-  MiltySlice,
+  MiltySlice, MiltySliceCoordinate,
 }
 import models/faction.{type FactionIdentifier}
-import models/game.{type Position}
+import models/game.{type Game, type Position}
+import models/map
 import models/planetary_system.{type System}
 import models/player.{type User}
 
 const default_player_count = 6
+
+pub const slice_coordinates = [
+  MiltySliceCoordinate(
+    home: #(0, -3),
+    neighbors: [#(-1, 2), #(0, -2), #(1, -3), #(0, -1), #(1, -2)],
+  ),
+  MiltySliceCoordinate(
+    home: #(3, -3),
+    neighbors: [#(2, -3), #(2, -2), #(3, -2), #(1, -1), #(2, -1)],
+  ),
+  MiltySliceCoordinate(
+    home: #(3, 0),
+    neighbors: [#(3, -1), #(2, 0), #(2, 1), #(1, 0), #(1, 1)],
+  ),
+  MiltySliceCoordinate(
+    home: #(0, 3),
+    neighbors: [#(1, 2), #(0, 2), #(-1, 3), #(0, 1), #(-1, 2)],
+  ),
+  MiltySliceCoordinate(
+    home: #(-3, 3),
+    neighbors: [#(-2, 3), #(-2, 2), #(-3, 2), #(-1, 1), #(-2, 1)],
+  ),
+  MiltySliceCoordinate(
+    home: #(-3, 0),
+    neighbors: [#(-3, 1), #(-2, 0), #(-2, -1), #(-1, 0), #(-1, -1)],
+  ),
+]
 
 pub fn total_players(player_count: Option(Int)) {
   player_count |> option.unwrap(default_player_count)
@@ -184,4 +214,41 @@ pub fn finished(draft: List(MiltyDraftResult)) {
     )
     |> bool.and(draft_result.position |> option.is_some())
   })
+}
+
+pub fn new_game(draft: Draft) -> Game {
+  let players =
+    io.debug(draft.result)
+    |> list.map(fn(res) {
+      let assert Some(faction) = res.faction
+      let assert Some(color) = res.color
+      player.setup_player(user: res.user, faction: factions.make(faction))
+      |> pair.new(color, _)
+    })
+
+  let map =
+    draft.result
+    |> list.map(fn(item) { item.slice })
+    |> list.zip(slice_coordinates)
+    |> list.map(fn(item) {
+      let #(slice, slice_coordinates) = item
+      let assert Some(home_system) = slice.home
+      let #(home_col, home_row) = slice_coordinates.home
+
+      let neighbors =
+        list.map2(
+          slice.neighbors,
+          slice_coordinates.neighbors,
+          with: fn(system, coords) {
+            let #(col, row) = coords
+            map.Tile(system:, col:, row:)
+          },
+        )
+
+      [map.Tile(system: home_system, col: home_col, row: home_row), ..neighbors]
+    })
+    |> list.flatten()
+    |> map.init()
+
+  game.setup_game(players:, map:)
 }

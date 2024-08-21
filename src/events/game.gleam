@@ -1,6 +1,5 @@
-import models/draft.{type Draft}
-import models/game
-import models/map
+import game/draft
+import models/draft.{type Draft} as _
 import models/state.{
   type State, DraftPhase, LobbyPhase, PlayingPhase, map_draft_phase,
   map_initial_phase,
@@ -19,9 +18,8 @@ fn initial_phase_event_handler(event: GameEvent, state: Result(State, String)) {
 }
 
 fn draft_phase_event_handler(event: GameEvent, draft: Draft) {
-  let assert Ok(game) = game.setup_game(map: map.init([]), players: [])
   case event {
-    GameStarted(_) -> PlayingPhase(game:) |> Ok
+    GameStarted(_) -> draft |> draft.new_game() |> PlayingPhase |> Ok
     _ -> draft |> DraftPhase |> Ok
   }
 }

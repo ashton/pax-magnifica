@@ -9,6 +9,10 @@ pub type MiltySlice {
   MiltySlice(home: Option(System), neighbors: List(System))
 }
 
+pub type MiltySliceCoordinate {
+  MiltySliceCoordinate(home: #(Int, Int), neighbors: List(#(Int, Int)))
+}
+
 pub type MiltyDraftPool {
   MiltyDraftPool(
     available_factions: List(FactionIdentifier),

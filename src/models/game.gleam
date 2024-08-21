@@ -50,26 +50,21 @@ pub fn default() {
   })
 }
 
-pub fn setup_game(
-  players players: List(#(Color, Player)),
-  map map: Map,
-) -> Result(Game, String) {
+pub fn setup_game(players players: List(#(Color, Player)), map map: Map) -> Game {
+  let assert Ok(id) = uuid.generate_v4()
   let players_by_color =
     list.fold(over: players, from: dict.new(), with: fn(acc, item) {
       let #(color, player) = item
       acc |> dict.insert(color, player)
     })
 
-  uuid.generate_v4()
-  |> result.map(fn(id) {
-    Game(
-      id: id,
-      players: players_by_color,
-      map: map,
-      public_objectives: [],
-      scored_public_objectives: [],
-      scored_secret_objectives: [],
-      elected_laws: [],
-    )
-  })
+  Game(
+    id: id,
+    players: players_by_color,
+    map: map,
+    public_objectives: [],
+    scored_public_objectives: [],
+    scored_secret_objectives: [],
+    elected_laws: [],
+  )
 }

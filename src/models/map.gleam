@@ -1,7 +1,7 @@
 import models/planetary_system.{type System}
 
 pub type Tile {
-  Tile(id: Int, system: System)
+  Tile(system: System, col: Int, row: Int)
 }
 
 pub opaque type Map {

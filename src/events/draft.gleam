@@ -51,10 +51,10 @@ pub fn event_handler(
   event: DraftEvent,
   state: Result(State, String),
 ) -> Result(State, String) {
-  case io.debug(state) {
+  case state {
     Ok(Initial) -> Error("You need to create a game first")
-    Ok(LobbyPhase(users)) -> lobby_phase_event_handler(io.debug(event), users)
-    Ok(DraftPhase(draft)) -> draft_phase_event_handler(io.debug(event), draft)
+    Ok(LobbyPhase(users)) -> lobby_phase_event_handler(event, users)
+    Ok(DraftPhase(draft)) -> draft_phase_event_handler(event, draft)
     Ok(PlayingPhase(..)) -> Error("This game already started!")
     Ok(EndGamePhase(..)) -> Error("This game already finished!")
     error -> error

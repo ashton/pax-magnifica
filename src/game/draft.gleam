@@ -5,7 +5,7 @@ import models/draft.{
   type Draft, type DraftType, DraftCompleted, Milty, MiltyDraft,
 }
 import models/faction.{type FactionIdentifier}
-import models/game.{type Position}
+import models/game.{type Game, type Position}
 import models/planetary_system.{type System}
 import models/player.{type User}
 
@@ -86,5 +86,11 @@ fn complete_if_needed(draft: Draft) {
   case draft |> finished() {
     True -> draft |> complete()
     False -> draft
+  }
+}
+
+pub fn new_game(draft: Draft) -> Game {
+  case draft {
+    MiltyDraft(..) -> milty_draft.new_game(draft)
   }
 }
