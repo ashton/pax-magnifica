@@ -1,6 +1,12 @@
 import gleam/option.{type Option}
 import models/technology.{type TechnologyType}
 
+pub type SystemColorCode {
+  Red
+  Blue
+  Green
+}
+
 pub type Trait {
   Cultural
   Hazardous
@@ -37,8 +43,23 @@ pub type Planet {
 }
 
 pub type System {
-  HomeSystem(planets: List(Planet), wormholes: List(WormHole))
-  PlanetarySystem(planets: List(Planet), wormholes: List(WormHole))
-  AnomalySystem(kind: Anomaly, wormholes: List(WormHole))
-  EmptySystem
+  HomeSystem(
+    planets: List(Planet),
+    wormholes: List(WormHole),
+    color: SystemColorCode,
+  )
+
+  PlanetarySystem(
+    planets: List(Planet),
+    wormholes: List(WormHole),
+    color: SystemColorCode,
+  )
+
+  AnomalySystem(
+    kind: Anomaly,
+    wormholes: List(WormHole),
+    color: SystemColorCode,
+  )
+
+  EmptySystem(color: SystemColorCode)
 }
