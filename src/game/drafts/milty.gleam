@@ -142,25 +142,10 @@ pub fn select_faction(
   })
 }
 
-fn build_slice(
-  faction: Option(FactionIdentifier),
-  slice: MiltySlice,
-  new_system: System,
-) -> MiltySlice {
-  let home =
-    faction
-    |> option.map(factions.home_system)
-    |> option.or(slice.home, _)
-
-  let neighbors = [new_system, ..slice.neighbors]
-
-  MiltySlice(home:, neighbors:)
-}
-
-pub fn select_system(
+pub fn select_slice(
   draft draft: List(MiltyDraftResult),
   user user: User,
-  system system: System,
+  systems systems: List(System),
 ) -> List(MiltyDraftResult) {
   draft
   |> list.map(fn(result) {
@@ -168,7 +153,7 @@ pub fn select_system(
       True ->
         MiltyDraftResult(
           ..result,
-          slice: build_slice(result.faction, result.slice, system),
+          slice: MiltySlice(..result.slice, neighbors: systems),
         )
       False -> result
     }
@@ -217,8 +202,10 @@ pub fn finished(draft: List(MiltyDraftResult)) {
 }
 
 pub fn new_game(draft: Draft) -> Game {
+  let assert MiltyDraft(result:, ..) = draft
+
   let players =
-    io.debug(draft.result)
+    io.debug(result)
     |> list.map(fn(res) {
       let assert Some(faction) = res.faction
       let assert Some(color) = res.color
@@ -227,7 +214,7 @@ pub fn new_game(draft: Draft) -> Game {
     })
 
   let map =
-    draft.result
+    result
     |> list.map(fn(item) { item.slice })
     |> list.zip(slice_coordinates)
     |> list.map(fn(item) {

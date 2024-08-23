@@ -2,7 +2,8 @@ import game/drafts/milty as milty_draft
 import gleam/option.{None, Some}
 import models/common.{type Color}
 import models/draft.{
-  type Draft, type DraftType, DraftCompleted, Milty, MiltyDraft,
+  type Draft, type DraftType, DraftCompleted, Milty, MiltyDraft, Standard,
+  StandardDraft,
 }
 import models/faction.{type FactionIdentifier}
 import models/game.{type Game, type Position}
@@ -12,6 +13,7 @@ import models/player.{type User}
 pub fn setup(kind: DraftType, users: List(User)) {
   case kind {
     Milty -> milty_draft.setup(users |> Some, override_player_count: None)
+    Standard -> todo
   }
 }
 
@@ -21,27 +23,16 @@ pub fn set_faction(
   faction faction_identifier: FactionIdentifier,
 ) {
   case draft {
-    MiltyDraft(..) -> {
-      let result =
-        milty_draft.select_faction(
-          draft: draft.result,
-          user:,
-          faction: faction_identifier,
-        )
-
-      MiltyDraft(..draft, result:)
+    MiltyDraft(result:, participants:, pool:, state:) -> {
+      milty_draft.select_faction(
+        draft: result,
+        user:,
+        faction: faction_identifier,
+      )
+      |> MiltyDraft(state:, pool:, participants:, result: _)
     }
-  }
-}
 
-pub fn set_system(draft draft: Draft, user user: User, system system: System) {
-  case draft {
-    MiltyDraft(..) -> {
-      let result =
-        milty_draft.select_system(draft: draft.result, user:, system:)
-
-      MiltyDraft(..draft, result:)
-    }
+    StandardDraft(..) -> todo
   }
 }
 
@@ -51,34 +42,37 @@ pub fn set_position(
   position position: Position,
 ) {
   case draft {
-    MiltyDraft(..) -> {
-      let result =
-        milty_draft.select_position(draft: draft.result, user:, position:)
-
-      MiltyDraft(..draft, result:)
+    MiltyDraft(result:, participants:, pool:, state:) -> {
+      milty_draft.select_position(draft: result, user:, position:)
+      |> MiltyDraft(state:, pool:, participants:, result: _)
     }
+    StandardDraft(..) -> todo
   }
 }
 
 pub fn set_color(draft draft: Draft, user user: User, color color: Color) {
   let result = case draft {
-    MiltyDraft(..) ->
-      milty_draft.select_color(draft: draft.result, user:, color:)
-  }
+    MiltyDraft(result:, ..) ->
+      milty_draft.select_color(draft: result, user:, color:)
 
-  MiltyDraft(..draft, result:)
-  |> complete_if_needed()
+    StandardDraft(..) -> todo
+  }
+  // MiltyDraft(..draft, result:)
+  // |> complete_if_needed()
 }
 
 pub fn finished(draft: Draft) {
   case draft {
-    MiltyDraft(..) -> milty_draft.finished(draft.result)
+    MiltyDraft(result:, ..) -> milty_draft.finished(result)
+    StandardDraft(..) -> todo
   }
 }
 
 pub fn complete(draft: Draft) {
   case draft {
-    MiltyDraft(..) -> MiltyDraft(..draft, state: DraftCompleted)
+    MiltyDraft(result:, pool:, participants:, ..) ->
+      MiltyDraft(result:, pool:, participants:, state: DraftCompleted)
+    StandardDraft(..) -> todo
   }
 }
 
@@ -92,5 +86,6 @@ fn complete_if_needed(draft: Draft) {
 pub fn new_game(draft: Draft) -> Game {
   case draft {
     MiltyDraft(..) -> milty_draft.new_game(draft)
+    StandardDraft(..) -> todo
   }
 }

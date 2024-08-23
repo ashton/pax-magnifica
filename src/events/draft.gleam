@@ -1,11 +1,8 @@
+import events/drafts/milty.{type MiltyDraftEvent}
+import events/drafts/standard.{type StandardDraftEvent}
 import game/draft
-import gleam/io
 import gleam/result
-import models/common.{type Color}
 import models/draft.{type Draft, type DraftType} as _
-import models/faction.{type FactionIdentifier}
-import models/game.{type Position}
-import models/planetary_system.{type System}
 import models/player.{type User}
 import models/state.{
   type State, DraftPhase, EndGamePhase, Initial, LobbyPhase, PlayingPhase,
@@ -13,10 +10,8 @@ import models/state.{
 
 pub type DraftEvent {
   DraftInitiated(kind: DraftType)
-  FactionSelected(faction: FactionIdentifier, user: User)
-  SystemSelected(system: System, user: User)
-  PositionSelected(position: Position, user: User)
-  ColorSelected(color: Color, user: User)
+  MiltyDraftEvent(MiltyDraftEvent)
+  StandardDraftEvent(StandardDraftEvent)
 }
 
 fn lobby_phase_event_handler(
@@ -35,14 +30,9 @@ fn draft_phase_event_handler(
 ) -> Result(State, String) {
   case event {
     DraftInitiated(..) -> Error("Draft was alredy initiated!")
-    FactionSelected(faction, user) ->
-      draft.set_faction(draft:, user:, faction:) |> Ok
-    SystemSelected(system, user) ->
-      draft.set_system(draft:, user:, system:) |> Ok
-    PositionSelected(position, user) ->
-      draft.set_position(draft:, user:, position:) |> Ok
-    ColorSelected(user: user, color: color) ->
-      draft.set_color(draft:, user:, color:) |> Ok
+    MiltyDraftEvent(milty_event) -> milty.event_handler(milty_event, draft)
+    StandardDraftEvent(standard_event) ->
+      standard.event_handler(standard_event, draft)
   }
   |> result.map(DraftPhase)
 }
