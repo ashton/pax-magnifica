@@ -2,7 +2,7 @@ import birl.{type Time, now}
 import commands/draft.{type DraftCommand, handle_draft_command}
 import commands/game.{type GameCommand, handle_game_command}
 import commands/player.{type PlayerCommand, handle_player_command}
-import models/event.{type Event}
+import models/event.{type Event, NoSource, draft_event, game_event, player_event}
 
 pub opaque type CommandAction {
   GameAction(GameCommand)
@@ -32,8 +32,11 @@ pub fn draft_action(action: DraftCommand, issuer issuer: String) -> Command {
 
 pub fn handle_command(command: Command) -> Event {
   case command.action {
-    GameAction(game_action) -> handle_game_command(game_action)
-    PlayerAction(player_action) -> handle_player_command(player_action)
-    DraftAction(draft_action) -> handle_draft_command(draft_action)
+    GameAction(game_action) ->
+      handle_game_command(game_action) |> game_event(NoSource)
+    PlayerAction(player_action) ->
+      handle_player_command(player_action) |> player_event(NoSource)
+    DraftAction(draft_action) ->
+      handle_draft_command(draft_action) |> draft_event()
   }
 }

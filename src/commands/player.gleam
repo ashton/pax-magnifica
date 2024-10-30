@@ -1,5 +1,4 @@
-import events/player.{UserJoined} as _
-import models/event.{type Event, NoSource}
+import events/player.{type PlayerEvent, UserJoined} as _
 import models/player.{type User}
 
 pub opaque type PlayerCommand {
@@ -10,8 +9,8 @@ pub fn join_lobby(user: User) -> PlayerCommand {
   JoinLobby(user)
 }
 
-pub fn handle_player_command(command: PlayerCommand) -> Event {
+pub fn handle_player_command(command: PlayerCommand) -> PlayerEvent {
   case command {
-    JoinLobby(user) -> UserJoined(user) |> event.player_event(NoSource)
+    JoinLobby(user) -> UserJoined(user)
   }
 }
