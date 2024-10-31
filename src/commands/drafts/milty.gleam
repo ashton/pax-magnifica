@@ -1,5 +1,7 @@
+import events/draft
 import events/drafts/milty.{
-  ColorSelected, FactionSelected, PositionSelected, SliceSelected,
+  type MiltyDraftEvent, ColorSelected, FactionSelected, PositionSelected,
+  SliceSelected,
 }
 import models/common.{type Color}
 import models/faction.{type FactionIdentifier}
@@ -30,7 +32,7 @@ pub fn pick_slice(user user: User, slice slice: List(System)) {
   PickSlice(user:, slice:)
 }
 
-pub fn handle_milty_command(command: MiltyDraftCommand) {
+pub fn handle_milty_command(command: MiltyDraftCommand) -> MiltyDraftEvent {
   case command {
     PickFaction(user:, faction:) -> FactionSelected(user:, faction:)
     PickColor(user:, color:) -> ColorSelected(user:, color:)
