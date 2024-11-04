@@ -15,19 +15,23 @@ pub opaque type StandardDraftCommand {
   PlaceSystem(user: User, system: System, coords: #(Int, Int))
 }
 
-pub fn set_speaker(user: User) {
+pub fn set_speaker(user user: User) {
   SetSpeaker(user:)
 }
 
-pub fn pick_faction(user: User, faction: FactionIdentifier) {
+pub fn pick_faction(user user: User, faction faction: FactionIdentifier) {
   PickFaction(user:, faction:)
 }
 
-pub fn pick_color(user: User, color: Color) {
+pub fn pick_color(user user: User, color color: Color) {
   PickColor(user:, color:)
 }
 
-pub fn place_system(user: User, system: System, coords: #(Int, Int)) {
+pub fn place_system(
+  user user: User,
+  system system: System,
+  coords coords: #(Int, Int),
+) {
   PlaceSystem(user:, system:, coords:)
 }
 

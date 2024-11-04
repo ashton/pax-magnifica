@@ -1,10 +1,13 @@
 import commands/drafts/milty.{type MiltyDraftCommand, handle_milty_command}
+
 import commands/drafts/standard.{
   type StandardDraftCommand, handle_standard_command,
 }
+
 import events/draft.{
   type DraftEvent, DraftInitiated, MiltyDraftEvent, StandardDraftEvent,
 } as _
+
 import models/draft.{type DraftType}
 
 pub opaque type DraftCommand {
@@ -13,7 +16,7 @@ pub opaque type DraftCommand {
   StandardDraftCommand(StandardDraftCommand)
 }
 
-pub fn prepare_draft(kind: DraftType) {
+pub fn prepare_draft(kind: DraftType) -> DraftCommand {
   PrepareDraft(kind)
 }
 
