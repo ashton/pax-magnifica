@@ -1,15 +1,9 @@
 import core/models/common.{type Color}
 import core/models/faction.{type FactionIdentifier}
-import core/models/game.{type Position}
-import core/models/planetary_system.{type System}
 import core/models/player.{type User}
-import core/models/state.{
-  type State, DraftPhase, EndGamePhase, Initial, LobbyPhase, PlayingPhase,
-}
 import draft/engine/standard as std_draft
 import draft/models/draft.{type Draft, StandardDraft} as _
 import draft/models/standard.{type SystemDraft}
-import gleam/result
 
 pub type StandardDraftEvent {
   FactionSelected(faction: FactionIdentifier, user: User)
@@ -20,9 +14,9 @@ pub type StandardDraftEvent {
 
 pub fn event_handler(
   event: StandardDraftEvent,
-  draft: Draft,
+  draft: Result(Draft, String),
 ) -> Result(Draft, String) {
-  let assert StandardDraft(result:, pool:, participants:, state:) = draft
+  let assert Ok(StandardDraft(result:, pool:, participants:, state:)) = draft
 
   let result = case event {
     FactionSelected(faction, user) ->

@@ -8,21 +8,22 @@ import draft/events/draft.{
   type DraftEvent, DraftInitiated, MiltyDraftEvent, StandardDraftEvent,
 } as _
 
+import core/models/player.{type User}
 import draft/models/draft.{type DraftType}
 
 pub opaque type DraftCommand {
-  PrepareDraft(DraftType)
+  PrepareDraft(DraftType, List(User))
   MiltyDraftCommand(MiltyDraftCommand)
   StandardDraftCommand(StandardDraftCommand)
 }
 
-pub fn prepare_draft(kind: DraftType) -> DraftCommand {
-  PrepareDraft(kind)
+pub fn prepare_draft(kind: DraftType, users: List(User)) -> DraftCommand {
+  PrepareDraft(kind, users)
 }
 
 pub fn handle_draft_command(command: DraftCommand) -> DraftEvent {
   case command {
-    PrepareDraft(kind) -> DraftInitiated(kind:)
+    PrepareDraft(kind, users) -> DraftInitiated(kind:, users:)
     MiltyDraftCommand(milty_command) ->
       handle_milty_command(milty_command) |> MiltyDraftEvent
     StandardDraftCommand(standard_command) ->

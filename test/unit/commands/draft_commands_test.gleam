@@ -9,13 +9,13 @@ pub fn main() {
 }
 
 pub fn handle_prepare_standard_draft_test() {
-  commands.prepare_draft(Standard)
+  commands.prepare_draft(Standard, [])
   |> commands.handle_draft_command()
-  |> should.equal(events.DraftInitiated(kind: Standard))
+  |> should.equal(events.DraftInitiated(kind: Standard, users: []))
 }
 
 pub fn handle_prepare_milty_draft_test() {
-  commands.prepare_draft(Milty)
+  commands.prepare_draft(Milty, [])
   |> commands.handle_draft_command()
-  |> should.equal(events.DraftInitiated(kind: Milty))
+  |> should.equal(events.DraftInitiated(kind: Milty, users: []))
 }

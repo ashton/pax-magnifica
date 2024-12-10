@@ -1,6 +1,6 @@
 import core/models/player.{type User}
 import core/models/state.{
-  type State, DraftPhase, EndGamePhase, Initial, LobbyPhase, PlayingPhase,
+  type State, EndGamePhase, Initial, LobbyPhase, PlayingPhase,
 }
 
 pub type PlayerEvent {
@@ -37,7 +37,6 @@ pub fn event_handler(
   case state {
     Ok(Initial) -> initial_state_handler()
     Ok(LobbyPhase(_)) -> lobby_phase_handler(event, state)
-    Ok(DraftPhase(_)) -> draft_phase_handler(event, state)
     Ok(PlayingPhase(_)) -> playing_phase_handler(event, state)
     Ok(EndGamePhase(_)) -> end_game_phase_handler(event, state)
     _ -> state

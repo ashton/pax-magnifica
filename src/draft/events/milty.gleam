@@ -15,9 +15,9 @@ pub type MiltyDraftEvent {
 
 pub fn event_handler(
   event: MiltyDraftEvent,
-  draft: Draft,
+  draft: Result(Draft, String),
 ) -> Result(Draft, String) {
-  let assert MiltyDraft(result:, pool:, participants:, state:) = draft
+  let assert Ok(MiltyDraft(result:, pool:, participants:, state:)) = draft
 
   let result = case event {
     FactionSelected(faction, user) ->
