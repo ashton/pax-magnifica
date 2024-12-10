@@ -1,8 +1,8 @@
-import game/planets
-import models/planetary_system.{
+import core/models/planetary_system.{
   Alpha, AnomalySystem, AsteroidField, Beta, Blue, Delta, EmptySystem,
   GravityRift, Green, HomeSystem, Nebula, PlanetarySystem, Red, Supernova,
 }
+import game/planets
 
 pub const sol_home_system = HomeSystem(
   planets: [planets.jord],

@@ -1,8 +1,8 @@
-import commands/player as commands
-import events/player as events
+import core/models/player.{User}
+import engine/commands/player as commands
+import engine/events/player as events
 import glacier
 import glacier/should
-import models/player.{User}
 
 pub fn main() {
   glacier.main()

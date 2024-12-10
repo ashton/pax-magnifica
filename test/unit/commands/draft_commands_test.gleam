@@ -1,8 +1,8 @@
-import commands/draft as commands
-import events/draft as events
+import draft/commands/draft as commands
+import draft/events/draft as events
+import draft/models/draft.{Milty, Standard}
 import glacier
 import glacier/should
-import models/draft.{Milty, Standard}
 
 pub fn main() {
   glacier.main()

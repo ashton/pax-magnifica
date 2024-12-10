@@ -1,12 +1,12 @@
+import core/models/state.{type State}
+import engine/models/command.{type Command}
+import engine/models/event.{type Event, reduce}
 import gleam/erlang/process.{type Subject}
 import gleam/list
 import gleam/option.{None}
 import gleam/otp/actor
 import gleam/result
 import ids/uuid
-import models/command.{type Command}
-import models/event.{type Event, reduce}
-import models/state.{type State}
 
 pub type GameId =
   String

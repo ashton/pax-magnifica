@@ -1,23 +1,23 @@
+import core/models/common.{
+  type Color, Black, Blue, Green, Hit, Orange, Purple, Red, Yellow,
+}
+import core/models/faction
+import core/models/planetary_system.{type Planet, type System}
+import core/models/technology.{
+  type Technology, Biotic, Cybernetic, PreReq, Propulsion, Technology,
+  UnitUpgrade, Warfare,
+}
+import core/models/unit.{
+  type UnitAmount, CarrierAmount, CruiserAmount, DestroyerAmount,
+  DreadnoughtAmount, FighterAmount, InfantryAmount, PDSAmount, SpaceDockAmount,
+  WarSunAmount,
+}
 import game/planets
 import game/systems
 import game/technologies
 import game/units
 import gleam/list
 import gleam/option.{None, Some}
-import models/common.{
-  type Color, Black, Blue, Green, Hit, Orange, Purple, Red, Yellow,
-}
-import models/faction
-import models/planetary_system.{type Planet, type System}
-import models/technology.{
-  type Technology, Biotic, Cybernetic, PreReq, Propulsion, Technology,
-  UnitUpgrade, Warfare,
-}
-import models/unit.{
-  type UnitAmount, CarrierAmount, CruiserAmount, DestroyerAmount,
-  DreadnoughtAmount, FighterAmount, InfantryAmount, PDSAmount, SpaceDockAmount,
-  WarSunAmount,
-}
 
 fn make_faction_data(
   name name: String,

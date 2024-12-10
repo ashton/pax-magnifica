@@ -1,15 +1,11 @@
 import actors/session_manager
-import commands/draft as draft_commands
-import commands/game as game_commmands
-import commands/player as player_commands
-import game/systems
+import core/models/player.{User}
+import draft/commands/draft as draft_commands
+import draft/models/draft.{Milty}
+import engine/commands/game as game_commmands
+import engine/commands/player as player_commands
+import engine/models/command
 import gleam/io.{debug}
-import models/command
-import models/common
-import models/draft.{Milty}
-import models/faction
-import models/game.{Second, Speaker}
-import models/player.{User}
 
 pub fn main() {
   // Start the live sessions registry.

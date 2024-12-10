@@ -1,5 +1,5 @@
-import commands/game as commands
-import events/game as events
+import engine/commands/game as commands
+import engine/events/game as events
 import glacier
 import glacier/should
 

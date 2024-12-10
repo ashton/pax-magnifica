@@ -1,10 +1,10 @@
-import events/player as events
-import game/draft
+import core/models/player.{User}
+import core/models/state
+import draft/engine/draft
+import draft/models/draft.{Milty} as _
+import engine/events/player as events
 import glacier
 import glacier/should
-import models/draft.{Milty} as _
-import models/player.{User}
-import models/state
 
 pub fn main() {
   glacier.main()
@@ -18,5 +18,5 @@ pub fn build_draft_phase_state() {
 pub fn handle_user_joined_event_test() {
   events.UserJoined(User(name: "test"))
   |> events.event_handler(build_draft_phase_state())
-  |> should.equal()
+  |> should.equal(Error(""))
 }

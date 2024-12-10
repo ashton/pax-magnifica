@@ -1,7 +1,7 @@
 import actors/game_manager
 import chip
+import engine/models/command.{type Command}
 import gleam/result
-import models/command.{type Command}
 
 pub fn start() {
   chip.start()

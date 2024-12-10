@@ -1,12 +1,12 @@
-import commands/drafts/milty as commands
-import events/drafts/milty as events
+import core/models/common.{Red}
+import core/models/faction
+import core/models/game
+import core/models/player
+import draft/commands/milty as commands
+import draft/events/milty as events
 import game/systems
 import glacier
 import glacier/should
-import models/common.{Red}
-import models/faction
-import models/game
-import models/player
 
 pub fn main() {
   glacier.main()

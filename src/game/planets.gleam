@@ -1,8 +1,8 @@
-import gleam/option.{None, Some}
-import models/planetary_system.{
+import core/models/planetary_system.{
   Cultural, Hazardous, Industrial, Planet, TechSpecialty,
 }
-import models/technology.{Biotic, Cybernetic, Propulsion, Warfare}
+import core/models/technology.{Biotic, Cybernetic, Propulsion, Warfare}
+import gleam/option.{None, Some}
 
 pub const triplezero = Planet(
   name: "[0.0.0]",

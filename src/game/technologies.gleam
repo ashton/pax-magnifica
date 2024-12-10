@@ -1,12 +1,12 @@
-import models/technology.{
+import core/models/technology.{
   type Technology, Biotic, Cybernetic, PreReq, Propulsion, Technology,
   UnitUpgrade, Warfare,
 }
 
+import core/models/common.{Hit}
+import core/models/unit
 import gleam/list
 import gleam/option.{None, Some}
-import models/common.{Hit}
-import models/unit
 
 pub const neural_motivator = Technology(
   name: "Neural Motivator",

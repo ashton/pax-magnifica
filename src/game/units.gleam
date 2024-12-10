@@ -1,6 +1,6 @@
+import core/models/common.{type Hit, Hit}
+import core/models/unit
 import gleam/option.{type Option, None, Some}
-import models/common.{type Hit, Hit}
-import models/unit
 import utils/option_utils.{or}
 
 pub fn make_fighter(
