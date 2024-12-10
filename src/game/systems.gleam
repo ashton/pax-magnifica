@@ -234,12 +234,6 @@ pub const planetary_system_19 = PlanetarySystem(
 
 pub const planetary_system_20 = PlanetarySystem(
   color: Blue,
-  planets: [planets.arinam, planets.meer],
-  wormholes: [],
-)
-
-pub const planetary_system_21 = PlanetarySystem(
-  color: Blue,
   planets: [planets.abyz, planets.fria],
   wormholes: [],
 )
@@ -313,7 +307,6 @@ pub const planetary_systems = [
   planetary_system_12, planetary_system_13, planetary_system_14,
   planetary_system_15, planetary_system_16, planetary_system_17,
   planetary_system_18, planetary_system_19, planetary_system_20,
-  planetary_system_21,
 ]
 
 pub const blue_systems = planetary_systems
@@ -347,7 +340,7 @@ pub const all_systems = [
   planetary_system_12, planetary_system_13, planetary_system_14,
   planetary_system_15, planetary_system_16, planetary_system_17,
   planetary_system_18, planetary_system_19, planetary_system_20,
-  planetary_system_21, wormhole_system_1, wormhole_system_2, anomaly_system_1,
-  anomaly_system_2, anomaly_system_3, anomaly_system_4, anomaly_system_5,
-  empty_system_1, empty_system_2, empty_system_3, empty_system_4, empty_system_5,
+  wormhole_system_1, wormhole_system_2, anomaly_system_1, anomaly_system_2,
+  anomaly_system_3, anomaly_system_4, anomaly_system_5, empty_system_1,
+  empty_system_2, empty_system_3, empty_system_4, empty_system_5,
 ]
