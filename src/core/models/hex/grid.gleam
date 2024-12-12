@@ -70,9 +70,9 @@ pub fn rings(grid: HexGrid) -> List(HexGridRing) {
 pub fn to_dict(grid: HexGrid) {
   grid
   |> rings()
-  |> list.fold(from: dict.new(), with: fn(acc, ring) {
-    let ring_number = ring |> ring.number()
-    let coordinates = ring |> ring.coordinates()
+  |> list.fold(from: dict.new(), with: fn(acc, current_ring) {
+    let ring_number = current_ring |> ring.number()
+    let coordinates = current_ring |> ring.coordinates()
 
     acc
     |> dict.insert(
