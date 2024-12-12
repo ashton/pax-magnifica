@@ -1,7 +1,8 @@
 import core/models/planetary_system.{type System}
 import game/systems
 import gleam/dict
-import gleam/option.{type Option}
+import gleam/int
+import gleam/result
 
 const tiles: List(#(Int, System)) = [
   #(1, systems.sol_home_system), #(2, systems.mentak_home_system),
@@ -32,9 +33,11 @@ const tiles: List(#(Int, System)) = [
   #(51, systems.creuss_home_system),
 ]
 
-pub fn get_system_from_tile_number(tile_number: Int) -> Option(System) {
+pub fn get_system_from_tile_number(tile_number: Int) -> Result(System, String) {
   tiles
   |> dict.from_list()
   |> dict.get(tile_number)
-  |> option.from_result()
+  |> result.replace_error(
+    "Unable to find tile numbered: " <> tile_number |> int.to_string(),
+  )
 }
