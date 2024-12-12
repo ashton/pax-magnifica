@@ -1,6 +1,7 @@
 import core/models/common.{type Color}
 import core/models/faction.{type FactionIdentifier}
 import core/models/game.{type Game, type Position}
+import core/models/hex/coordinate
 import core/models/map
 import core/models/planetary_system.{type System}
 import core/models/player.{type User}
@@ -227,12 +228,17 @@ pub fn new_game(draft: Draft) -> Game {
           slice.neighbors,
           slice_coordinates.neighbors,
           with: fn(system, coords) {
-            let #(col, row) = coords
-            map.Tile(system:, col:, row:)
+            map.Tile(system:, coordinates: coords |> coordinate.from_pair())
           },
         )
 
-      [map.Tile(system: home_system, col: home_col, row: home_row), ..neighbors]
+      [
+        map.Tile(
+          system: home_system,
+          coordinates: coordinate.new(home_col, home_row),
+        ),
+        ..neighbors
+      ]
     })
     |> list.flatten()
     |> map.init()
