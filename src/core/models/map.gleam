@@ -1,6 +1,7 @@
 import core/models/hex/coordinate.{type Coordinate}
 import core/models/hex/grid.{type HexGrid}
 import core/models/planetary_system.{type System}
+import gleam/list
 import gleam/option.{type Option, None}
 
 pub type Tile {
@@ -46,6 +47,22 @@ pub fn update_map_tiles(
   case map {
     Map(tiles) -> Map(tiles_updater(tiles))
     _ -> panic as "Impossible to update map tiles, Map id not complete."
+  }
+}
+
+pub fn complete(map: Map) -> Result(Map, String) {
+  case map {
+    Drafting(tiles, grid) -> {
+      case
+        tiles |> list.length()
+        == grid |> option.map(grid.length) |> option.unwrap(-1)
+      {
+        True -> Map(tiles)
+        False -> map
+      }
+      |> Ok()
+    }
+    _ -> Error("Map is already completed")
   }
 }
 
