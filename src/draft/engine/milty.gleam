@@ -241,7 +241,7 @@ pub fn new_game(draft: Draft) -> Game {
       ]
     })
     |> list.flatten()
-    |> map.init()
+    |> map.new()
 
   game.setup_game(players:, map:)
 }

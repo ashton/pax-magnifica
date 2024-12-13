@@ -36,7 +36,7 @@ fn build_map(systems: List(System), coordinates: List(Coordinate)) -> Map {
   list.map2(systems, coordinates, with: fn(system, coordinates) {
     map.Tile(system:, coordinates:)
   })
-  |> map.init()
+  |> map.new()
 }
 
 fn validate_map_data(

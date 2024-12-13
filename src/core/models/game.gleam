@@ -5,7 +5,7 @@ import core/models/objective.{type Objective}
 import core/models/player.{type Player}
 import gleam/dict.{type Dict}
 import gleam/list
-import gleam/result
+import gleam/option.{None}
 import ids/uuid
 
 pub type Score {
@@ -36,18 +36,16 @@ pub type Game {
 }
 
 pub fn default() {
-  uuid.generate_v4()
-  |> result.map(fn(id) {
-    Game(
-      id: id,
-      players: dict.new(),
-      map: map.default(),
-      public_objectives: [],
-      scored_public_objectives: [],
-      scored_secret_objectives: [],
-      elected_laws: [],
-    )
-  })
+  let assert Ok(id) = uuid.generate_v4()
+  Game(
+    id: id,
+    players: dict.new(),
+    map: map.default(),
+    public_objectives: [],
+    scored_public_objectives: [],
+    scored_secret_objectives: [],
+    elected_laws: [],
+  )
 }
 
 pub fn setup_game(players players: List(#(Color, Player)), map map: Map) -> Game {
@@ -67,4 +65,8 @@ pub fn setup_game(players players: List(#(Color, Player)), map map: Map) -> Game
     scored_secret_objectives: [],
     elected_laws: [],
   )
+}
+
+pub fn update_map(game: Game, map: Map) {
+  Game(..game, map:)
 }

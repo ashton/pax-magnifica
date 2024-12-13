@@ -1,19 +1,28 @@
 import core/models/hex/grid
-import engine/map/commands.{type MapCommand, CreateMapGrid}
+import engine/map/aggregate
+import engine/map/commands.{type MapCommand, CreateMapGrid, SetTile}
 import engine/map/events.{type MapEvent}
+import gleam/list
 import gleam/result
 import utils/uuid
 
-pub fn process(command: MapCommand) -> Result(List(MapEvent), String) {
+pub fn validate(command: MapCommand) -> Result(MapCommand, String) {
+  aggregate.validate_command(command)
+}
+
+pub fn process(command: MapCommand) -> List(MapEvent) {
   case command {
-    CreateMapGrid(ring_amount) -> {
-      let event = {
-        use grid <- result.map(grid.new(ring_amount))
-        events.map_created(uuid.new(), grid)
+    CreateMapGrid(player_count) -> {
+      let assert Ok(event) = {
+        use grid <- result.map(grid.new(player_count))
+        events.grid_defined(uuid.new(), grid)
       }
 
-      [event] |> result.all()
+      event |> list.wrap()
     }
-    _ -> Ok([])
+
+    SetTile(game, system, coordinates) -> {
+      events.tile_set(game, system, coordinates) |> list.wrap()
+    }
   }
 }

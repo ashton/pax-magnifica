@@ -1,49 +1,36 @@
-import core/models/game.{type Game}
+import core/models/map.{type Map}
 import core/models/player.{type Player, type User}
+
+pub type GameState {
+  GameState(id: String, map: Map)
+}
 
 pub type State {
   Initial
   LobbyPhase(users: List(User))
-  PlayingPhase(game: Game)
+  PlayingPhase(game: GameState)
   EndGamePhase(winner: Player)
 }
 
-pub fn map_initial_phase(
-  state: Result(State, String),
-  mapper: fn() -> Result(State, String),
-) {
+pub fn update_playing_phase(
+  state: State,
+  game_updater: fn(GameState) -> GameState,
+) -> State {
   case state {
-    Ok(Initial) -> mapper()
-    _ -> state
+    PlayingPhase(game: current_game) ->
+      PlayingPhase(game: game_updater(current_game))
+    _ -> panic as "Unable to update state: Not in playing phase"
   }
 }
 
-pub fn map_lobby_phase(
-  state: Result(State, String),
-  mapper: fn(List(User)) -> Result(State, String),
-) {
-  case state {
-    Ok(LobbyPhase(users)) -> mapper(users)
-    _ -> state
-  }
+pub fn update_game_id(game_state: GameState, id_updater: fn(String) -> String) {
+  let GameState(id: current_id, ..) = game_state
+
+  GameState(..game_state, id: id_updater(current_id))
 }
 
-pub fn map_playing_phase(
-  state: Result(State, String),
-  mapper: fn(Game) -> Result(State, String),
-) {
-  case state {
-    Ok(PlayingPhase(game)) -> mapper(game)
-    _ -> state
-  }
-}
+pub fn update_game_map(game_state: GameState, map_updater: fn(Map) -> Map) {
+  let GameState(map: current_map, ..) = game_state
 
-pub fn map_end_game_phase(
-  state: Result(State, String),
-  mapper: fn(Player) -> Result(State, String),
-) {
-  case state {
-    Ok(EndGamePhase(winner)) -> mapper(winner)
-    _ -> state
-  }
+  GameState(..game_state, map: map_updater(current_map))
 }

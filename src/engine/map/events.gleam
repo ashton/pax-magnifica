@@ -1,12 +1,22 @@
 import core/models/hex/coordinate.{type Coordinate}
 import core/models/hex/grid.{type HexGrid}
+import core/models/map.{type Map}
 import core/models/planetary_system.{type System}
 
 pub type MapEvent {
-  MapCreated(id: String, grid: HexGrid)
-  TileSet(map: String, system: System, coordinates: Coordinate)
+  GridDefined(game: String, grid: HexGrid)
+  MapCreated(game: String, map: Map)
+  TileSet(game: String, system: System, coordinates: Coordinate)
 }
 
-pub fn map_created(id: String, grid: HexGrid) {
-  MapCreated(id:, grid:)
+pub fn grid_defined(game: String, grid: grid.HexGrid) {
+  GridDefined(game:, grid:)
+}
+
+pub fn tile_set(game: String, system: System, coordinates: Coordinate) {
+  TileSet(game:, system:, coordinates:)
+}
+
+pub fn map_created(game: String, map: Map) {
+  MapCreated(game:, map:)
 }
