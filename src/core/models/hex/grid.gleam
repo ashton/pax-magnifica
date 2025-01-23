@@ -1,56 +1,24 @@
-import core/models/hex/coordinate
+import core/models/hex/hex
 import core/models/hex/ring.{type HexGridRing}
-import gleam/dict
+import gleam/dict.{type Dict}
 import gleam/list
 import gleam/option.{type Option}
+import gleam/result
 
 pub opaque type HexGrid {
   HexGrid(List(HexGridRing))
 }
 
-const center_pairs = [#(0, 0)]
-
-const first_ring_pairs = [
-  #(0, -1), #(1, -1), #(1, 0), #(0, 1), #(-1, 1), #(-1, 0),
-]
-
-const second_ring_pairs = [
-  #(0, -2), #(1, -2), #(2, -2), #(2, -1), #(2, 0), #(1, 1), #(0, 2), #(-1, 2),
-  #(-2, 2), #(-2, 1), #(-2, 0), #(-1, -1),
-]
-
-const third_ring_pairs = [
-  #(0, -3), #(1, -3), #(2, -3), #(3, -3), #(3, -2), #(3, -1), #(3, 0), #(2, 1),
-  #(1, 2), #(0, 3), #(-1, 3), #(-2, 3), #(-3, 3), #(-3, 2), #(-3, 1), #(-3, 0),
-  #(-2, -1), #(-1, -2),
-]
-
-const fourth_ring_pairs = [
-  #(0, -4), #(1, -4), #(2, -4), #(3, -4), #(4, -4), #(4, -3), #(4, -2), #(4, -1),
-  #(4, 0), #(3, 1), #(2, 2), #(1, 3), #(0, 4), #(-1, 4), #(-2, 4), #(-3, 4),
-  #(-4, 4), #(-4, 3), #(-4, 2), #(-4, 1), #(-4, 0), #(-3, -1), #(-2, -2),
-  #(-1, -3),
-]
-
-fn build_grid(ring_amount: Int) -> HexGrid {
-  [center_pairs]
-  |> list.append([first_ring_pairs])
-  |> list.append([second_ring_pairs])
-  |> list.append([third_ring_pairs])
-  |> list.append([fourth_ring_pairs])
-  |> list.take(ring_amount + 1)
-  |> list.index_map(with: fn(coords, index) {
-    ring.new(
-      number: index,
-      coordinates: coords |> list.map(coordinate.from_pair),
-    )
-  })
-  |> HexGrid
+fn build_grid(radius: Int) -> Result(HexGrid, String) {
+  list.range(0, radius)
+  |> list.map(ring.create)
+  |> result.all()
+  |> result.map(HexGrid)
 }
 
-pub fn new(ring_amount: Int) -> Result(HexGrid, String) {
-  case ring_amount {
-    0 | 1 | 2 | 3 | 4 -> build_grid(ring_amount) |> Ok
+pub fn new(radius radius: Int) -> Result(HexGrid, String) {
+  case radius {
+    0 | 1 | 2 | 3 | 4 -> build_grid(radius)
     _ -> Error("Invalid amount of rings. It should be >= 0 and <= 4")
   }
 }
@@ -67,27 +35,21 @@ pub fn rings(grid: HexGrid) -> List(HexGridRing) {
   grid_rings
 }
 
-pub fn to_dict(grid: HexGrid) {
-  grid
-  |> rings()
-  |> list.fold(from: dict.new(), with: fn(acc, current_ring) {
-    let ring_number = current_ring |> ring.number()
-    let coordinates = current_ring |> ring.coordinates()
+pub fn to_dict(grid: HexGrid) -> Dict(#(Int, Int), hex.Hex) {
+  let HexGrid(grid_rings) = grid
 
-    acc
-    |> dict.insert(
-      for: ring_number,
-      insert: coordinates |> list.map(coordinate.to_pair),
-    )
+  grid_rings
+  |> list.map(ring.items)
+  |> list.flatten()
+  |> list.fold(from: dict.new(), with: fn(acc, item) {
+    dict.insert(acc, for: hex.to_pair(item), insert: item)
   })
 }
 
 pub fn ring(grid: HexGrid, number: Int) -> Option(HexGridRing) {
   let HexGrid(grid_rings) = grid
   grid_rings
-  |> list.find(fn(ring: HexGridRing) {
-    let ring_number = ring |> ring.number()
-    ring_number == number
-  })
-  |> option.from_result()
+  |> list.drop(number - 1)
+  |> list.first()
+  |> option.from_result
 }

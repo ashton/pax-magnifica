@@ -206,7 +206,7 @@ pub fn new_game(draft: Draft) -> Game {
   let assert MiltyDraft(result:, ..) = draft
 
   let players =
-    io.debug(result)
+    result
     |> list.map(fn(res) {
       let assert Some(faction) = res.faction
       let assert Some(color) = res.color
