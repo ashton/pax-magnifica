@@ -1,11 +1,6 @@
 import engine/map/aggregate
 import engine/map/commands
-import glacier
 import glacier/should
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn validate_create_map_grid_with_valid_params_test() {
   let command = commands.create_map_grid(player_count: 6)

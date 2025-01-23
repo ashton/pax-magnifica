@@ -1,14 +1,9 @@
 import core/models/hex/coordinate
 import core/models/map
 import game/systems
-import glacier
 import glacier/should
 
 import plugins/tts_string.{map_from_tts_string}
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn import_map_with_0_ringfrom_tts_string_test() {
   let tiles = [

@@ -5,12 +5,7 @@ import draft/commands/standard as commands
 import draft/events/standard as events
 import draft/models/standard.{SystemDraft}
 import game/systems
-import glacier
 import glacier/should
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn handle_pick_faction_command_test() {
   let user = player.User(name: "test")

@@ -5,12 +5,7 @@ import core/models/player
 import draft/commands/milty as commands
 import draft/events/milty as events
 import game/systems
-import glacier
 import glacier/should
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn handle_pick_faction_command_test() {
   let user = player.User(name: "test")

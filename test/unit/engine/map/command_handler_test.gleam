@@ -4,14 +4,9 @@ import engine/map/command_handler.{process}
 import engine/map/commands
 import engine/map/events.{GridDefined}
 import game/systems
-import glacier
 import glacier/should
 import gleam/list
 import gleam/string
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn process_create_map_grid_command_test() {
   let command = commands.create_map_grid(3)

@@ -2,13 +2,8 @@ import core/models/hex/coordinate
 import core/models/hex/grid
 import engine/map/events
 import game/systems
-import glacier
 import glacier/should
 import gleam/result
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn grid_defined_test() {
   use grid <- result.map(grid.new(3))

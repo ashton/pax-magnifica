@@ -5,13 +5,8 @@ import core/models/state.{type State, GameState, PlayingPhase}
 import engine/map/event_handler as handler
 import engine/map/events
 import game/systems
-import glacier
 import glacier/should
 import gleam/option.{None, Some}
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn grid_defined_test() {
   let state = PlayingPhase(game: GameState(id: "game_id", map: map.default()))
@@ -64,7 +59,6 @@ pub fn set_more_than_one_tile_and_map_still_drafting_test() {
   }
   |> should.equal([first_tile, expected_tile])
 }
-
 // pub fn set_tile_and_map_is_finished_test() {
 //   let assert Ok(initial_grid) = grid.new(0)
 //   let expected_tile = Tile(systems.mecatol_rex_system, coordinate.new(0, 0))

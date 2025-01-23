@@ -1,12 +1,7 @@
 import core/models/player.{User}
 import core/models/state
 import engine/events/player as events
-import glacier
 import glacier/should
-
-pub fn main() {
-  glacier.main()
-}
 
 pub fn build_initial_state() {
   state.Initial |> Ok
