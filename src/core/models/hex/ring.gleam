@@ -20,7 +20,7 @@ pub fn number(ring: HexGridRing) -> Int {
   radius(ring)
 }
 
-pub fn coordinates(ring: HexGridRing) -> List(Coordinate) {
+pub fn coordinates(ring: HexGridRing) -> List(#(Int, Int)) {
   []
 }
 

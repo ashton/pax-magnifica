@@ -1,4 +1,3 @@
-import core/models/hex/coordinate.{type Coordinate}
 import core/models/hex/grid.{type HexGrid}
 import core/models/hex/ring
 import core/models/map.{type Map}
@@ -32,7 +31,7 @@ fn get_rings_amount(
   }
 }
 
-fn build_map(systems: List(System), coordinates: List(Coordinate)) -> Map {
+fn build_map(systems: List(System), coordinates: List(#(Int, Int))) -> Map {
   list.map2(systems, coordinates, with: fn(system, coordinates) {
     map.Tile(system:, coordinates:)
   })
@@ -41,7 +40,7 @@ fn build_map(systems: List(System), coordinates: List(Coordinate)) -> Map {
 
 fn validate_map_data(
   systems: List(System),
-  coordinates: List(Coordinate),
+  coordinates: List(#(Int, Int)),
 ) -> Result(Map, String) {
   case list.length(systems) == list.length(coordinates) {
     True -> build_map(systems, coordinates) |> Ok

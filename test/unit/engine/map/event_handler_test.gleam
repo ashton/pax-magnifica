@@ -26,9 +26,8 @@ pub fn grid_defined_test() {
 pub fn set_first_tile_and_map_still_drafting_test() {
   let state = PlayingPhase(game: GameState(id: "game_id", map: map.default()))
   let expected_tile =
-    Tile(system: systems.mecatol_rex_system, coordinates: coordinate.new(0, 0))
-  let event =
-    events.tile_set("game_id", systems.mecatol_rex_system, coordinate.new(0, 0))
+    Tile(system: systems.mecatol_rex_system, coordinates: #(0, 0))
+  let event = events.tile_set("game_id", systems.mecatol_rex_system, #(0, 0))
 
   handler.apply(state, event)
   |> fn(state: State) {
@@ -41,15 +40,14 @@ pub fn set_first_tile_and_map_still_drafting_test() {
 
 pub fn set_more_than_one_tile_and_map_still_drafting_test() {
   let first_tile =
-    Tile(system: systems.planetary_system_6, coordinates: coordinate.new(0, 1))
-  let expected_tile = Tile(systems.mecatol_rex_system, coordinate.new(0, 0))
+    Tile(system: systems.planetary_system_6, coordinates: #(0, 1))
+  let expected_tile = Tile(systems.mecatol_rex_system, #(0, 0))
   let state =
     PlayingPhase(game: GameState(
       id: "game_id",
       map: map.new_drafting(Some([first_tile]), None),
     ))
-  let event =
-    events.tile_set("game_id", systems.mecatol_rex_system, coordinate.new(0, 0))
+  let event = events.tile_set("game_id", systems.mecatol_rex_system, #(0, 0))
 
   handler.apply(state, event)
   |> fn(state: State) {

@@ -1,4 +1,3 @@
-import core/models/hex/coordinate
 import core/models/hex/grid
 import engine/map/command_handler.{process}
 import engine/map/commands
@@ -22,14 +21,8 @@ pub fn process_create_map_grid_command_test() {
 }
 
 pub fn process_set_tile_command_test() {
-  let command =
-    commands.set_tile(
-      "map_id",
-      systems.mecatol_rex_system,
-      coordinate.new(0, 0),
-    )
-  let event =
-    events.tile_set("map_id", systems.mecatol_rex_system, coordinate.new(0, 0))
+  let command = commands.set_tile("map_id", systems.mecatol_rex_system, #(0, 0))
+  let event = events.tile_set("map_id", systems.mecatol_rex_system, #(0, 0))
 
   process(command)
   |> list.first()

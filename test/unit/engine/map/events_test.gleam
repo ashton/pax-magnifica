@@ -1,4 +1,3 @@
-import core/models/hex/coordinate
 import core/models/hex/grid
 import engine/map/events
 import game/systems
@@ -15,7 +14,7 @@ pub fn grid_defined_test() {
 pub fn tile_set_test() {
   let map_id = "map_id"
   let system = systems.mecatol_rex_system
-  let coordinates = coordinate.new(0, 0)
+  let coordinates = #(0, 0)
   let expectation = events.TileSet(map_id, system, coordinates)
 
   events.tile_set(map_id, system, coordinates)

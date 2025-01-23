@@ -227,16 +227,11 @@ pub fn new_game(draft: Draft) -> Game {
         list.map2(
           slice.neighbors,
           slice_coordinates.neighbors,
-          with: fn(system, coords) {
-            map.Tile(system:, coordinates: coords |> coordinate.from_pair())
-          },
+          with: fn(system, coords) { map.Tile(system:, coordinates: coords) },
         )
 
       [
-        map.Tile(
-          system: home_system,
-          coordinates: coordinate.new(home_col, home_row),
-        ),
+        map.Tile(system: home_system, coordinates: #(home_col, home_row)),
         ..neighbors
       ]
     })

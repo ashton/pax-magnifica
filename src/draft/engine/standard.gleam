@@ -1,7 +1,6 @@
 import core/models/common.{type Color}
 import core/models/faction.{type FactionIdentifier}
 import core/models/game
-import core/models/hex/coordinate
 import core/models/map
 import core/models/player.{type User}
 import draft/models/draft.{DraftRunning, StandardDraft}
@@ -108,10 +107,7 @@ pub fn place_system(
         StandardDraftResult(
           ..result,
           tiles: result.tiles
-            |> list.prepend(map.Tile(
-              system:,
-              coordinates: coordinate.new(col, row),
-            )),
+            |> list.prepend(map.Tile(system:, coordinates: #(col, row))),
         )
       False -> result
     }

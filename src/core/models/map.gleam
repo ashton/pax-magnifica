@@ -5,7 +5,7 @@ import gleam/list
 import gleam/option.{type Option, None}
 
 pub type Tile {
-  Tile(system: System, coordinates: Coordinate)
+  Tile(system: System, coordinates: #(Int, Int))
 }
 
 pub type Map {
