@@ -1,4 +1,5 @@
 import core/models/technology.{type TechnologyType}
+import core/models/unit.{type Unit}
 import gleam/option.{type Option}
 
 pub type SystemColorCode {
@@ -39,27 +40,24 @@ pub type Planet {
     influence: Int,
     trait: Option(Trait),
     specialties: List(Specialty),
+    ground_units: List(Unit),
   )
 }
 
+pub type SystemTrait {
+  MecatolRex
+  HomeSystem
+  PlanetarySystem
+  AnomalySystem(kind: Anomaly)
+  EmptySystem
+}
+
 pub type System {
-  HomeSystem(
+  System(
+    units: List(Unit),
     planets: List(Planet),
     wormholes: List(WormHole),
     color: SystemColorCode,
+    trait: SystemTrait,
   )
-
-  PlanetarySystem(
-    planets: List(Planet),
-    wormholes: List(WormHole),
-    color: SystemColorCode,
-  )
-
-  AnomalySystem(
-    kind: Anomaly,
-    wormholes: List(WormHole),
-    color: SystemColorCode,
-  )
-
-  EmptySystem(color: SystemColorCode)
 }

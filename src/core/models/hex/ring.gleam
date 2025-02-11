@@ -1,4 +1,3 @@
-import core/models/hex/coordinate.{type Coordinate}
 import core/models/hex/hex.{type Hex}
 import core/models/hex/vector
 import gleam/list
@@ -41,7 +40,7 @@ fn walk_direction(
   }
 }
 
-pub fn create(radius radius: Int) -> Result(HexGridRing, String) {
+fn build_ring(radius radius: Int) -> Result(HexGridRing, String) {
   let rotation_vectors =
     vector.vector_directions
     |> list.map(vector.scale(_, radius))
@@ -69,6 +68,24 @@ pub fn create(radius radius: Int) -> Result(HexGridRing, String) {
     |> list.map(hex.from_vector)
     |> result.all()
     |> result.map(HexGridRing(radius, _))
+  }
+}
+
+pub fn create(radius radius: Int) -> Result(HexGridRing, String) {
+  case radius {
+    0 -> {
+      hex.from_pair(#(0, 0))
+      |> result.map(list.wrap)
+      |> result.map(HexGridRing(_, radius:))
+    }
+
+    1 -> {
+      vector.vector_directions
+      |> list.map(hex.from_vector)
+      |> result.all()
+      |> result.map(HexGridRing(_, radius:))
+    }
+    _ -> build_ring(radius:)
   }
 }
 

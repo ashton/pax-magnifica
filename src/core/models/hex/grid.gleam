@@ -53,3 +53,10 @@ pub fn ring(grid: HexGrid, number: Int) -> Option(HexGridRing) {
   |> list.first()
   |> option.from_result
 }
+
+pub fn hexes(grid: HexGrid) -> List(hex.Hex) {
+  let HexGrid(grid_rings) = grid
+  grid_rings
+  |> list.map(ring.items)
+  |> list.flatten()
+}

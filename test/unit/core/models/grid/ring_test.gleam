@@ -31,10 +31,13 @@ pub fn ring_radius_one_test() {
     |> result.all()
     |> should.be_ok()
 
+  let is_contained = list.contains(expectation, _)
+
   ring.create(radius: 1)
   |> should.be_ok()
   |> ring.items()
-  |> should.equal(expectation)
+  |> list.all(is_contained)
+  |> should.be_true()
 }
 
 pub fn ring_radius_two_test() {

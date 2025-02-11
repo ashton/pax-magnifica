@@ -1,5 +1,5 @@
-import core/models/hex/coordinate
 import core/models/hex/grid
+import core/models/hex/hex
 import core/models/map.{Tile}
 import core/models/state.{type State, GameState, PlayingPhase}
 import engine/map/event_handler as handler
@@ -26,7 +26,10 @@ pub fn grid_defined_test() {
 pub fn set_first_tile_and_map_still_drafting_test() {
   let state = PlayingPhase(game: GameState(id: "game_id", map: map.default()))
   let expected_tile =
-    Tile(system: systems.mecatol_rex_system, coordinates: #(0, 0))
+    Tile(
+      system: systems.mecatol_rex_system,
+      hex: hex.from_pair(#(0, 0)) |> should.be_ok(),
+    )
   let event = events.tile_set("game_id", systems.mecatol_rex_system, #(0, 0))
 
   handler.apply(state, event)
@@ -40,12 +43,16 @@ pub fn set_first_tile_and_map_still_drafting_test() {
 
 pub fn set_more_than_one_tile_and_map_still_drafting_test() {
   let first_tile =
-    Tile(system: systems.planetary_system_6, coordinates: #(0, 1))
-  let expected_tile = Tile(systems.mecatol_rex_system, #(0, 0))
+    Tile(
+      system: systems.planetary_system_6,
+      hex: hex.from_pair(#(0, 1)) |> should.be_ok(),
+    )
+  let expected_tile =
+    Tile(systems.mecatol_rex_system, hex.from_pair(#(0, 0)) |> should.be_ok())
   let state =
     PlayingPhase(game: GameState(
       id: "game_id",
-      map: map.new_drafting(Some([first_tile]), None),
+      map: map.setup(Some([first_tile]), None),
     ))
   let event = events.tile_set("game_id", systems.mecatol_rex_system, #(0, 0))
 

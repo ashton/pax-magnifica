@@ -11,6 +11,7 @@ pub const triplezero = Planet(
   influence: 0,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const abyz = Planet(
@@ -20,6 +21,7 @@ pub const abyz = Planet(
   influence: 0,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const arc_prime = Planet(
@@ -29,6 +31,7 @@ pub const arc_prime = Planet(
   influence: 0,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const archon_ren = Planet(
@@ -38,6 +41,7 @@ pub const archon_ren = Planet(
   influence: 3,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const archon_tau = Planet(
@@ -47,6 +51,7 @@ pub const archon_tau = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const arinam = Planet(
@@ -56,6 +61,7 @@ pub const arinam = Planet(
   influence: 2,
   trait: Some(Industrial),
   specialties: [],
+  ground_units: [],
 )
 
 pub const arnor = Planet(
@@ -65,6 +71,7 @@ pub const arnor = Planet(
   influence: 1,
   trait: Some(Industrial),
   specialties: [],
+  ground_units: [],
 )
 
 pub const arretze = Planet(
@@ -74,6 +81,7 @@ pub const arretze = Planet(
   influence: 0,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const bereg = Planet(
@@ -83,6 +91,7 @@ pub const bereg = Planet(
   influence: 1,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const centauri = Planet(
@@ -92,6 +101,7 @@ pub const centauri = Planet(
   influence: 3,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const corneeq = Planet(
@@ -101,6 +111,7 @@ pub const corneeq = Planet(
   influence: 2,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const creuss = Planet(
@@ -110,6 +121,7 @@ pub const creuss = Planet(
   influence: 2,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const dal_bootha = Planet(
@@ -119,6 +131,7 @@ pub const dal_bootha = Planet(
   influence: 2,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const darien = Planet(
@@ -128,6 +141,7 @@ pub const darien = Planet(
   influence: 4,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const druaa = Planet(
@@ -137,6 +151,7 @@ pub const druaa = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const fria = Planet(
@@ -146,6 +161,7 @@ pub const fria = Planet(
   influence: 0,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const gral = Planet(
@@ -155,6 +171,7 @@ pub const gral = Planet(
   influence: 1,
   trait: Some(Industrial),
   specialties: [TechSpecialty(Propulsion)],
+  ground_units: [],
 )
 
 pub const hercant = Planet(
@@ -164,6 +181,7 @@ pub const hercant = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const jol = Planet(
@@ -173,6 +191,7 @@ pub const jol = Planet(
   influence: 2,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const jord = Planet(
@@ -182,6 +201,7 @@ pub const jord = Planet(
   influence: 2,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const kamdorn = Planet(
@@ -191,6 +211,7 @@ pub const kamdorn = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const lazar = Planet(
@@ -200,6 +221,7 @@ pub const lazar = Planet(
   influence: 0,
   trait: Some(Industrial),
   specialties: [TechSpecialty(Cybernetic)],
+  ground_units: [],
 )
 
 pub const lirta_iv = Planet(
@@ -209,6 +231,7 @@ pub const lirta_iv = Planet(
   influence: 3,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const lisis_ii = Planet(
@@ -218,6 +241,7 @@ pub const lisis_ii = Planet(
   influence: 0,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const lodor = Planet(
@@ -227,6 +251,7 @@ pub const lodor = Planet(
   influence: 1,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const lor = Planet(
@@ -236,6 +261,7 @@ pub const lor = Planet(
   influence: 2,
   trait: Some(Industrial),
   specialties: [],
+  ground_units: [],
 )
 
 pub const maaluuk = Planet(
@@ -245,6 +271,7 @@ pub const maaluuk = Planet(
   influence: 2,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const mecatol_rex = Planet(
@@ -254,6 +281,7 @@ pub const mecatol_rex = Planet(
   influence: 6,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const meer = Planet(
@@ -263,6 +291,7 @@ pub const meer = Planet(
   influence: 4,
   trait: Some(Hazardous),
   specialties: [TechSpecialty(Warfare)],
+  ground_units: [],
 )
 
 pub const mehar_xull = Planet(
@@ -272,6 +301,7 @@ pub const mehar_xull = Planet(
   influence: 4,
   trait: Some(Hazardous),
   specialties: [TechSpecialty(Warfare)],
+  ground_units: [],
 )
 
 pub const mellon = Planet(
@@ -281,6 +311,7 @@ pub const mellon = Planet(
   influence: 2,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const moll_primus = Planet(
@@ -290,6 +321,7 @@ pub const moll_primus = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const mordai_ii = Planet(
@@ -299,6 +331,7 @@ pub const mordai_ii = Planet(
   influence: 0,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const muaat = Planet(
@@ -308,6 +341,7 @@ pub const muaat = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const nar = Planet(
@@ -317,6 +351,7 @@ pub const nar = Planet(
   influence: 3,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const nestphar = Planet(
@@ -326,6 +361,7 @@ pub const nestphar = Planet(
   influence: 2,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const new_albion = Planet(
@@ -335,6 +371,7 @@ pub const new_albion = Planet(
   influence: 1,
   trait: Some(Industrial),
   specialties: [TechSpecialty(Biotic)],
+  ground_units: [],
 )
 
 pub const quann = Planet(
@@ -344,6 +381,7 @@ pub const quann = Planet(
   influence: 1,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const qucenn = Planet(
@@ -353,6 +391,7 @@ pub const qucenn = Planet(
   influence: 1,
   trait: Some(Industrial),
   specialties: [TechSpecialty(Biotic)],
+  ground_units: [],
 )
 
 pub const quinarra = Planet(
@@ -362,6 +401,7 @@ pub const quinarra = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const ragh = Planet(
@@ -371,6 +411,7 @@ pub const ragh = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const rarron = Planet(
@@ -380,6 +421,7 @@ pub const rarron = Planet(
   influence: 3,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const resculon = Planet(
@@ -389,6 +431,7 @@ pub const resculon = Planet(
   influence: 0,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const retillion = Planet(
@@ -398,6 +441,7 @@ pub const retillion = Planet(
   influence: 3,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const sakulag = Planet(
@@ -407,6 +451,7 @@ pub const sakulag = Planet(
   influence: 1,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const saudor = Planet(
@@ -416,6 +461,7 @@ pub const saudor = Planet(
   influence: 2,
   trait: Some(Industrial),
   specialties: [],
+  ground_units: [],
 )
 
 pub const shalloq = Planet(
@@ -425,6 +471,7 @@ pub const shalloq = Planet(
   influence: 2,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const starpoint = Planet(
@@ -434,6 +481,7 @@ pub const starpoint = Planet(
   influence: 1,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const tarmann = Planet(
@@ -443,6 +491,7 @@ pub const tarmann = Planet(
   influence: 1,
   trait: Some(Industrial),
   specialties: [TechSpecialty(Biotic)],
+  ground_units: [],
 )
 
 pub const tequran = Planet(
@@ -452,6 +501,7 @@ pub const tequran = Planet(
   influence: 0,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const thibah = Planet(
@@ -461,6 +511,7 @@ pub const thibah = Planet(
   influence: 1,
   trait: Some(Industrial),
   specialties: [TechSpecialty(Propulsion)],
+  ground_units: [],
 )
 
 pub const torkan = Planet(
@@ -470,6 +521,7 @@ pub const torkan = Planet(
   influence: 3,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const trenlak = Planet(
@@ -479,6 +531,7 @@ pub const trenlak = Planet(
   influence: 0,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const vefut_ii = Planet(
@@ -488,6 +541,7 @@ pub const vefut_ii = Planet(
   influence: 2,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const wellon = Planet(
@@ -497,6 +551,7 @@ pub const wellon = Planet(
   influence: 2,
   trait: Some(Industrial),
   specialties: [TechSpecialty(Cybernetic)],
+  ground_units: [],
 )
 
 pub const winnu = Planet(
@@ -506,6 +561,7 @@ pub const winnu = Planet(
   influence: 4,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const wren_terra = Planet(
@@ -515,6 +571,7 @@ pub const wren_terra = Planet(
   influence: 1,
   trait: None,
   specialties: [],
+  ground_units: [],
 )
 
 pub const xxehan = Planet(
@@ -524,6 +581,7 @@ pub const xxehan = Planet(
   influence: 1,
   trait: Some(Cultural),
   specialties: [],
+  ground_units: [],
 )
 
 pub const zohbat = Planet(
@@ -533,14 +591,67 @@ pub const zohbat = Planet(
   influence: 1,
   trait: Some(Hazardous),
   specialties: [],
+  ground_units: [],
 )
 
 pub const all = [
-  triplezero, abyz, arc_prime, archon_ren, archon_tau, arinam, arnor, arretze,
-  bereg, centauri, corneeq, creuss, dal_bootha, darien, druaa, fria, gral,
-  hercant, jol, jord, kamdorn, lazar, lirta_iv, lisis_ii, lodor, lor, maaluuk,
-  mecatol_rex, meer, mehar_xull, mellon, moll_primus, mordai_ii, muaat, nar,
-  nestphar, new_albion, quann, qucenn, quinarra, ragh, rarron, resculon,
-  retillion, sakulag, saudor, shalloq, starpoint, tarmann, tequran, thibah,
-  torkan, trenlak, vefut_ii, wellon, winnu, wren_terra, xxehan, zohbat,
+  triplezero,
+  abyz,
+  arc_prime,
+  archon_ren,
+  archon_tau,
+  arinam,
+  arnor,
+  arretze,
+  bereg,
+  centauri,
+  corneeq,
+  creuss,
+  dal_bootha,
+  darien,
+  druaa,
+  fria,
+  gral,
+  hercant,
+  jol,
+  jord,
+  kamdorn,
+  lazar,
+  lirta_iv,
+  lisis_ii,
+  lodor,
+  lor,
+  maaluuk,
+  mecatol_rex,
+  meer,
+  mehar_xull,
+  mellon,
+  moll_primus,
+  mordai_ii,
+  muaat,
+  nar,
+  nestphar,
+  new_albion,
+  quann,
+  qucenn,
+  quinarra,
+  ragh,
+  rarron,
+  resculon,
+  retillion,
+  sakulag,
+  saudor,
+  shalloq,
+  starpoint,
+  tarmann,
+  tequran,
+  thibah,
+  torkan,
+  trenlak,
+  vefut_ii,
+  wellon,
+  winnu,
+  wren_terra,
+  xxehan,
+  zohbat,
 ]
