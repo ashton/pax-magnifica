@@ -3,6 +3,7 @@ import core/models/hex/hex.{type Hex}
 import core/models/planetary_system.{type System}
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/result
 
 pub type Tile {
   Tile(system: System, hex: Hex)
@@ -45,4 +46,22 @@ pub fn default() {
 
 pub fn new(tiles: List(Tile), grid: HexGrid) {
   Map(tiles:, grid:, active_system: None)
+}
+
+pub fn add_tile(
+  map: Result(Map, String),
+  tile: Result(Tile, String),
+) -> Result(Map, String) {
+  map.map()
+  case map {
+    Drafting(tiles, _) -> Drafting(..map, tiles: list.append(tiles, [tile]))
+    _ -> panic as "Only drafting maps can have its tiles changed"
+  }
+}
+
+pub fn new_tile(
+  system: System,
+  hex_tile: Result(Hex, String),
+) -> Result(Tile, String) {
+  result.map(hex_tile, fn(hex) { Tile(system:, hex:) })
 }

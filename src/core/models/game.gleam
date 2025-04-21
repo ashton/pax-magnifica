@@ -5,7 +5,6 @@ import core/models/objective.{type Objective}
 import core/models/player.{type Player}
 import gleam/dict.{type Dict}
 import gleam/list
-import gleam/option.{None}
 import ids/uuid
 
 pub type Score {
@@ -67,6 +66,6 @@ pub fn setup_game(players players: List(#(Color, Player)), map map: Map) -> Game
   )
 }
 
-pub fn update_map(game: Game, map: Map) {
-  Game(..game, map:)
+pub fn map_game_map(game: Game, updater: fn(Map) -> Map) -> Game {
+  Game(..game, map: updater(game.map))
 }
