@@ -1,7 +1,5 @@
 import core/models/player.{type User}
-import core/models/state.{
-  type State, EndGamePhase, Initial, LobbyPhase, PlayingPhase,
-}
+import core/models/state.{type State, Active, Ended, Initial, Lobby}
 
 pub type PlayerEvent {
   UserJoined(User)
@@ -12,9 +10,9 @@ pub fn initial_state_handler() {
 }
 
 pub fn lobby_phase_handler(event, state) {
-  let assert Ok(LobbyPhase(users: current_users)) = state
+  let assert Ok(Lobby(state: current_users)) = state
   case event {
-    UserJoined(user) -> LobbyPhase(users: [user, ..current_users]) |> Ok
+    UserJoined(user) -> Lobby(state: [user, ..current_users]) |> Ok
   }
 }
 
@@ -36,9 +34,9 @@ pub fn event_handler(
 ) -> Result(State, String) {
   case state {
     Ok(Initial) -> initial_state_handler()
-    Ok(LobbyPhase(_)) -> lobby_phase_handler(event, state)
-    Ok(PlayingPhase(_)) -> playing_phase_handler(event, state)
-    Ok(EndGamePhase(_)) -> end_game_phase_handler(event, state)
+    Ok(Lobby(_)) -> lobby_phase_handler(event, state)
+    Ok(Active(_)) -> playing_phase_handler(event, state)
+    Ok(Ended(_)) -> end_game_phase_handler(event, state)
     _ -> state
   }
 }

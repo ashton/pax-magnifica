@@ -8,14 +8,18 @@ pub type MapEvent {
   TileSet(game: String, system: System, coordinates: #(Int, Int))
 }
 
-pub fn grid_defined(game: String, grid: grid.HexGrid) {
+pub fn grid_defined(game game: String, grid grid: grid.HexGrid) {
   GridDefined(game:, grid:)
 }
 
-pub fn tile_set(game: String, system: System, coordinates: #(Int, Int)) {
+pub fn tile_set(
+  game game: String,
+  system system: System,
+  coordinates coordinates: #(Int, Int),
+) {
   TileSet(game:, system:, coordinates:)
 }
 
-pub fn map_created(game: String, map: Map) {
+pub fn map_created(game game: String, map map: Map) {
   MapCreated(game:, map:)
 }

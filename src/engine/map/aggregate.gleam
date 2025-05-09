@@ -1,5 +1,5 @@
 import core/models/hex/grid.{type HexGrid}
-import engine/map/commands.{type MapCommand, CreateMapGrid, SetTile}
+import engine/map/commands.{type MapCommand, CompleteMap, CreateMapGrid, SetTile}
 import gleam/int
 import gleam/result
 
@@ -39,5 +39,7 @@ pub fn validate_command(command: MapCommand) -> Result(MapCommand, String) {
     }
 
     SetTile(..) -> Ok(command)
+
+    CompleteMap(..) -> Ok(command)
   }
 }

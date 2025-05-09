@@ -1,4 +1,4 @@
-import core/models/state.{type State, LobbyPhase}
+import core/models/state.{type State, Lobby}
 
 pub type GameEvent {
   GameCreated(id: String)
@@ -7,7 +7,7 @@ pub type GameEvent {
 
 fn initial_phase_event_handler(event: GameEvent, state: Result(State, String)) {
   case event {
-    GameCreated(_) -> LobbyPhase(users: []) |> Ok
+    GameCreated(_) -> Lobby(state: []) |> Ok
     GameStarted(_) -> state
   }
 }

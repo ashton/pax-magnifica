@@ -1,6 +1,7 @@
 import core/models/hex/grid
+import core/models/map
 import engine/map/aggregate
-import engine/map/commands.{type MapCommand, CreateMapGrid, SetTile}
+import engine/map/commands.{type MapCommand, CompleteMap, CreateMapGrid, SetTile}
 import engine/map/events.{type MapEvent}
 import gleam/list
 import gleam/result
@@ -23,6 +24,12 @@ pub fn process(command: MapCommand) -> List(MapEvent) {
 
     SetTile(game, system, coordinates) -> {
       events.tile_set(game, system, coordinates) |> list.wrap()
+    }
+
+    CompleteMap(game, grid, tiles) -> {
+      map.new(tiles, grid)
+      |> events.map_created(game, _)
+      |> list.wrap()
     }
   }
 }
