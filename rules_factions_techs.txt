@@ -1,0 +1,880 @@
+// src/rules/types.gleam
+// This module defines the universal types for the Rules Engine.
+
+// --- Core Types ---
+
+pub type Source {
+  FactionAbility(faction_id: String)
+  Technology(tech_id: String)
+  Anomaly(anomaly_type: Anomaly)
+  AgendaLaw(agenda_id: String)
+}
+
+pub type Rule {
+  Rule(
+    rule_id: String,
+    source: Source,
+    trigger: Trigger,
+    effect: Effect,
+  )
+}
+
+// --- Trigger Types ---
+// Triggers define *when* a rule should be checked by the Rules Engine.
+
+pub type Trigger {
+  // General & Economic Triggers
+  OnGameStart
+  OnTransaction
+  OnTechnologyResearch
+  OnGainControlOfPlanet(by_opponent: Bool)
+  OnUnitDestroyed(is_opponent_unit: Bool, unit_type: UnitType)
+  OnExploration(is_frontier: Bool)
+  OnRelicGained
+  PostProduction
+  OnSpendInfluence
+  OnSpendResources
+
+  // Action & Flow Triggers
+  OnActionPhaseTurnStart
+  OnStrategyCardSelection
+  OnStatusPhaseScoreObjective
+  OnSystemActivation(by_opponent: Bool)
+
+  // Movement & Board Triggers
+  ValidateMovement
+  PostMovement(into_system_with_own_units: Bool)
+
+  // Combat Triggers
+  PreCombatRound(is_attacker: Bool, is_defender: Bool)
+  PreCombatRoll(is_attacker: Bool, is_defender: Bool)
+  OnGroundCombatRoll(is_attacker: Bool, is_defender: Bool)
+  OnInvasionStart(planet_id: String)
+  PostCombat(did_win: Bool, opponent_has_commander: Bool)
+
+  // Agenda Phase Triggers
+  OnAgendaRevealed
+  OnAgendaPhaseStart
+}
+
+// --- Effect Types ---
+// Effects define *what* a rule does when its trigger is met.
+
+pub type Effect {
+  // Player Stat Modifiers
+  ModifyPlayerStat(stat: PlayerStat, modifier: Int)
+
+  // Combat Modifiers
+  ModifyCombatRoll(modifier: Int)
+  GrantCombatRolls(unit_type: UnitType, count: Int)
+  RerollDice(count: Int)
+  DestroyOpponentUnit(unit_type: UnitType, count: Int)
+  ModifySustainDamageRule(can_sustain_per_round: Bool)
+  RemoveInfantry(count: Int)
+
+  // Economic Modifiers
+  StealTradeGoods(count: Int)
+  GainTradeGoods(count: Int)
+  GainCommodities(count: Int)
+  ModifyPlanetSpend(discount: Int)
+
+  // Rule Overrides & Permissions
+  IgnorePrerequisites(tech_colors: List(TechColor))
+  IgnoreAdjacencyForTransactions
+  IgnoreAnomaly(anomaly_type: Anomaly)
+  IgnorePlacementRestriction(restriction: PlacementRestriction)
+  IgnoreMecatolRexCost
+  ModifyVotingRights(can_vote: Bool)
+  GrantPdsSpaceCannonInSystem
+  IgnorePlanetaryShield
+
+  // Action Grants
+  AddAction(action: Action)
+
+  // Unit & Production Grants
+  GrantAbilityToUnit(unit_type: UnitType, ability: UnitAbility)
+  GrantProduction(unit_type: UnitType, count: Int)
+  ModifyUnitStats(unit_type: UnitType, stats: List(UnitStatModifier))
+  PlaceUnit(unit_type: UnitType)
+  PlaceInfantry(count: Int)
+  CopyTechnology
+
+  // Special Faction Effects
+  ConvertOpponentInfantry
+  SacrificeUnitForHits(unit_type: UnitType, count: Int)
+  GainOpponentCommandToken
+  CopyFactionAbility
+  PlaceToken(token_type: TokenType)
+  CaptureOpponentUnit(unit_type: UnitType)
+}
+
+// --- Supporting Enum Types ---
+
+pub type PlayerStat {
+  FleetPool
+  CommandCounterCount
+  Initiative
+}
+
+pub type UnitType {
+  Infantry
+  Fighter
+  Destroyer
+  Cruiser
+  Dreadnought
+  WarSun
+  Carrier
+  PDS
+  SpaceDock
+  Structure // A generic type for PDS or Space Dock
+}
+
+pub type UnitAbility {
+  Bombardment
+  SustainDamage
+  Production
+  SpaceCannon
+  PlanetaryShield
+}
+
+pub type UnitStatModifier {
+  ModifyCombat(modifier: Int)
+  ModifyMove(modifier: Int)
+  ModifyCost(modifier: Int)
+  ModifyCapacity(modifier: Int)
+}
+
+pub type TechColor {
+  Green
+  Blue
+  Yellow
+  Red
+}
+
+pub type Anomaly {
+  Nebula
+  Supernova
+  AsteroidField
+}
+
+pub type PlacementRestriction {
+  SpaceDockMustBeOnPlanet
+  PDSMustBeOnPlanet
+}
+
+pub type TokenType {
+  Aetherstream
+  Sleeper
+}
+
+pub type Action {
+  // Faction Actions
+  Scheming
+  Spy
+  MunitionsReserves
+  StarForge
+  OrbitalDrop
+  PeaceAccords
+  Quash
+  Indoctrination
+  Devotion
+  ProductionBiomes
+  TemporalCommandSuite
+  Fabrication
+  // Tech Actions
+  AntimassDeflectors
+  GravityDrive
+  ExploreFrontier
+  PerformSecondAction
+  LightWaveDeflector
+  SlingRelay
+  IntegratedEconomy
+  BioStims
+  InstinctTraining
+  TransitDiodes
+  PredictiveIntelligence
+}
+```gleam
+// src/factions/rules.gleam
+// This module generates the specific rule sets for each faction.
+
+import rules/types.{
+  Action, AddAction, Anomaly, Blue, Bombardment, CaptureOpponentUnit,
+  CommandCounterCount, ConvertOpponentInfantry, CopyFactionAbility,
+  CopyTechnology, Cruiser, Devotion, Dreadnought, Effect, Fabrication,
+  FactionAbility, FleetPool, GainCommodities, GainOpponentCommandToken,
+  GainTradeGoods, GrantAbilityToUnit, GrantCombatRolls, GrantProduction, Green,
+  IgnoreAdjacencyForTransactions, IgnoreAnomaly, IgnoreMecatolRexCost,
+  IgnorePlacementRestriction, IgnorePrerequisites, Indoctrination, Infantry,
+  Initiative, ModifyCombatRoll, ModifyPlayerStat, ModifyUnitStats,
+  ModifyVotingRights, MunitionsReserves, OnActionPhaseTurnStart, OnAgendaRevealed,
+  OnAgendaPhaseStart, OnExploration, OnGainControlOfPlanet, OnGameStart,
+  OnRelicGained, OnSystemActivation, OnTechnologyResearch, OnTransaction,
+  OnUnitDestroyed, PDS, PeaceAccords, PlacementRestriction, PlayerStat,
+  PostCombat, PostMovement, PreCombatRoll, PreCombatRound, ProductionBiomes,
+  Quash, Red, RerollDice, Rule, SacrificeUnitForHits, Scheming, Source,
+  SpaceDock, SpaceDockMustBeOnPlanet, Spy, StarForge, StealTradeGoods,
+  Supernova, TemporalCommandSuite, TokenType, Trigger, UnitAbility, UnitType,
+  Yellow,
+}
+
+// --- Base Game Factions ---
+
+pub fn get_arborec_rules() -> List(Rule) {
+  [
+    Rule(
+      "arborec_mitosis",
+      FactionAbility("arborec"),
+      PostMovement(into_system_with_own_units: True),
+      GrantProduction(Infantry, 1),
+    ),
+  ]
+}
+
+pub fn get_letnev_rules() -> List(Rule) {
+  [
+    Rule(
+      "letnev_armada",
+      FactionAbility("letnev"),
+      OnGameStart,
+      ModifyPlayerStat(FleetPool, 1),
+    ),
+    Rule(
+      "letnev_munitions_reserves",
+      FactionAbility("letnev"),
+      OnActionPhaseTurnStart,
+      AddAction(MunitionsReserves),
+    ),
+  ]
+}
+
+pub fn get_saar_rules() -> List(Rule) {
+  [
+    Rule(
+      "saar_scavenge",
+      FactionAbility("saar"),
+      OnGainControlOfPlanet(by_opponent: False),
+      GainTradeGoods(1),
+    ),
+    Rule(
+      "saar_nomadic",
+      FactionAbility("saar"),
+      OnGameStart,
+      IgnorePlacementRestriction(SpaceDockMustBeOnPlanet),
+    ),
+  ]
+}
+
+pub fn get_muaat_rules() -> List(Rule) {
+  [
+    Rule(
+      "muaat_star_forge",
+      FactionAbility("muaat"),
+      OnActionPhaseTurnStart,
+      AddAction(StarForge),
+    ),
+    Rule(
+      "muaat_gashlai_physiology",
+      FactionAbility("muaat"),
+      OnGameStart,
+      IgnoreAnomaly(Supernova),
+    ),
+  ]
+}
+
+pub fn get_hacan_rules() -> List(Rule) {
+  [
+    Rule(
+      "hacan_masters_of_trade",
+      FactionAbility("hacan"),
+      OnTransaction,
+      IgnoreAdjacencyForTransactions,
+    ),
+  ]
+}
+
+pub fn get_sol_rules() -> List(Rule) {
+  [
+    Rule(
+      "sol_orbital_drop",
+      FactionAbility("sol"),
+      OnActionPhaseTurnStart,
+      AddAction(types.OrbitalDrop),
+    ),
+    Rule(
+      "sol_versatile",
+      FactionAbility("sol"),
+      OnGameStart,
+      ModifyPlayerStat(CommandCounterCount, 1),
+    ),
+  ]
+}
+
+pub fn get_creuss_rules() -> List(Rule) {
+  [] // Complex adjacency rules would need special effects
+}
+
+pub fn get_l1z1x_rules() -> List(Rule) {
+  [
+    Rule(
+      "l1z1x_harrow",
+      FactionAbility("l1z1x"),
+      OnGameStart,
+      GrantAbilityToUnit(Dreadnought, Bombardment),
+    ),
+  ]
+}
+
+pub fn get_mentak_rules() -> List(Rule) {
+  [
+    Rule(
+      "mentak_ambush",
+      FactionAbility("mentak"),
+      PreCombatRound(is_attacker: True, is_defender: True),
+      GrantCombatRolls(Cruiser, 2),
+    ),
+    Rule(
+      "mentak_pillage",
+      FactionAbility("mentak"),
+      PostCombat(did_win: True, opponent_has_commander: False), // Simplified
+      StealTradeGoods(1),
+    ),
+  ]
+}
+
+pub fn get_naalu_rules() -> List(Rule) {
+  [
+    Rule(
+      "naalu_telepathic",
+      FactionAbility("naalu"),
+      OnGameStart,
+      ModifyPlayerStat(Initiative, 0),
+    ),
+  ]
+}
+
+pub fn get_nekro_rules() -> List(Rule) {
+  [
+    Rule(
+      "nekro_galactic_threat",
+      FactionAbility("nekro"),
+      OnGameStart,
+      ModifyVotingRights(can_vote: False),
+    ),
+    Rule(
+      "nekro_technological_singularity",
+      FactionAbility("nekro"),
+      OnUnitDestroyed(is_opponent_unit: True, unit_type: Fighter), // Simplified
+      CopyTechnology,
+    ),
+  ]
+}
+
+pub fn get_sardakk_norr_rules() -> List(Rule) {
+  [
+    Rule(
+      "sardakk_unrelenting",
+      FactionAbility("sardakk_norr"),
+      PreCombatRoll(is_attacker: True, is_defender: True),
+      ModifyCombatRoll(1),
+    ),
+  ]
+}
+
+pub fn get_jol_nar_rules() -> List(Rule) {
+  [
+    Rule(
+      "jol_nar_fragile",
+      FactionAbility("jol_nar"),
+      PreCombatRoll(is_attacker: True, is_defender: True),
+      ModifyCombatRoll(-1),
+    ),
+    Rule(
+      "jol_nar_brilliant",
+      FactionAbility("jol_nar"),
+      OnTechnologyResearch,
+      IgnorePrerequisites([Green, Blue, Yellow, Red]),
+    ),
+  ]
+}
+
+pub fn get_winnu_rules() -> List(Rule) {
+  [
+    Rule(
+      "winnu_reclamation",
+      FactionAbility("winnu"),
+      OnGainControlOfPlanet(by_opponent: False),
+      IgnoreMecatolRexCost,
+    ),
+  ]
+}
+
+pub fn get_xxcha_rules() -> List(Rule) {
+  [
+    Rule(
+      "xxcha_peace_accords",
+      FactionAbility("xxcha"),
+      OnActionPhaseTurnStart,
+      AddAction(PeaceAccords),
+    ),
+    Rule(
+      "xxcha_quash",
+      FactionAbility("xxcha"),
+      OnAgendaRevealed,
+      AddAction(Quash),
+    ),
+  ]
+}
+
+pub fn get_yin_rules() -> List(Rule) {
+  [
+    Rule(
+      "yin_indoctrination",
+      FactionAbility("yin"),
+      PostCombat(did_win: True, opponent_has_commander: False),
+      AddAction(Indoctrination),
+    ),
+    Rule(
+      "yin_devotion",
+      FactionAbility("yin"),
+      PreCombatRoll(is_attacker: True, is_defender: True),
+      AddAction(Devotion),
+    ),
+  ]
+}
+
+pub fn get_yssaril_rules() -> List(Rule) {
+  [
+    Rule(
+      "yssaril_scheming",
+      FactionAbility("yssaril"),
+      OnActionPhaseTurnStart,
+      AddAction(Scheming),
+    ),
+    Rule(
+      "yssaril_spy",
+      FactionAbility("yssaril"),
+      OnActionPhaseTurnStart,
+      AddAction(Spy),
+    ),
+  ]
+}
+
+// --- Prophecy of Kings Factions ---
+
+// --- The Argent Flight ---
+pub fn get_argent_flight_rules() -> List(Rule) {
+  [
+    // Zeal: +1 to the move of your destroyers and cruisers.
+    Rule(
+      "argent_zeal",
+      FactionAbility("argent_flight"),
+      OnGameStart,
+      ModifyUnitStats(Destroyer, [types.ModifyMove(1)]),
+    ),
+    Rule(
+      "argent_zeal_cruiser", // Separate rule for clarity
+      FactionAbility("argent_flight"),
+      OnGameStart,
+      ModifyUnitStats(Cruiser, [types.ModifyMove(1)]),
+    ),
+    // Raid Formation: Your ships can move through systems with opponent's ships.
+    // This would require a more complex `IgnoreMovementRestriction` effect.
+  ]
+}
+
+// --- The Empyrean ---
+pub fn get_empyrean_rules() -> List(Rule) {
+  [
+    // Aetherstream: When you activate a system, you may place an Aetherstream token.
+    Rule(
+      "empyrean_aetherstream",
+      FactionAbility("empyrean"),
+      OnSystemActivation(by_opponent: False),
+      PlaceToken(types.Aetherstream),
+    ),
+  ]
+}
+
+// --- The Mahact Gene-Sorcerers ---
+pub fn get_mahact_rules() -> List(Rule) {
+  [
+    // Edict: At the start of the agenda phase, you may gain 1 command token from another player.
+    Rule(
+      "mahact_edict",
+      FactionAbility("mahact"),
+      OnAgendaPhaseStart,
+      GainOpponentCommandToken,
+    ),
+    // Genetic Recombination: After you win a combat against a player, if you destroyed one of their units, you may copy one of their faction abilities.
+    Rule(
+      "mahact_genetic_recombination",
+      FactionAbility("mahact"),
+      PostCombat(did_win: True, opponent_has_commander: False), // Simplified
+      CopyFactionAbility,
+    ),
+  ]
+}
+
+// --- The Naaz-Rokha Alliance ---
+pub fn get_naaz_rokha_rules() -> List(Rule) {
+  [
+    // Distant Suns: When you explore, you may explore one additional planet.
+    Rule(
+      "nra_distant_suns",
+      FactionAbility("naaz_rokha"),
+      OnExploration(is_frontier: False),
+      AddAction(types.Explore), // Simplified, would grant another exploration action
+    ),
+    // Fabrication: When you gain a relic, you may gain a technology of your choice.
+    Rule(
+      "nra_fabrication",
+      FactionAbility("naaz_rokha"),
+      OnRelicGained,
+      AddAction(Fabrication),
+    ),
+  ]
+}
+
+// --- The Nomad ---
+pub fn get_nomad_rules() -> List(Rule) {
+  [
+    // The Thundarian (Flagship): At the start of your turn, you may produce 1 unit in this system.
+    // This would be a rule attached to the flagship unit instance.
+    // Temporal Command Suite: As an action, ready 2 planets you control.
+    Rule(
+      "nomad_temporal_command_suite",
+      FactionAbility("nomad"),
+      OnActionPhaseTurnStart,
+      AddAction(TemporalCommandSuite),
+    ),
+  ]
+}
+
+// --- The Titans of Ul ---
+pub fn get_titans_of_ul_rules() -> List(Rule) {
+  [
+    // Awaken: After you explore a planet, you may place a sleeper token on it.
+    Rule(
+      "titans_awaken",
+      FactionAbility("titans_of_ul"),
+      OnExploration(is_frontier: False),
+      PlaceToken(types.Sleeper),
+    ),
+    // Production Biomes: As an action, you may spend 1 resource to place a PDS on a planet with a sleeper token.
+    Rule(
+      "titans_production_biomes",
+      FactionAbility("titans_of_ul"),
+      OnActionPhaseTurnStart,
+      AddAction(ProductionBiomes),
+    ),
+  ]
+}
+
+// --- The Vuil'Raith Cabal ---
+pub fn get_vuil_raith_cabal_rules() -> List(Rule) {
+  [
+    // Dimensional Tear: When one of your opponent's units is destroyed, you may capture it.
+    Rule(
+      "vuil_raith_dimensional_tear",
+      FactionAbility("vuil_raith"),
+      OnUnitDestroyed(is_opponent_unit: True, unit_type: Fighter), // Simplified
+      CaptureOpponentUnit(Infantry), // Simplified, would need to know unit type
+    ),
+    // Vortex: Your space docks cannot produce. Instead, you may spawn fighters from captured docks.
+    // This would be a complex override of the Production ability.
+  ]
+}
+```gleam
+// src/technologies/rules.gleam
+// This module generates the specific rule sets for technologies.
+
+import rules/types.{
+  Action, AddAction, Anomaly, BioStims, Blue, Bombardment, CaptureOpponentUnit,
+  CommandCounterCount, ConvertOpponentInfantry, CopyFactionAbility,
+  CopyTechnology, Cruiser, Devotion, Dreadnought, Effect, Fabrication,
+  FactionAbility, Fighter, FleetPool, GainCommodities, GainOpponentCommandToken,
+  GainTradeGoods, GrantAbilityToUnit, GrantCombatRolls, GrantPdsSpaceCannonInSystem,
+  GrantProduction, Green, IgnoreAdjacencyForTransactions, IgnoreAnomaly,
+  IgnoreMecatolRexCost, IgnorePlacementRestriction, IgnorePlanetaryShield,
+  IgnorePrerequisites, Indoctrination, Infantry, Initiative, InstinctTraining,
+  IntegratedEconomy, ModifyCombatRoll, ModifyPlanetSpend, ModifyPlayerStat,
+  ModifySustainDamageRule, ModifyUnitStats, MunitionsReserves,
+  OnActionPhaseTurnStart, OnAgendaRevealed, OnAgendaPhaseStart, OnExploration,
+  OnGainControlOfPlanet, OnGameStart, OnGroundCombatRoll, OnInvasionStart,
+  OnRelicGained, OnSpendInfluence, OnSpendResources, OnSystemActivation,
+  OnTechnologyResearch, OnTransaction, OnUnitDestroyed, PDS, PeaceAccords,
+  PlacementRestriction, PlayerStat, PlaceInfantry, PostCombat, PostMovement,
+  PostProduction, PredictiveIntelligence, PreCombatRoll, PreCombatRound,
+  ProductionBiomes, Quash, Red, RemoveInfantry, RerollDice, Rule,
+  SacrificeUnitForHits, Scheming, Source, SpaceDock, SpaceDockMustBeOnPlanet,
+  Spy, StarForge, StealTradeGoods, Structure, Supernova, TemporalCommandSuite,
+  Technology, TokenType, TransitDiodes, Trigger, UnitAbility, UnitType, WarSun,
+  Yellow,
+}
+
+// --- Propulsion (Blue) Technologies ---
+
+pub fn get_propulsion_tech_rules() -> List(Rule) {
+  [
+    // --- General Abilities ---
+    Rule(
+      "tech_antimass_deflectors",
+      Technology("antimass_deflectors"),
+      OnGameStart,
+      AddAction(types.AntimassDeflectors),
+    ),
+    Rule(
+      "tech_gravity_drive",
+      Technology("gravity_drive"),
+      OnSystemActivation(by_opponent: False),
+      AddAction(types.GravityDrive),
+    ),
+    Rule(
+      "tech_dark_energy_tap",
+      Technology("dark_energy_tap"),
+      OnSystemActivation(by_opponent: False),
+      AddAction(types.ExploreFrontier),
+    ),
+    Rule(
+      "tech_fleet_logistics",
+      Technology("fleet_logistics"),
+      OnActionPhaseTurnStart,
+      AddAction(types.PerformSecondAction),
+    ),
+    Rule(
+      "tech_light_wave_deflector",
+      Technology("light_wave_deflector"),
+      OnGameStart,
+      AddAction(types.LightWaveDeflector),
+    ),
+    Rule(
+      "tech_sling_relay",
+      Technology("sling_relay"),
+      OnActionPhaseTurnStart,
+      AddAction(types.SlingRelay),
+    ),
+
+    // --- Unit Upgrades ---
+    Rule(
+      "tech_carrier_2",
+      Technology("carrier_2"),
+      OnGameStart,
+      ModifyUnitStats(Carrier, [types.ModifyMove(1), types.ModifyCapacity(2)]),
+    ),
+    Rule(
+      "tech_destroyer_2",
+      Technology("destroyer_2"),
+      OnGameStart,
+      ModifyUnitStats(Destroyer, [
+        types.ModifyMove(1),
+        types.ModifyCombat(-1), // 9 -> 8
+      ]),
+    ),
+    Rule(
+      "tech_dreadnought_2",
+      Technology("dreadnought_2"),
+      OnGameStart,
+      ModifyUnitStats(Dreadnought, [types.ModifyMove(1)]),
+    ),
+    Rule(
+      "tech_dreadnought_2_sustain",
+      Technology("dreadnought_2"),
+      OnGameStart,
+      GrantAbilityToUnit(Dreadnought, types.SustainDamage),
+    ),
+  ]
+}
+
+// --- Warfare (Red) Technologies ---
+
+pub fn get_warfare_tech_rules() -> List(Rule) {
+  [
+    // --- General Abilities ---
+    Rule(
+      "tech_magen_defense_grid",
+      Technology("magen_defense_grid"),
+      OnSystemActivation(by_opponent: False),
+      GrantPdsSpaceCannonInSystem,
+    ),
+    Rule(
+      "tech_duranium_armor",
+      Technology("duranium_armor"),
+      OnGameStart,
+      ModifySustainDamageRule(can_sustain_per_round: True),
+    ),
+    Rule(
+      "tech_assault_cannon",
+      Technology("assault_cannon"),
+      PreCombatRound(is_attacker: True, is_defender: True),
+      DestroyOpponentUnit(Fighter, 1), // Simplified
+    ),
+    Rule(
+      "tech_self_assembly_routines",
+      Technology("self_assembly_routines"),
+      OnUnitDestroyed(is_opponent_unit: False, unit_type: Structure),
+      PlaceUnit(Structure), // Simplified
+    ),
+    Rule(
+      "tech_integrated_economy",
+      Technology("integrated_economy"),
+      PostProduction,
+      AddAction(IntegratedEconomy),
+    ),
+
+    // --- Unit Upgrades ---
+    Rule(
+      "tech_pds_2",
+      Technology("pds_2"),
+      OnGameStart,
+      ModifyUnitStats(PDS, [types.ModifyCombat(-1)]),
+    ),
+    Rule(
+      "tech_space_dock_2",
+      Technology("space_dock_2"),
+      OnGameStart,
+      ModifyUnitStats(SpaceDock, [types.ModifyProduction(2)]),
+    ),
+    Rule(
+      "tech_war_sun",
+      Technology("war_sun"),
+      OnGameStart,
+      ModifyUnitStats(WarSun, [types.ModifyMove(2)]),
+    ),
+    Rule(
+      "tech_war_sun_sustain",
+      Technology("war_sun"),
+      OnGameStart,
+      GrantAbilityToUnit(WarSun, types.SustainDamage),
+    ),
+    Rule(
+      "tech_war_sun_production",
+      Technology("war_sun"),
+      OnGameStart,
+      GrantAbilityToUnit(WarSun, types.Production),
+    ),
+  ]
+}
+
+// --- Biotic (Green) Technologies ---
+
+pub fn get_biotic_tech_rules() -> List(Rule) {
+  [
+    // --- General Abilities ---
+    Rule(
+      "tech_daxcive_animators",
+      Technology("daxcive_animators"),
+      PostCombat(did_win: True, opponent_has_commander: False), // Simplified
+      PlaceInfantry(1),
+    ),
+    Rule(
+      "tech_hyper_metabolism",
+      Technology("hyper_metabolism"),
+      OnGameStart,
+      ModifyPlayerStat(CommandCounterCount, 1), // Simplified
+    ),
+    Rule(
+      "tech_x89_bacterial_weapon",
+      Technology("x89_bacterial_weapon"),
+      OnActionPhaseTurnStart,
+      AddAction(types.BacterialWeapon), // Placeholder
+    ),
+    Rule(
+      "tech_bio_stims",
+      Technology("bio_stims"),
+      OnActionPhaseTurnStart,
+      AddAction(BioStims),
+    ),
+    Rule(
+      "tech_instinct_training",
+      Technology("instinct_training"),
+      OnInvasionStart(""), // Simplified
+      AddAction(InstinctTraining),
+    ),
+    Rule(
+      "tech_magen_defense_grid_omega",
+      Technology("magen_defense_grid_omega"),
+      OnGameStart,
+      GrantAbilityToUnit(PDS, types.PlanetaryShield), // Simplified
+    ),
+
+    // --- Unit Upgrades ---
+    Rule(
+      "tech_infantry_2",
+      Technology("infantry_2"),
+      OnGameStart,
+      ModifyUnitStats(Infantry, [types.ModifyCombat(-1)]),
+    ),
+    Rule(
+      "tech_cruiser_2",
+      Technology("cruiser_2"),
+      OnGameStart,
+      ModifyUnitStats(Cruiser, [
+        types.ModifyCombat(-1),
+        types.ModifyMove(1),
+        types.ModifyCapacity(1),
+      ]),
+    ),
+  ]
+}
+
+// --- Cybernetic (Yellow) Technologies ---
+
+pub fn get_cybernetic_tech_rules() -> List(Rule) {
+  [
+    // --- General Abilities ---
+    Rule(
+      "tech_sarween_tools",
+      Technology("sarween_tools"),
+      OnSpendResources, // Engine would check if the spend was for production
+      ModifyPlanetSpend(discount: 1),
+    ),
+    Rule(
+      "tech_graviton_laser_system",
+      Technology("graviton_laser_system"),
+      OnGameStart,
+      GrantAbilityToUnit(PDS, types.SpaceCannon), // Simplified
+    ),
+    Rule(
+      "tech_transit_diodes",
+      Technology("transit_diodes"),
+      OnActionPhaseTurnStart,
+      AddAction(TransitDiodes),
+    ),
+    Rule(
+      "tech_predictive_intelligence",
+      Technology("predictive_intelligence"),
+      OnActionPhaseTurnStart, // Simplified
+      AddAction(PredictiveIntelligence),
+    ),
+
+    // --- Unit Upgrades ---
+    Rule(
+      "tech_fighter_2",
+      Technology("fighter_2"),
+      OnGameStart,
+      ModifyUnitStats(Fighter, [
+        types.ModifyCombat(-1), // 9 -> 8
+        types.ModifyMove(1),
+      ]),
+    ),
+    Rule(
+      "tech_dreadnought_2_yellow",
+      Technology("dreadnought_2"),
+      OnGameStart,
+      ModifyUnitStats(Dreadnought, [types.ModifyMove(1)]),
+    ),
+    Rule(
+      "tech_dreadnought_2_sustain_yellow",
+      Technology("dreadnought_2"),
+      OnGameStart,
+      GrantAbilityToUnit(Dreadnought, types.SustainDamage),
+    ),
+    Rule(
+      "tech_pds_2_omega",
+      Technology("pds_2_omega"),
+      OnGameStart,
+      GrantAbilityToUnit(PDS, types.PlanetaryShield), // Simplified
+    ),
+  ]
+}

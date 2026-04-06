@@ -1,17 +1,22 @@
 import core/models/player.{type User}
-import engine/events/player.{type PlayerEvent, UserJoined} as _
+import engine/lobby/events.{type LobbyEvent, LobbyCreated, UserJoined}
 
 pub opaque type LobbyCommand {
-  CreateLobby
-  JoinLobby(user: User)
+  CreateLobby(id: String)
+  JoinLobby(lobby: String, user: User)
 }
 
-pub fn join_lobby(user: User) -> LobbyCommand {
-  JoinLobby(user)
+pub fn create_lobby(id: String) {
+  CreateLobby(id)
 }
 
-pub fn handle_player_command(command: LobbyCommand) -> PlayerEvent {
+pub fn join_lobby(lobby: String, user: User) -> LobbyCommand {
+  JoinLobby(lobby, user)
+}
+
+pub fn handle_command(command: LobbyCommand) -> LobbyEvent {
   case command {
-    JoinLobby(user) -> UserJoined(user)
+    CreateLobby(id) -> LobbyCreated(id)
+    JoinLobby(lobby, user) -> UserJoined(lobby, user)
   }
 }

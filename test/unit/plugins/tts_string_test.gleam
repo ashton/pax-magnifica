@@ -1,4 +1,3 @@
-import core/models/hex/grid
 import core/models/hex/hex
 import core/models/map
 import game/systems
@@ -14,15 +13,9 @@ pub fn import_map_with_0_ringfrom_tts_string_test() {
     ),
   ]
 
-  let hexgrid =
-    grid.new(0)
-    |> should.be_ok()
-
-  let map = map.new(tiles, hexgrid)
-
   map_from_tts_string("")
   |> should.be_ok()
-  |> should.equal(map)
+  |> should.equal(tiles)
 }
 
 pub fn import_map_with_1_ringfrom_tts_string_test() {
@@ -57,15 +50,9 @@ pub fn import_map_with_1_ringfrom_tts_string_test() {
     ),
   ]
 
-  let hexgrid =
-    grid.new(1)
-    |> should.be_ok()
-
-  let map = map.new(tiles, hexgrid)
-
   map_from_tts_string("33 30 43 40 36 26")
   |> should.be_ok()
-  |> should.equal(map)
+  |> should.equal(tiles)
 }
 
 pub fn import_map_with_2_ringfrom_tts_string_test() {
@@ -148,15 +135,9 @@ pub fn import_map_with_2_ringfrom_tts_string_test() {
     ),
   ]
 
-  let hexgrid =
-    grid.new(2)
-    |> should.be_ok()
-
-  let map = map.new(tiles, hexgrid)
-
   map_from_tts_string("33 30 43 40 36 26 35 45 27 46 31 47 37 21 34 22 38 29")
   |> should.be_ok()
-  |> should.equal(map)
+  |> should.equal(tiles)
 }
 
 pub fn import_map_with_3_ringfrom_tts_string_test() {
@@ -311,14 +292,9 @@ pub fn import_map_with_3_ringfrom_tts_string_test() {
     ),
   ]
 
-  let hexgrid =
-    grid.new(3)
-    |> should.be_ok()
-
-  let map = map.new(tiles, hexgrid)
   map_from_tts_string(
     "33 30 43 40 36 26 35 45 27 46 31 47 37 21 34 22 38 29 13 24 25 17 48 19 11 50 44 5 39 42 15 49 41 1 32 20",
   )
   |> should.be_ok()
-  |> should.equal(map)
+  |> should.equal(tiles)
 }

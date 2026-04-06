@@ -55,8 +55,9 @@ fn build_ring(radius radius: Int) -> Result(HexGridRing, String) {
       list.last(rotation_vectors) |> result.replace_error("not found."),
     )
 
-    [#(last_item, first_item)]
-    |> list.append(rotation_vectors_combinations)
+    rotation_vectors_combinations
+    |> list.append([#(last_item, first_item)])
+    |> echo
     |> list.fold(from: set.new(), with: fn(results, current_pair) {
       let #(first_vec, second_vec) = current_pair
       second_vec

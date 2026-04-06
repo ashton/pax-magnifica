@@ -1,7 +1,7 @@
-pub type BinaryFun(a, b, c) =
+type BinaryFun(a, b, c) =
   fn(a, b) -> c
 
-pub type BinaryFunLifted(a, b, c, error) =
+type BinaryFunLifted(a, b, c, error) =
   fn(Result(a, error), Result(b, error)) -> Result(c, error)
 
 pub fn lift2(fun: BinaryFun(a, b, c)) -> BinaryFunLifted(a, b, c, error) {

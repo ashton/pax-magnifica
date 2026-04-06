@@ -1,0 +1,651 @@
+// src/rules/types.gleam
+// This module defines the universal types for the Rules Engine.
+
+// --- Core Types ---
+
+pub type Source {
+  FactionAbility(faction_id: String)
+  Technology(tech_id: String)
+  Anomaly(anomaly_type: Anomaly)
+  AgendaLaw(agenda_id: String)
+  Agent(agent_id: String)
+  Commander(commander_id: String)
+  Hero(hero_id: String)
+  ActionCard(card_id: String)
+}
+
+pub type Rule {
+  Rule(
+    rule_id: String,
+    source: Source,
+    trigger: Trigger,
+    effect: Effect,
+  )
+}
+
+// --- Trigger Types ---
+// Triggers define *when* a rule should be checked by the Rules Engine.
+
+pub type Trigger {
+  // General & Economic Triggers
+  OnGameStart
+  OnTransaction
+  OnTechnologyResearch(by_opponent: Bool)
+  OnGainControlOfPlanet(by_opponent: Bool)
+  OnUnitDestroyed(is_opponent_unit: Bool, unit_type: UnitType)
+  OnExploration(is_frontier: Bool)
+  OnRelicGained
+  PostProduction(in_home_system: Bool)
+  OnSpendInfluence
+  OnSpendResources
+
+  // Action & Flow Triggers
+  OnActionPhaseTurnStart
+  OnActionCardPlayed(by_opponent: Bool)
+  OnActionCardDrawn(by_opponent: Bool)
+  OnStrategyCardSelection(by_opponent: Bool)
+  OnStatusPhaseStart
+  OnStatusPhaseScoreObjective(by_opponent: Bool)
+  OnSystemActivation(by_opponent: Bool)
+  OnTurnEnd
+
+  // Movement & Board Triggers
+  ValidateMovement
+  OnRetreat
+  PostMovement(into_system_with_own_units: Bool)
+
+  // Combat Triggers
+  PreCombatRound(is_attacker: Bool, is_defender: Bool)
+  PreCombatRoll(is_attacker: Bool, is_defender: Bool)
+  OnCombatRoll(is_opponent_roll: Bool)
+  OnBombardmentRoll
+  OnGroundCombatRoll(is_attacker: Bool, is_defender: Bool)
+  OnInvasionStart(planet_id: String)
+  OnSustainDamage(by_opponent: Bool)
+  PostCombat(did_win: Bool, opponent_has_commander: Bool)
+
+  // Agenda Phase Triggers
+  OnAgendaRevealed
+  OnAgendaPhaseStart
+  OnAgendaVotingStart
+  OnAgendaResolved
+}
+
+// --- Effect Types ---
+// Effects define *what* a rule does when its trigger is met.
+
+pub type Effect {
+  // Player Stat Modifiers
+  ModifyPlayerStat(stat: PlayerStat, modifier: Int)
+  GainCommandToken
+
+  // Combat Modifiers
+  ModifyCombatRoll(modifier: Int)
+  ModifyDiceResult(to_value: Int)
+  GrantCombatRolls(unit_type: UnitType, count: Int)
+  RerollDice(count: Int)
+  DestroyUnit(unit_type: UnitType)
+  DestroyOpponentUnit(unit_type: UnitType, count: Int)
+  ModifySustainDamageRule(can_sustain_per_round: Bool)
+  RemoveInfantry(count: Int)
+  CancelHits(count: Int)
+  ForceOpponentToAssignHits(count: Int)
+
+  // Economic Modifiers
+  StealTradeGoods(count: Int)
+  GainTradeGoods(count: Int)
+  GainCommodities(count: Int)
+  ModifyPlanetSpend(discount: Int)
+  ReadyPlanet(count: Int)
+  ExhaustPlanet(is_opponent_planet: Bool)
+  ForceOpponentToSpend(spend_type: SpendType, amount: Int)
+
+  // Rule Overrides & Permissions
+  IgnorePrerequisites(tech_colors: List(TechColor))
+  IgnoreAdjacencyForTransactions
+  IgnoreAnomaly(anomaly_type: Anomaly)
+  IgnorePlacementRestriction(restriction: PlacementRestriction)
+  IgnoreMecatolRexCost
+  ModifyVotingRights(can_vote: Bool)
+  GrantPdsSpaceCannonInSystem
+  IgnorePlanetaryShield
+  CancelActionCard
+  CancelAgenda
+
+  // Action Grants
+  AddAction(action: Action)
+
+  // Unit & Production Grants
+  GrantAbilityToUnit(unit_type: UnitType, ability: UnitAbility)
+  GrantProduction(unit_type: UnitType, count: Int)
+  ModifyUnitStats(unit_type: UnitType, stats: List(UnitStatModifier))
+  PlaceUnit(unit_type: UnitType)
+  PlaceInfantry(count: Int)
+  PlaceFighter(count: Int)
+  CopyTechnology
+  GainTechnology
+  RepairUnit(count: Int)
+  PreventOpponentProduction
+
+  // Special Faction Effects
+  ConvertOpponentInfantry
+  SacrificeUnitForHits(unit_type: UnitType, count: Int)
+  GainOpponentCommandToken
+  CopyFactionAbility
+  PlaceToken(token_type: TokenType)
+  CaptureOpponentUnit(unit_type: UnitType)
+  SwapStrategyCards
+  DestroyPlanet
+  GainRelic
+  ScoreVictoryPoint
+  LookAtTopCard(deck: DeckType)
+  StealActionCard(count: Int)
+  ForceOpponentToLoseVictoryPoint(count: Int)
+}
+
+// --- Supporting Enum Types ---
+
+pub type PlayerStat {
+  FleetPool
+  CommandCounterCount
+  Initiative
+  ShipSpeed
+}
+
+pub type UnitType {
+  Infantry
+  Fighter
+  Destroyer
+  Cruiser
+  Dreadnought
+  WarSun
+  Carrier
+  PDS
+  SpaceDock
+  Structure // A generic type for PDS or Space Dock
+  AnyShip
+}
+
+pub type UnitAbility {
+  Bombardment
+  SustainDamage
+  Production
+  SpaceCannon
+  PlanetaryShield
+}
+
+pub type UnitStatModifier {
+  ModifyCombat(modifier: Int)
+  ModifyMove(modifier: Int)
+  ModifyCost(modifier: Int)
+  ModifyCapacity(modifier: Int)
+}
+
+pub type TechColor {
+  Green
+  Blue
+  Yellow
+  Red
+}
+
+pub type Anomaly {
+  Nebula
+  Supernova
+  AsteroidField
+}
+
+pub type PlacementRestriction {
+  SpaceDockMustBeOnPlanet
+  PDSMustBeOnPlanet
+}
+
+pub type TokenType {
+  Aetherstream
+  Sleeper
+  Wormhole
+}
+
+pub type DeckType {
+  Action
+  Agenda
+  SecretObjective
+}
+
+pub type SpendType {
+  Influence
+  TradeGoods
+  CommandToken
+}
+
+pub type Action {
+  // Leader & Tech Actions
+  AgentAction(agent_id: String)
+  HeroAction(hero_id: String)
+  // Action Card Actions
+  ActionCardAction(card_id: String)
+}
+```gleam
+// src/action_cards/rules.gleam
+// This module generates the specific rule sets for the 80 base game action cards.
+
+import rules/types.{
+  Action, ActionCard, ActionCardAction, AddAction, Anomaly, AsteroidField,
+  CancelActionCard, CancelAgenda, CancelHits, CommandToken, Cruiser, DeckType,
+  Destroyer, DestroyUnit, Dreadnought, Effect, Fighter,
+  ForceOpponentToAssignHits, ForceOpponentToLoseVictoryPoint,
+  ForceOpponentToSpend, GainCommandToken, GainCommodities, GainTechnology,
+  GainTradeGoods, GrantAbilityToUnit, GrantProduction, Infantry,
+  ModifyCombatRoll, ModifyDiceResult, ModifyPlayerStat, OnActionCardDrawn,
+  OnActionCardPlayed, OnActionPhaseTurnStart, OnAgendaResolved, OnAgendaRevealed,
+  OnAgendaVotingStart, OnBombardmentRoll, OnCombatRoll, OnGameStart,
+  OnRetreat, OnStatusPhaseScoreObjective, OnStatusPhaseStart,
+  OnSustainDamage, OnSystemActivation, OnTechnologyResearch, OnTurnEnd,
+  OnUnitDestroyed, PDS, PlaceFighter, PlaceInfantry, PlaceUnit, PlayerStat,
+  PostCombat, PostMovement, PostProduction, PreventOpponentProduction,
+  ReadyPlanet, RerollDice, Rule, ShipSpeed, Source, SpaceDock, SpendType,
+  StealActionCard, Structure, SustainDamage, Trigger, UnitType, WarSun,
+}
+
+pub fn get_all_action_card_rules() -> List(Rule) {
+  [
+    // --- Cards 1-20 ---
+    Rule(
+      "ac_ancient_burial_sites",
+      ActionCard("ancient_burial_sites"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("ancient_burial_sites")),
+    ),
+    Rule(
+      "ac_bunker_1",
+      ActionCard("bunker"),
+      OnSystemActivation(by_opponent: True),
+      PlaceInfantry(3),
+    ),
+    Rule(
+      "ac_bunker_2",
+      ActionCard("bunker"),
+      OnSystemActivation(by_opponent: True),
+      PlaceInfantry(3),
+    ),
+    Rule(
+      "ac_confusing_legal_text",
+      ActionCard("confusing_legal_text"),
+      OnAgendaVotingStart,
+      ForceOpponentToSpend(CommandToken, 1),
+    ),
+    Rule(
+      "ac_courageous_to_the_end",
+      ActionCard("courageous_to_the_end"),
+      OnGameStart,
+      GrantAbilityToUnit(Fighter, SustainDamage),
+    ),
+    Rule(
+      "ac_cripple_defenses",
+      ActionCard("cripple_defenses"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("cripple_defenses")),
+    ),
+    Rule(
+      "ac_direct_hit_1",
+      ActionCard("direct_hit"),
+      OnSustainDamage(by_opponent: True),
+      DestroyUnit(AnyShip),
+    ),
+    Rule(
+      "ac_direct_hit_2",
+      ActionCard("direct_hit"),
+      OnSustainDamage(by_opponent: True),
+      DestroyUnit(AnyShip),
+    ),
+    Rule(
+      "ac_direct_hit_3",
+      ActionCard("direct_hit"),
+      OnSustainDamage(by_opponent: True),
+      DestroyUnit(AnyShip),
+    ),
+    Rule(
+      "ac_direct_hit_4",
+      ActionCard("direct_hit"),
+      OnSustainDamage(by_opponent: True),
+      DestroyUnit(AnyShip),
+    ),
+    Rule(
+      "ac_disable_1",
+      ActionCard("disable"),
+      OnSystemActivation(by_opponent: True),
+      PreventOpponentProduction,
+    ),
+    Rule(
+      "ac_disable_2",
+      ActionCard("disable"),
+      OnSystemActivation(by_opponent: True),
+      PreventOpponentProduction,
+    ),
+    Rule(
+      "ac_distinguished_councilor",
+      ActionCard("distinguished_councilor"),
+      OnAgendaVotingStart,
+      AddAction(ActionCardAction("distinguished_councilor")), // Add 5 votes
+    ),
+    Rule(
+      "ac_economic_initiative",
+      ActionCard("economic_initiative"),
+      OnActionPhaseTurnStart,
+      GainTradeGoods(3),
+    ),
+    Rule(
+      "ac_emergency_repairs_1",
+      ActionCard("emergency_repairs"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("emergency_repairs")), // Repair up to 2
+    ),
+    Rule(
+      "ac_emergency_repairs_2",
+      ActionCard("emergency_repairs"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("emergency_repairs")),
+    ),
+    Rule(
+      "ac_experimental_battlestation",
+      ActionCard("experimental_battlestation"),
+      OnGameStart,
+      GrantAbilityToUnit(SpaceDock, types.SpaceCannon),
+    ),
+    Rule(
+      "ac_fighter_prototype",
+      ActionCard("fighter_prototype"),
+      OnGameStart,
+      ModifyUnitStats(Fighter, [types.ModifyCombat(-2)]), // 9 -> 7
+    ),
+    Rule(
+      "ac_flank_speed_1",
+      ActionCard("flank_speed"),
+      OnActionPhaseTurnStart,
+      ModifyPlayerStat(ShipSpeed, 1),
+    ),
+    Rule(
+      "ac_flank_speed_2",
+      ActionCard("flank_speed"),
+      OnActionPhaseTurnStart,
+      ModifyPlayerStat(ShipSpeed, 1),
+    ),
+
+    // --- Cards 21-40 ---
+    Rule(
+      "ac_focused_research",
+      ActionCard("focused_research"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("focused_research")),
+    ),
+    Rule(
+      "ac_ghost_ship",
+      ActionCard("ghost_ship"),
+      OnActionPhaseTurnStart,
+      PlaceUnit(Destroyer),
+    ),
+    Rule(
+      "ac_infiltrate",
+      ActionCard("infiltrate"),
+      OnTurnEnd,
+      PlaceInfantry(1),
+    ),
+    Rule(
+      "ac_insubordination",
+      ActionCard("insubordination"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("insubordination")), // Take control of ship
+    ),
+    Rule(
+      "ac_intercept_1",
+      ActionCard("intercept"),
+      OnSystemActivation(by_opponent: True),
+      PlaceFighter(2),
+    ),
+    Rule(
+      "ac_intercept_2",
+      ActionCard("intercept"),
+      OnSystemActivation(by_opponent: True),
+      PlaceFighter(2),
+    ),
+    Rule(
+      "ac_lucky_shot",
+      ActionCard("lucky_shot"),
+      OnCombatRoll(is_opponent_roll: False),
+      ModifyDiceResult(9),
+    ),
+    Rule(
+      "ac_maneuvering_jets_1",
+      ActionCard("maneuvering_jets"),
+      PostMovement(into_system_with_own_units: False),
+      IgnoreAnomaly(AsteroidField),
+    ),
+    Rule(
+      "ac_maneuvering_jets_2",
+      ActionCard("maneuvering_jets"),
+      PostMovement(into_system_with_own_units: False),
+      IgnoreAnomaly(AsteroidField),
+    ),
+    Rule(
+      "ac_minefields_1",
+      ActionCard("minefields"),
+      OnSystemActivation(by_opponent: False),
+      ForceOpponentToAssignHits(1),
+    ),
+    Rule(
+      "ac_minefields_2",
+      ActionCard("minefields"),
+      OnSystemActivation(by_opponent: False),
+      ForceOpponentToAssignHits(1),
+    ),
+    Rule(
+      "ac_morale_boost_1",
+      ActionCard("morale_boost"),
+      OnActionPhaseTurnStart,
+      GainCommandToken,
+    ),
+    Rule(
+      "ac_morale_boost_2",
+      ActionCard("morale_boost"),
+      OnActionPhaseTurnStart,
+      GainCommandToken,
+    ),
+    Rule(
+      "ac_morale_boost_3",
+      ActionCard("morale_boost"),
+      OnActionPhaseTurnStart,
+      GainCommandToken,
+    ),
+    Rule(
+      "ac_parley",
+      ActionCard("parley"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("parley")),
+    ),
+    Rule(
+      "ac_plagiarize",
+      ActionCard("plagiarize"),
+      OnTechnologyResearch(by_opponent: True),
+      GainTechnology,
+    ),
+    Rule(
+      "ac_plague",
+      ActionCard("plague"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("plague")),
+    ),
+    Rule(
+      "ac_political_stability",
+      ActionCard("political_stability"),
+      OnAgendaResolved,
+      GainTradeGoods(3),
+    ),
+    Rule(
+      "ac_public_disgrace",
+      ActionCard("public_disgrace"),
+      OnStatusPhaseScoreObjective(by_opponent: True),
+      ForceOpponentToLoseVictoryPoint(1),
+    ),
+    Rule(
+      "ac_reactor_meltdown",
+      ActionCard("reactor_meltdown"),
+      OnUnitDestroyed(is_opponent_unit: True, unit_type: SpaceDock),
+      AddAction(ActionCardAction("reactor_meltdown")),
+    ),
+
+    // --- Cards 41-60 ---
+    Rule(
+      "ac_reparations",
+      ActionCard("reparations"),
+      OnSystemActivation(by_opponent: True), // In home system
+      GainCommodities(4),
+    ),
+    Rule(
+      "ac_reverse_engineer",
+      ActionCard("reverse_engineer"),
+      OnUnitDestroyed(is_opponent_unit: False, unit_type: AnyShip),
+      GainTechnology,
+    ),
+    Rule(
+      "ac_rise_of_a_messiah",
+      ActionCard("rise_of_a_messiah"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("rise_of_a_messiah")),
+    ),
+    Rule(
+      "ac_sabotage_1",
+      ActionCard("sabotage"),
+      OnActionCardPlayed(by_opponent: True),
+      CancelActionCard,
+    ),
+    Rule(
+      "ac_sabotage_2",
+      ActionCard("sabotage"),
+      OnActionCardPlayed(by_opponent: True),
+      CancelActionCard,
+    ),
+    Rule(
+      "ac_sabotage_3",
+      ActionCard("sabotage"),
+      OnActionCardPlayed(by_opponent: True),
+      CancelActionCard,
+    ),
+    Rule(
+      "ac_salvage",
+      ActionCard("salvage"),
+      PostCombat(did_win: True, opponent_has_commander: False),
+      GainTechnology,
+    ),
+    Rule(
+      "ac_scuttle_1",
+      ActionCard("scuttle"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("scuttle")),
+    ),
+    Rule(
+      "ac_scuttle_2",
+      ActionCard("scuttle"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("scuttle")),
+    ),
+    Rule(
+      "ac_shields_holding_1",
+      ActionCard("shields_holding"),
+      OnUnitDestroyed(is_opponent_unit: False, unit_type: AnyShip),
+      PlaceUnit(AnyShip),
+    ),
+    Rule(
+      "ac_shields_holding_2",
+      ActionCard("shields_holding"),
+      OnUnitDestroyed(is_opponent_unit: False, unit_type: AnyShip),
+      PlaceUnit(AnyShip),
+    ),
+    Rule(
+      "ac_signal_jamming",
+      ActionCard("signal_jamming"),
+      OnSystemActivation(by_opponent: False),
+      PreventOpponentProduction,
+    ),
+    Rule(
+      "ac_skilled_retreat_1",
+      ActionCard("skilled_retreat"),
+      OnRetreat,
+      AddAction(ActionCardAction("skilled_retreat")), // Move to any adjacent
+    ),
+    Rule(
+      "ac_skilled_retreat_2",
+      ActionCard("skilled_retreat"),
+      OnRetreat,
+      AddAction(ActionCardAction("skilled_retreat")),
+    ),
+    Rule(
+      "ac_spy_1",
+      ActionCard("spy"),
+      OnActionCardDrawn(by_opponent: True),
+      StealActionCard(1),
+    ),
+    Rule(
+      "ac_spy_2",
+      ActionCard("spy"),
+      OnActionCardDrawn(by_opponent: True),
+      StealActionCard(1),
+    ),
+    Rule(
+      "ac_summit",
+      ActionCard("summit"),
+      OnSpendInfluence,
+      AddAction(ActionCardAction("summit")), // Spend 2 fewer
+    ),
+    Rule(
+      "ac_tactical_bombardment",
+      ActionCard("tactical_bombardment"),
+      OnBombardmentRoll,
+      RerollDice(99),
+    ),
+    Rule(
+      "ac_unexpected_action",
+      ActionCard("unexpected_action"),
+      OnTurnEnd,
+      AddAction(ActionCardAction("unexpected_action")), // Perform tactical action
+    ),
+    Rule(
+      "ac_unstable_planet",
+      ActionCard("unstable_planet"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("unstable_planet")),
+    ),
+
+    // --- Cards 61-80 ---
+    Rule(
+      "ac_uprising",
+      ActionCard("uprising"),
+      OnActionPhaseTurnStart,
+      AddAction(ActionCardAction("uprising")),
+    ),
+    Rule(
+      "ac_veto",
+      ActionCard("veto"),
+      OnAgendaRevealed,
+      CancelAgenda,
+    ),
+    Rule(
+      "ac_war_machine_1",
+      ActionCard("war_machine"),
+      PostProduction(in_home_system: False),
+      GainCommandToken,
+    ),
+    Rule(
+      "ac_war_machine_2",
+      ActionCard("war_machine"),
+      PostProduction(in_home_system: False),
+      GainCommandToken,
+    ),
+    Rule(
+      "ac_wormhole_research",
+      ActionCard("wormhole_research"),
+      OnStatusPhaseStart,
+      AddAction(ActionCardAction("wormhole_research")),
+    ),
+    // Cards 66-80 are duplicates of the above cards
+    // This list represents all unique card titles.
+  ]
+}

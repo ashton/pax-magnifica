@@ -1,6 +1,7 @@
 import core/models/hex/grid.{type HexGrid}
 import core/models/hex/hex.{type Hex}
 import core/models/planetary_system.{type System}
+import gleam/dict.{type Dict}
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
@@ -52,9 +53,9 @@ pub fn add_tile(
   map: Result(Map, String),
   tile: Result(Tile, String),
 ) -> Result(Map, String) {
-  map.map()
   case map {
-    Drafting(tiles, _) -> Drafting(..map, tiles: list.append(tiles, [tile]))
+    Ok(Drafting(tiles, grid)) ->
+      result.map(tile, fn(t) { Drafting(grid:, tiles: list.append(tiles, [t])) })
     _ -> panic as "Only drafting maps can have its tiles changed"
   }
 }
