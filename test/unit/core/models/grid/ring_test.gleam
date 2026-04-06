@@ -1,47 +1,42 @@
 import core/models/hex/hex
 import core/models/hex/ring
-import glacier/should
 import gleam/list
 import gleam/result
 
 pub fn create_test() {
-  ring.create(radius: 2)
-  |> should.be_ok()
+  assert ring.create(radius: 2) |> result.is_ok()
 }
 
 pub fn radius_test() {
-  ring.create(radius: 2)
-  |> should.be_ok()
-  |> ring.radius()
-  |> should.equal(2)
+  let assert Ok(r) = ring.create(radius: 2)
+
+  assert 2 == ring.radius(r)
 }
 
 pub fn ring_radius_zero_test() {
-  let expected = hex.new(0, 0) |> should.be_ok()
-  ring.create(radius: 0)
-  |> should.be_ok()
-  |> ring.items()
-  |> should.equal([expected])
+  let assert Ok(expected) = hex.new(0, 0)
+
+  let assert Ok(subject) = ring.create(radius: 0)
+  assert [expected] == ring.items(subject)
 }
 
 pub fn ring_radius_one_test() {
-  let expectation =
+  let assert Ok(expectation) =
     [#(-1, 0), #(-1, 1), #(0, -1), #(0, 1), #(1, -1), #(1, 0)]
     |> list.map(hex.from_pair)
     |> result.all()
-    |> should.be_ok()
 
   let is_contained = list.contains(expectation, _)
 
-  ring.create(radius: 1)
-  |> should.be_ok()
-  |> ring.items()
-  |> list.all(is_contained)
-  |> should.be_true()
+  let assert Ok(subject) = ring.create(radius: 1)
+
+  assert subject
+    |> ring.items()
+    |> list.all(is_contained)
 }
 
 pub fn ring_radius_two_test() {
-  let expectation =
+  let assert Ok(expectation) =
     [
       #(-2, 0),
       #(-2, 1),
@@ -58,10 +53,8 @@ pub fn ring_radius_two_test() {
     ]
     |> list.map(hex.from_pair)
     |> result.all()
-    |> should.be_ok()
 
-  ring.create(radius: 2)
-  |> should.be_ok()
-  |> ring.items()
-  |> should.equal(expectation)
+  let assert Ok(subject) = ring.create(radius: 2)
+
+  assert expectation == ring.items(subject)
 }

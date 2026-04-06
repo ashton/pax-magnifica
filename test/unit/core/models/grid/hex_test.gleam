@@ -1,66 +1,46 @@
 import core/models/hex/hex
 import core/models/hex/vector
-import glacier/should
 import gleam/list
 import gleam/result
 
 pub fn equal_test() {
-  let hex1 =
-    hex.new(0, 0)
-    |> should.be_ok()
+  let assert Ok(hex1) = hex.new(0, 0)
+  let assert Ok(hex2) = hex.new(0, 0)
 
-  let hex2 =
-    hex.new(0, 0)
-    |> should.be_ok()
-
-  hex.equal(hex1, hex2)
-  |> should.be_true()
+  assert hex.equal(hex1, hex2)
 }
 
 pub fn from_pair_test() {
-  let base_hex =
-    hex.new(1, -1)
-    |> should.be_ok()
+  let assert Ok(base_hex) = hex.new(1, -1)
 
-  hex.from_pair(#(1, -1))
-  |> should.be_ok()
-  |> hex.equal(base_hex)
-  |> should.be_true()
+  let assert Ok(hex_from_pair) = hex.from_pair(#(1, -1))
+  assert hex.equal(base_hex, hex_from_pair)
 }
 
 pub fn to_pair_test() {
-  hex.new(1, -1)
-  |> should.be_ok()
-  |> hex.to_pair()
-  |> should.equal(#(1, -1))
+  let assert Ok(subject) = hex.new(1, -1)
+  assert #(1, -1) == hex.to_pair(subject)
 }
 
 pub fn to_vector_test() {
-  hex.new(1, -1)
-  |> should.be_ok()
-  |> hex.to_vector()
-  |> should.be_ok()
-  |> vector.to_triplet()
-  |> should.equal(#(1, -1, 0))
+  let assert Ok(subject) = hex.new(1, -1)
+  let assert Ok(vec) = hex.to_vector(subject)
+  assert #(1, -1, 0) == vector.to_triplet(vec)
 }
 
 pub fn from_vector_test() {
-  vector.new(1, -1, 0)
-  |> should.be_ok()
-  |> hex.from_vector()
-  |> should.be_ok()
-  |> hex.equal(hex.new(1, -1) |> should.be_ok())
-  |> should.be_true()
+  let assert Ok(vec) = vector.new(1, -1, 0)
+  let assert Ok(subject) = hex.from_vector(vec)
+  let assert Ok(expectation) = hex.new(1, -1)
+
+  assert hex.equal(expectation, subject)
 }
 
 pub fn neighbors_test() {
-  let subject = hex.new(1, -1) |> should.be_ok()
-  let result =
-    subject
-    |> hex.neighbors()
-    |> should.be_ok()
+  let assert Ok(subject) = hex.new(1, -1)
+  let assert Ok(result) = subject |> hex.neighbors()
 
-  let expected =
+  let assert Ok(expected) =
     [
       hex.new(1, -2),
       hex.new(2, -2),
@@ -70,22 +50,18 @@ pub fn neighbors_test() {
       hex.new(0, -1),
     ]
     |> result.all()
-    |> should.be_ok()
 
-  result
-  |> list.length()
-  |> should.equal(expected |> list.length())
-
-  result
-  |> should.equal(expected)
+  assert list.length(expected) == list.length(result)
+  assert expected == result
 }
 
 pub fn distance_test() {
-  let origin = hex.new(0, 0) |> should.be_ok()
-  let dest = hex.new(-1, -2) |> should.be_ok()
+  let assert Ok(origin) = hex.new(0, 0)
+  let assert Ok(dest) = hex.new(-1, -2)
 
-  origin
-  |> hex.distance(dest)
-  |> should.be_ok()
-  |> should.equal(3)
+  let assert Ok(distance) =
+    origin
+    |> hex.distance(dest)
+
+  assert 3 == distance
 }

@@ -1,6 +1,7 @@
 import core/models/hex/hex
 import core/models/hex/ring.{type HexGridRing}
 import gleam/dict.{type Dict}
+import gleam/int
 import gleam/list
 import gleam/option.{type Option}
 import gleam/result
@@ -10,7 +11,7 @@ pub opaque type HexGrid {
 }
 
 fn build_grid(radius: Int) -> Result(HexGrid, String) {
-  list.range(0, radius)
+  int.range(from: 0, to: radius, with: [], run: list.prepend)
   |> list.map(ring.create)
   |> result.all()
   |> result.map(HexGrid)

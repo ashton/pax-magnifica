@@ -1,6 +1,5 @@
-import ids/uuid
+import youid/uuid
 
 pub fn new() {
-  let assert Ok(id) = uuid.generate_v4()
-  id
+  uuid.v4_string()
 }

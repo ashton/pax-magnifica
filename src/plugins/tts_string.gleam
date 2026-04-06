@@ -54,12 +54,12 @@ pub fn map_from_tts_string(tts_string: String) -> Result(List(Tile), String) {
   let grid =
     tile_numbers
     |> get_rings_amount()
-    |> result.then(grid.new)
+    |> result.try(grid.new)
     |> echo
 
   let systems =
     tile_numbers
-    |> result.then(fn(numbers) {
+    |> result.try(fn(numbers) {
       numbers
       |> list.map(tiles.get_system_from_tile_number)
       |> result.all()

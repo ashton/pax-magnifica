@@ -64,15 +64,15 @@ pub fn subtract(subject: Hex, vec: Vector) -> Result(Vector, String) {
 pub fn neighbors(origin_hex: Hex) -> Result(List(Hex), String) {
   vector.vector_directions
   |> list.map(add(origin_hex, _))
-  |> list.map(with: result.then(_, from_vector))
+  |> list.map(with: result.try(_, from_vector))
   |> result.all()
 }
 
 pub fn distance(one: Hex, other: Hex) -> Result(Int, String) {
   other
   |> to_vector()
-  |> result.then(subtract(one, _))
-  |> result.then(fn(res: Vector) {
+  |> result.try(subtract(one, _))
+  |> result.try(fn(res: Vector) {
     let #(vcol, vrow, vdiag) = res |> vector.to_triplet()
     let col_abs = vcol |> int.absolute_value()
     let row_abs = vrow |> int.absolute_value()

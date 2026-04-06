@@ -26,7 +26,7 @@ fn grid_for_player_count(player_count: Int) -> Result(HexGrid, String) {
         <> ". A game should have 3 players minimum, and 6 players maximum.",
       )
   }
-  |> result.then(grid.new)
+  |> result.try(grid.new)
 }
 
 pub fn validate_command(command: MapCommand) -> Result(MapCommand, String) {
@@ -34,7 +34,7 @@ pub fn validate_command(command: MapCommand) -> Result(MapCommand, String) {
     CreateMapGrid(player_count) -> {
       player_count
       |> validate_player_count()
-      |> result.then(grid_for_player_count)
+      |> result.try(grid_for_player_count)
       |> result.replace(command)
     }
 

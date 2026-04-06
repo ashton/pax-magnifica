@@ -5,7 +5,7 @@ import core/models/objective.{type Objective}
 import core/models/player.{type Player}
 import gleam/dict.{type Dict}
 import gleam/list
-import ids/uuid
+import utils/uuid
 
 pub type Score {
   Score(objective: Objective, color: Color)
@@ -35,7 +35,7 @@ pub type Game {
 }
 
 pub fn default() {
-  let assert Ok(id) = uuid.generate_v4()
+  let id = uuid.new()
   Game(
     id: id,
     players: dict.new(),
@@ -48,7 +48,7 @@ pub fn default() {
 }
 
 pub fn setup_game(players players: List(#(Color, Player)), map map: Map) -> Game {
-  let assert Ok(id) = uuid.generate_v4()
+  let id = uuid.new()
   let players_by_color =
     list.fold(over: players, from: dict.new(), with: fn(acc, item) {
       let #(color, player) = item

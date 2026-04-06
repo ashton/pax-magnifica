@@ -48,10 +48,10 @@ fn build_ring(radius radius: Int) -> Result(HexGridRing, String) {
   let rotation_vectors_combinations = list.window_by_2(rotation_vectors)
 
   {
-    use first_item <- result.then(
+    use first_item <- result.try(
       list.first(rotation_vectors) |> result.replace_error("not found."),
     )
-    use last_item <- result.then(
+    use last_item <- result.try(
       list.last(rotation_vectors) |> result.replace_error("not found."),
     )
 
