@@ -1,68 +1,32 @@
-import core/models/hex/grid.{type HexGrid}
 import core/models/hex/hex.{type Hex}
 import core/models/planetary_system.{type System}
 import gleam/dict.{type Dict}
-import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/result
-
-pub type Tile {
-  Tile(system: System, hex: Hex)
-}
+import gleam/option.{type Option, None}
 
 pub type Map {
-  Drafting(tiles: List(Tile), grid: Option(HexGrid))
-  Map(tiles: List(Tile), grid: HexGrid, active_system: Option(Tile))
+  Drafting(tiles: Dict(Hex, System))
+  Map(tiles: Dict(Hex, System), active_system: Option(Hex))
 }
 
-pub fn setup(tiles: Option(List(Tile)), grid: Option(HexGrid)) {
-  Drafting(tiles: tiles |> option.unwrap([]), grid:)
+pub fn default() -> Map {
+  Drafting(dict.new())
+}
+
+pub fn new(tiles: Dict(Hex, System)) -> Map {
+  Map(tiles:, active_system: None)
+}
+
+pub fn add_tile(map: Result(Map, String), hex: Hex, system: System) -> Result(Map, String) {
+  case map {
+    Ok(Drafting(tiles)) -> Ok(Drafting(tiles: dict.insert(tiles, hex, system)))
+    Ok(_) -> Error("Only drafting maps can have tiles added")
+    Error(_) -> map
+  }
 }
 
 pub fn complete(map: Map) -> Result(Map, String) {
   case map {
-    Drafting(tiles: tiles, grid: Some(grid)) -> {
-      let map_tiles_amount = tiles |> list.length()
-      let grid_hexes_amount =
-        grid
-        |> grid.hexes
-        |> list.length
-
-      case map_tiles_amount == grid_hexes_amount {
-        True -> Map(tiles:, grid:, active_system: None)
-        False -> map
-      }
-      |> Ok()
-    }
-
-    Drafting(grid: None, ..) -> map |> Ok
-
+    Drafting(tiles) -> Map(tiles:, active_system: None) |> Ok
     _ -> Error("Map is already completed")
   }
-}
-
-pub fn default() {
-  setup(None, None)
-}
-
-pub fn new(tiles: List(Tile), grid: HexGrid) {
-  Map(tiles:, grid:, active_system: None)
-}
-
-pub fn add_tile(
-  map: Result(Map, String),
-  tile: Result(Tile, String),
-) -> Result(Map, String) {
-  case map {
-    Ok(Drafting(tiles, grid)) ->
-      result.map(tile, fn(t) { Drafting(grid:, tiles: list.append(tiles, [t])) })
-    _ -> panic as "Only drafting maps can have its tiles changed"
-  }
-}
-
-pub fn new_tile(
-  system: System,
-  hex_tile: Result(Hex, String),
-) -> Result(Tile, String) {
-  result.map(hex_tile, fn(hex) { Tile(system:, hex:) })
 }

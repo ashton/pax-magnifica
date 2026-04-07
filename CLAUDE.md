@@ -5,26 +5,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-gleam run                          # Run the project
-gleam test                         # Run all tests
-gleam format --check src test      # Check formatting
-gleam format src test              # Auto-format code
-gleam shell                        # Start Erlang REPL
-gleam deps download                # Install dependencies
+gleam run                               # Run the project
+gleam test                              # Run all tests with random order
+gleam test -- --seed [randomSeed]       # Run tests in a reproducible order
+gleam test -- test/mod_test.gleam       # Run all tests in the `module.gleam` file
+gleam test -- test/mod_test.gleam:42    # Run test on line 42
+gleam test -- --test mod_test.fn_name   # Run a single test in `fn_name` inside `mod_test.gleam` file
+gleam format --check src test           # Check formatting
+gleam format src test                   # Auto-format code
+gleam shell                             # Start Erlang REPL
+gleam deps download                     # Install dependencies
 ```
-
-There is no single-test runner; all tests run together via `gleam test`.
 
 ## Architecture
 
-This is a **Twilight Imperium 4th Edition** game engine written in **Gleam** (functional, statically typed, compiles to Erlang/OTP), using **DDD + CQRS + Event Sourcing** with the **Actor Model** (via `chip` and `gleam_otp`).
+This is a **Twilight Imperium 4th Edition** game engine written in **Gleam** (functional, statically typed, compiles to Erlang/OTP), using **DDD + CQRS + Event Sourcing** with the **Actor Model**.
 
 ### Core Patterns
 
 - **Commands** describe intent (write side). **Events** describe facts (immutable, logged). State is reconstructed by reducing events — never mutated directly.
 - **Aggregates** validate commands and emit events. **Event handlers** fold events into state.
 - Game lifecycle is a **state machine**: `Initial → Lobby → PlayerSetup → MapSetup → Active → Ended`.
-- Each game runs as an isolated **OTP actor** managed by `SessionManager` (chip registry).
+- Each game runs as an isolated **OTP actor** managed by `SessionManager`.
 
 ### Layer Structure
 

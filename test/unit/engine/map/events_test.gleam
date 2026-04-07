@@ -3,12 +3,13 @@ import core/models/hex/hex
 import core/models/map
 import engine/map/events
 import game/systems
+import gleam/dict
 import gleam/result
 
 pub fn grid_defined_test() {
-  use grid <- result.map(grid.new(3))
-  let expectation = events.GridDefined("id", grid)
-  assert expectation == events.grid_defined("id", grid)
+  use g <- result.map(grid.new(3))
+  let expectation = events.GridDefined("id", g)
+  assert expectation == events.grid_defined("id", g)
 }
 
 pub fn tile_set_test() {
@@ -21,12 +22,9 @@ pub fn tile_set_test() {
 }
 
 pub fn map_completed_test() {
-  let assert Ok(hexgrid) = grid.new(0)
-  let assert Ok(hextile) = hex.new(0, 0)
-
-  let tile = map.Tile(system: systems.mecatol_rex_system, hex: hextile)
-  let map = map.new([tile], hexgrid)
-
+  let assert Ok(h) = hex.new(0, 0)
+  let tiles = dict.from_list([#(h, systems.mecatol_rex_system)])
+  let map = map.new(tiles)
   let expectation = events.MapCreated("game_id", map:)
 
   assert expectation == events.map_created("game_id", map:)

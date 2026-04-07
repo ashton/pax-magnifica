@@ -26,8 +26,8 @@ pub fn process(command: MapCommand) -> List(MapEvent) {
       events.tile_set(game, system, coordinates) |> list.wrap()
     }
 
-    CompleteMap(game, grid, tiles) -> {
-      map.new(tiles, grid)
+    CompleteMap(game, tiles) -> {
+      map.new(tiles)
       |> events.map_created(game, _)
       |> list.wrap()
     }

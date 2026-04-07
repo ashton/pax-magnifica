@@ -1,8 +1,9 @@
 import core/models/hex/hex.{type Hex}
 import core/models/hex/vector
+import gleam/dict
 import gleam/list
 import gleam/result
-import gleam/set
+import utils/result_utils
 
 pub opaque type HexGridRing {
   HexGridRing(radius: Int, items: List(Hex))
@@ -24,12 +25,12 @@ pub fn coordinates(ring: HexGridRing) -> List(#(Int, Int)) {
 }
 
 fn walk_direction(
-  current current,
-  target target,
-  direction direction,
-  items items,
-) {
-  let items = items |> set.insert(this: current)
+  current current: vector.Vector,
+  target target: vector.Vector,
+  direction direction: vector.Vector,
+  items items: List(vector.Vector),
+) -> List(vector.Vector) {
+  let items = list.append(items, [current])
 
   case current == target {
     True -> items
@@ -42,8 +43,13 @@ fn walk_direction(
 
 fn build_ring(radius radius: Int) -> Result(HexGridRing, String) {
   let rotation_vectors =
-    vector.vector_directions
-    |> list.map(vector.scale(_, radius))
+    hex.directions()
+    |> dict.to_list()
+    |> list.map(fn(pair) {
+      let #(_, val) = pair
+      val
+    })
+    |> list.map(result.map(_, vector.scale(_, radius)))
 
   let rotation_vectors_combinations = list.window_by_2(rotation_vectors)
 
@@ -57,17 +63,27 @@ fn build_ring(radius radius: Int) -> Result(HexGridRing, String) {
 
     rotation_vectors_combinations
     |> list.append([#(last_item, first_item)])
-    |> echo
-    |> list.fold(from: set.new(), with: fn(results, current_pair) {
+    |> list.fold(from: Ok([]), with: fn(results, current_pair) {
       let #(first_vec, second_vec) = current_pair
-      second_vec
-      |> vector.subtract(first_vec)
-      |> vector.reduce(radius)
-      |> walk_direction(first_vec, second_vec, _, results)
+      let sub = result_utils.lift2(vector.subtract)
+      let walk =
+        result_utils.lift3(fn(current, target, direction) {
+          walk_direction(
+            current,
+            target,
+            direction,
+            results |> result.unwrap([]),
+          )
+        })
+
+      sub(second_vec, first_vec)
+      |> result.map(vector.reduce(_, radius))
+      |> walk(first_vec, second_vec, _)
     })
-    |> set.to_list()
-    |> list.map(hex.from_vector)
-    |> result.all()
+    |> result.map(list.unique)
+    |> result.map(list.map(_, hex.from_vector))
+    |> result.map(result.all)
+    |> result.flatten()
     |> result.map(HexGridRing(radius, _))
   }
 }
@@ -81,8 +97,13 @@ pub fn create(radius radius: Int) -> Result(HexGridRing, String) {
     }
 
     1 -> {
-      vector.vector_directions
-      |> list.map(hex.from_vector)
+      hex.directions()
+      |> dict.to_list()
+      |> list.map(fn(pair) {
+        let #(_, val) = pair
+        val
+      })
+      |> list.map(result.try(_, hex.from_vector))
       |> result.all()
       |> result.map(HexGridRing(_, radius:))
     }

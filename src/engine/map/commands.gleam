@@ -1,13 +1,13 @@
-import core/models/hex/grid.{type HexGrid}
-import core/models/map.{type Tile}
+import core/models/hex/hex.{type Hex}
 import core/models/planetary_system.{type System}
+import gleam/dict.{type Dict}
 
 // should be opaque but this would make testing it difficult
-// so we handle it as an opaque type, even though it is not declared as one 
+// so we handle it as an opaque type, even though it is not declared as one
 pub type MapCommand {
   CreateMapGrid(player_count: Int)
   SetTile(game: String, system: System, coordinates: #(Int, Int))
-  CompleteMap(game: String, grid: HexGrid, tiles: List(Tile))
+  CompleteMap(game: String, tiles: Dict(Hex, System))
 }
 
 pub fn create_map_grid(player_count player_count: Int) {
@@ -22,6 +22,6 @@ pub fn set_tile(
   SetTile(game:, system: system, coordinates: coords)
 }
 
-pub fn complete(game game: String, grid grid: HexGrid, tiles tiles: List(Tile)) {
-  CompleteMap(game:, grid:, tiles:)
+pub fn complete(game game: String, tiles tiles: Dict(Hex, System)) {
+  CompleteMap(game:, tiles:)
 }

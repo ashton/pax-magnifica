@@ -1,20 +1,25 @@
-import core/models/hex/hex
-import core/models/hex/ring.{type HexGridRing}
-import gleam/dict.{type Dict}
+import core/models/hex/hex.{type Hex}
+import core/models/hex/ring
 import gleam/int
 import gleam/list
-import gleam/option.{type Option}
 import gleam/result
+import gleam/set.{type Set}
 
 pub opaque type HexGrid {
-  HexGrid(List(HexGridRing))
+  HexGrid(radius: Int, hexes: Set(Hex))
 }
 
 fn build_grid(radius: Int) -> Result(HexGrid, String) {
-  int.range(from: 0, to: radius, with: [], run: list.prepend)
+  int.range(from: 0, to: radius + 1, with: [], run: list.prepend)
   |> list.map(ring.create)
   |> result.all()
-  |> result.map(HexGrid)
+  |> result.map(fn(rings) {
+    let hexes =
+      rings
+      |> list.flat_map(ring.items)
+      |> set.from_list()
+    HexGrid(radius:, hexes:)
+  })
 }
 
 pub fn new(radius radius: Int) -> Result(HexGrid, String) {
@@ -24,40 +29,29 @@ pub fn new(radius radius: Int) -> Result(HexGrid, String) {
   }
 }
 
-pub fn length(grid: HexGrid) -> Int {
-  let HexGrid(rings) = grid
-
-  list.length(rings)
+pub fn radius(grid: HexGrid) -> Int {
+  let HexGrid(radius:, ..) = grid
+  radius
 }
 
-pub fn rings(grid: HexGrid) -> List(HexGridRing) {
-  let HexGrid(grid_rings) = grid
-
-  grid_rings
+pub fn contains(grid: HexGrid, hex: Hex) -> Bool {
+  let HexGrid(hexes:, ..) = grid
+  set.contains(hexes, hex)
 }
 
-pub fn to_dict(grid: HexGrid) -> Dict(#(Int, Int), hex.Hex) {
-  let HexGrid(grid_rings) = grid
+pub fn hexes(grid: HexGrid) -> List(Hex) {
+  let HexGrid(hexes:, ..) = grid
+  set.to_list(hexes)
+}
 
-  grid_rings
-  |> list.map(ring.items)
-  |> list.flatten()
-  |> list.fold(from: dict.new(), with: fn(acc, item) {
-    dict.insert(acc, for: hex.to_pair(item), insert: item)
+pub fn hexes_by_ring(grid: HexGrid) -> List(Hex) {
+  let HexGrid(radius:, ..) = grid
+  int.range(from: 0, to: radius + 1, with: [], run: list.prepend)
+  |> list.reverse()
+  |> list.flat_map(fn(r) {
+    case ring.create(r) {
+      Ok(r) -> ring.items(r)
+      Error(_) -> []
+    }
   })
-}
-
-pub fn ring(grid: HexGrid, number: Int) -> Option(HexGridRing) {
-  let HexGrid(grid_rings) = grid
-  grid_rings
-  |> list.drop(number - 1)
-  |> list.first()
-  |> option.from_result
-}
-
-pub fn hexes(grid: HexGrid) -> List(hex.Hex) {
-  let HexGrid(grid_rings) = grid
-  grid_rings
-  |> list.map(ring.items)
-  |> list.flatten()
 }

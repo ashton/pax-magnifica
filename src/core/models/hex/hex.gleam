@@ -1,11 +1,24 @@
 import core/models/hex/vector.{type Vector}
 import gleam/bool
+import gleam/dict
 import gleam/int
 import gleam/list
 import gleam/result
 
 pub opaque type Hex {
   Hex(col: Int, row: Int)
+}
+
+pub fn directions() {
+  [
+    #(0, vector.new(0, -1, 1)),
+    #(1, vector.new(1, -1, 0)),
+    #(2, vector.new(1, 0, -1)),
+    #(3, vector.new(0, 1, -1)),
+    #(4, vector.new(-1, 1, 0)),
+    #(5, vector.new(-1, 0, 1)),
+  ]
+  |> dict.from_list()
 }
 
 fn diagonal(col, row) -> Int {
@@ -62,10 +75,48 @@ pub fn subtract(subject: Hex, vec: Vector) -> Result(Vector, String) {
 }
 
 pub fn neighbors(origin_hex: Hex) -> Result(List(Hex), String) {
-  vector.vector_directions
-  |> list.map(add(origin_hex, _))
+  directions()
+  |> dict.to_list
+  |> list.map(fn(pair) {
+    let #(_, val) = pair
+    val
+  })
+  |> list.map(result.try(_, add(origin_hex, _)))
   |> list.map(with: result.try(_, from_vector))
   |> result.all()
+}
+
+pub fn rotate_clockwise(subject: Hex, around center: Hex) -> Result(Hex, String) {
+  use subject_vec <- result.try(to_vector(subject))
+  use center_vec <- result.try(to_vector(center))
+
+  let relative = vector.subtract(subject_vec, center_vec)
+  let #(x, y, z) = vector.to_triplet(relative)
+
+  // Clockwise 60° rotation in cube coordinates: (x, y, z) → (-y, -z, -x)
+  use rotated <- result.try(vector.new(-y, -z, -x))
+
+  rotated
+  |> vector.add(center_vec)
+  |> from_vector()
+}
+
+pub fn rotate_counter_clockwise(
+  subject: Hex,
+  around center: Hex,
+) -> Result(Hex, String) {
+  use subject_vec <- result.try(to_vector(subject))
+  use center_vec <- result.try(to_vector(center))
+
+  let relative = vector.subtract(subject_vec, center_vec)
+  let #(x, y, z) = vector.to_triplet(relative)
+
+  // Counter-clockwise 60° rotation in cube coordinates: (x, y, z) → (-z, -x, -y)
+  use rotated <- result.try(vector.new(-z, -x, -y))
+
+  rotated
+  |> vector.add(center_vec)
+  |> from_vector()
 }
 
 pub fn distance(one: Hex, other: Hex) -> Result(Int, String) {

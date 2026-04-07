@@ -35,21 +35,25 @@ pub fn ring_radius_one_test() {
     |> list.all(is_contained)
 }
 
-pub fn ring_radius_two_test() {
+// BUG: build_ring stores hexes in a Set, so ring.items for radius >= 2 returns
+// hexes in Erlang term-sorted order (col then row) instead of the clockwise
+// order that ring.create(1) produces via dict.to_list on direction indices.
+// This test asserts the expected clockwise order and fails because of that bug.
+pub fn ring_radius_two_clockwise_order_test() {
   let assert Ok(expectation) =
     [
-      #(-2, 0),
-      #(-2, 1),
-      #(-2, 2),
-      #(-1, -1),
-      #(-1, 2),
       #(0, -2),
-      #(0, 2),
       #(1, -2),
-      #(1, 1),
       #(2, -2),
       #(2, -1),
       #(2, 0),
+      #(1, 1),
+      #(0, 2),
+      #(-1, 2),
+      #(-2, 2),
+      #(-2, 1),
+      #(-2, 0),
+      #(-1, -1),
     ]
     |> list.map(hex.from_pair)
     |> result.all()

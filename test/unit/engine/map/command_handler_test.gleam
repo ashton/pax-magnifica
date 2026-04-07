@@ -6,6 +6,7 @@ import engine/map/commands
 import engine/map/events.{GridDefined}
 import game/systems
 import gleam/bool
+import gleam/dict
 import gleam/list
 import gleam/string
 
@@ -16,7 +17,7 @@ pub fn process_create_map_grid_command_test() {
 
   let assert GridDefined(id, grid) = subject
   assert id |> string.is_empty() |> bool.negate()
-  assert 4 == grid |> grid.length()
+  assert 3 == grid |> grid.radius()
 }
 
 pub fn process_set_tile_command_test() {
@@ -29,14 +30,11 @@ pub fn process_set_tile_command_test() {
 }
 
 pub fn process_complete_command_test() {
-  let assert Ok(hexgrid) = grid.new(0)
-  let assert Ok(hextile) = hex.new(0, 0)
+  let assert Ok(h) = hex.new(0, 0)
+  let tiles = dict.from_list([#(h, systems.mecatol_rex_system)])
+  let map = map.new(tiles)
 
-  let tile = map.Tile(system: systems.mecatol_rex_system, hex: hextile)
-
-  let map = map.new([tile], hexgrid)
-
-  let command = commands.complete("game_id", grid: hexgrid, tiles: [tile])
+  let command = commands.complete("game_id", tiles:)
   let event = events.map_created("game_id", map:)
 
   let assert Ok(res) = process(command) |> list.first()
