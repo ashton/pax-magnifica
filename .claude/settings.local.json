@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(wc -l /Users/matheus.ashton/dev/pessoal/ti4/src/**/*.gleam)",
-      "Bash(gleam test:*)"
+      "Bash(gleam test:*)",
+      "Bash(find /home/john/dev/ti4/test/unit/engine -type f -name *.gleam)"
     ]
   }
 }

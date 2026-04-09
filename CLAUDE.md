@@ -28,6 +28,15 @@ This is a **Twilight Imperium 4th Edition** game engine written in **Gleam** (fu
 - Game lifecycle is a **state machine**: `Initial → Lobby → PlayerSetup → MapSetup → Active → Ended`.
 - Each game runs as an isolated **OTP actor** managed by `SessionManager`.
 
+### Development Workflow
+
+#### Adding functionalities
+When adding new functionalities ALWAYS use Test Driven Development, generate AT LEAST one, but preferentially multiple test cases BEFORE starting to generate the implementation for the functionality. 
+
+#### Changing existent functionalities
+When changing existent functionalities, ALWAYS check if there test cases for that functionality already, BEFORE generating the implementation, try to improve the current test cases or add missing test cases if there is some,
+only then, generate the implementation, and at the end, ALWAYS run the tests to make sure the change didn't break anything.
+
 ### Layer Structure
 
 | Directory | Responsibility |
