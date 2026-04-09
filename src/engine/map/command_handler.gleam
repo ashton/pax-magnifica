@@ -22,8 +22,8 @@ pub fn process(command: MapCommand) -> List(MapEvent) {
       event |> list.wrap()
     }
 
-    SetTile(game, system, coordinates) -> {
-      events.tile_set(game, system, coordinates) |> list.wrap()
+    SetTile(game, system, hex) -> {
+      events.tile_set(game, system, hex) |> list.wrap()
     }
 
     CompleteMap(game, tiles) -> {

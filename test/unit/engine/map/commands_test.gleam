@@ -10,8 +10,9 @@ pub fn create_map_grid_test() {
 }
 
 pub fn set_tile_test() {
-  let expectation = SetTile("map_id", systems.mecatol_rex_system, #(0, 0))
-  let subject = commands.set_tile("map_id", systems.mecatol_rex_system, #(0, 0))
+  let assert Ok(h) = hex.new(0, 0)
+  let expectation = SetTile("map_id", systems.mecatol_rex_system, h)
+  let subject = commands.set_tile("map_id", systems.mecatol_rex_system, h)
 
   assert expectation == subject
 }

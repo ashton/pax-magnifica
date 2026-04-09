@@ -15,10 +15,10 @@ pub fn grid_defined_test() {
 pub fn tile_set_test() {
   let map_id = "map_id"
   let system = systems.mecatol_rex_system
-  let coordinates = #(0, 0)
-  let expectation = events.TileSet(map_id, system, coordinates)
+  let assert Ok(h) = hex.new(0, 0)
+  let expectation = events.TileSet(map_id, system, h)
 
-  assert expectation == events.tile_set(map_id, system, coordinates)
+  assert expectation == events.tile_set(map_id, system, h)
 }
 
 pub fn map_completed_test() {
