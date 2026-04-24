@@ -2,16 +2,20 @@ import engine/game_setup/commands.{
   type GameSetupCommand, AddSecretObjectiveToPlayer, AppointSpeaker, CreateGame,
   DealSecretObjectives, JoinGame, SetPlayerInitialComponents, StartGame,
 }
-import engine/game_setup/events.{
-  type GameSetupEvent, PlayerGainedCommandTokens,
-}
+import engine/game_setup/events.{type GameSetupEvent, PlayerGainedCommandTokens}
 
+//TODO: Remove this to a config or game constant
 const default_victory_points = 10
 
 pub fn process(command: GameSetupCommand) -> List(GameSetupEvent) {
   case command {
     CreateGame(game_id, player_count, setup_type) -> [
-      events.GameCreated(game_id, player_count, default_victory_points, setup_type),
+      events.GameCreated(
+        game_id,
+        player_count,
+        default_victory_points,
+        setup_type,
+      ),
     ]
 
     JoinGame(game_id, player_id, color, faction) -> [
