@@ -15,8 +15,6 @@ pub fn apply(state: State, event: MapEvent) -> State {
       })
 
     MapCreated(_, completed_map) ->
-      state.update_map(state, fn(ms) {
-        MapState(..ms, map: completed_map)
-      })
+      state.update_map(state, fn(ms) { MapState(..ms, map: completed_map) })
   }
 }
