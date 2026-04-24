@@ -5,6 +5,10 @@
 - [ ] **Winnu starting technology**: Winnu choose 1 technology with no prerequisites during setup instead of having a fixed starting tech. Needs a dedicated command/flow to handle this choice.
 - [ ] **Sardakk starting technology**: Sardakk start with no technologies. Verify this is intentional and not a data gap when the full game loop is implemented.
 
+## Scoring
+
+- [ ] **`RevokeVictoryPoints`**: Command and event for removing VPs from a player (e.g. losing Custodians token). Needs `PlayerLostVictoryPoints` event and fold into scoring state.
+
 ## Known gaps (from setup rules analysis)
 
 - [ ] **`StartGame` command**: Currently has no fields — cannot produce a valid `GameStarted(game_id, players, game_board)` event. Needs redesign.
