@@ -13,3 +13,7 @@ pub type Objective {
   Public(name: String, stage: Stage, points: Int)
   Secret(name: String, phase: Phase, points: Int)
 }
+
+pub type SecretObjective {
+  SecretObjective(id: String)
+}
