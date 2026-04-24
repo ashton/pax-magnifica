@@ -1,6 +1,11 @@
+import core/models/command_token.{type CommandTokenPool}
 import core/models/common.{type Color}
 import core/models/faction.{type FactionIdentifier}
 import core/models/game_setup.{type GameSetupType}
+import core/models/objective.{type SecretObjective}
+import core/models/planetary_system.{type Planet}
+import core/models/technology.{type Technology}
+import core/models/unit.{type UnitAmount}
 
 pub type GameSetupEvent {
   GameCreated(
@@ -18,15 +23,43 @@ pub type GameSetupEvent {
   )
 
   SpeakerAppointed(game_id: String, player_id: String)
-  FrontierTokensPlaced(game_id: String, token_locations: List(String))
   SystemTilePlaced(game_id: String, tile_id: String, location: String)
   GalaxyBuildCompleted(game_id: String)
-  InitialComponentsSetup(game_id: String)
 
-  SecretObjectivesChosen(
+  PlayerStartingTechnologiesSetup(
     game_id: String,
     player_id: String,
-    objective_id: String,
+    technologies: List(Technology),
+  )
+
+  PlayerStartingUnitsSetup(
+    game_id: String,
+    player_id: String,
+    units: List(UnitAmount),
+  )
+
+  PlayerStartingPlanetsSetup(
+    game_id: String,
+    player_id: String,
+    planets: List(Planet),
+  )
+
+  PlayerGainedCommandTokens(
+    game_id: String,
+    player_id: String,
+    tokens: List(CommandTokenPool),
+  )
+
+  SecretObjectivesDealt(
+    game_id: String,
+    player_id: String,
+    objectives: List(SecretObjective),
+  )
+
+  PlayerAddedSecretObjective(
+    game_id: String,
+    player_id: String,
+    objective: SecretObjective,
   )
 
   PublicObjectivesRevealed(game_id: String, objectives: List(String))
