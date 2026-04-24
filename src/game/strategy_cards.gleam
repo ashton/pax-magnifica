@@ -5,12 +5,12 @@ import core/models/common.{
 import core/models/strategy_card.{StrategyCard}
 
 pub const all = [
-  StrategyCard(Leadership, 0),
-  StrategyCard(Diplomacy, 0),
-  StrategyCard(Politics, 0),
-  StrategyCard(Construction, 0),
-  StrategyCard(Trade, 0),
-  StrategyCard(Warfare, 0),
-  StrategyCard(Technology, 0),
-  StrategyCard(Imperial, 0),
+  StrategyCard(Leadership, 1, 0),
+  StrategyCard(Diplomacy, 2, 0),
+  StrategyCard(Politics, 3, 0),
+  StrategyCard(Construction, 4, 0),
+  StrategyCard(Trade, 5, 0),
+  StrategyCard(Warfare, 6, 0),
+  StrategyCard(Technology, 7, 0),
+  StrategyCard(Imperial, 8, 0),
 ]
