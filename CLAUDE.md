@@ -66,7 +66,6 @@ TI4 uses a hex map. The implementation uses **axial coordinates** (`hex.gleam`),
 2. Define the event type in the matching `events.gleam`.
 3. Implement the command handler (validates state → returns events).
 4. Implement the event handler (folds event into state).
-5. Wire into the top-level `engine/models/command.gleam` dispatcher.
 
 ### README
 
