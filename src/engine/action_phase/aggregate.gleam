@@ -1,26 +1,22 @@
 import core/models/action.{StrategicAction}
 import core/models/strategy
 import core/models/state/action_phase.{type ActionPhaseState}
+import core/value_objects/game
+import core/value_objects/player
 import engine/action_phase/commands.{
   type ActionPhaseCommand, Pass, StartActionPhase, TakeAction,
 }
 import gleam/list
 import gleam/option
 import gleam/result
-import gleam/string
 
 pub fn validate_start(
   command: ActionPhaseCommand,
 ) -> Result(ActionPhaseCommand, String) {
   let assert StartActionPhase(game_id, initiative_order) = command
-  case string.is_empty(game_id) {
-    True -> Error("Game id cannot be empty")
-    False ->
-      case initiative_order {
-        [] -> Error("Initiative order cannot be empty")
-        _ -> Ok(command)
-      }
-  }
+  use _ <- result.try(game.new_id(game_id))
+  use _ <- result.try(player.new_cards(initiative_order))
+  Ok(command)
 }
 
 pub fn validate_action(
@@ -28,20 +24,18 @@ pub fn validate_action(
   command: ActionPhaseCommand,
 ) -> Result(ActionPhaseCommand, String) {
   let assert TakeAction(game_id, player_id, action) = command
-  case string.is_empty(game_id) || string.is_empty(player_id) {
-    True -> Error("Game id and player id cannot be empty")
+  use _ <- result.try(game.new_id(game_id))
+  use _ <- result.try(player.new_id(player_id))
+  case list.contains(state.passed_players, player_id) {
+    True -> Error("Player has already passed and cannot take actions")
     False ->
-      case list.contains(state.passed_players, player_id) {
-        True -> Error("Player has already passed and cannot take actions")
-        False ->
-          case next_player(state) == player_id {
-            False -> Error("It is not this player's turn")
-            True ->
-              case action {
-                StrategicAction(strategy: strat) ->
-                  validate_strategic_action(state, command, player_id, strat)
-                _ -> Ok(command)
-              }
+      case next_player(state) == player_id {
+        False -> Error("It is not this player's turn")
+        True ->
+          case action {
+            StrategicAction(strategy: strat) ->
+              validate_strategic_action(state, command, player_id, strat)
+            _ -> Ok(command)
           }
       }
   }
@@ -52,16 +46,14 @@ pub fn validate_pass(
   command: ActionPhaseCommand,
 ) -> Result(ActionPhaseCommand, String) {
   let assert Pass(game_id, player_id) = command
-  case string.is_empty(game_id) || string.is_empty(player_id) {
-    True -> Error("Game id and player id cannot be empty")
+  use _ <- result.try(game.new_id(game_id))
+  use _ <- result.try(player.new_id(player_id))
+  case list.contains(state.passed_players, player_id) {
+    True -> Error("Player has already passed")
     False ->
-      case list.contains(state.passed_players, player_id) {
-        True -> Error("Player has already passed")
-        False ->
-          case next_player(state) == player_id {
-            True -> Ok(command)
-            False -> Error("It is not this player's turn")
-          }
+      case next_player(state) == player_id {
+        True -> Ok(command)
+        False -> Error("It is not this player's turn")
       }
   }
 }

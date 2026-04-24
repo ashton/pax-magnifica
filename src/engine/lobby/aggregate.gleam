@@ -1,13 +1,12 @@
+import core/value_objects/game
 import engine/lobby/commands.{type LobbyCommand, CreateLobby, JoinLobby}
-import gleam/string
+import gleam/result
 
 pub fn validate_command(command: LobbyCommand) -> Result(LobbyCommand, String) {
   case command {
     CreateLobby(id) ->
-      case string.is_empty(id) {
-        True -> Error("Lobby id cannot be empty")
-        False -> Ok(command)
-      }
+      game.new_id(id)
+      |> result.replace(command)
     JoinLobby(_, _) -> Ok(command)
   }
 }

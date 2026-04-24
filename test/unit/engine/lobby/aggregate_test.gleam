@@ -11,9 +11,7 @@ pub fn validate_create_lobby_with_valid_id_test() {
 
 pub fn validate_create_lobby_with_empty_id_test() {
   let command = commands.create_lobby("")
-
-  let assert Error(err) = aggregate.validate_command(command)
-  assert "Lobby id cannot be empty" == err
+  let assert Error(_) = aggregate.validate_command(command)
 }
 
 pub fn validate_join_lobby_test() {
