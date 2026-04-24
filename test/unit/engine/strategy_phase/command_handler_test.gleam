@@ -1,4 +1,4 @@
-import core/models/common.{Imperial, Leadership, Trade, Warfare}
+import core/models/strategy.{Imperial, Leadership, Trade, Warfare}
 import core/models/state/strategy_phase.{StrategyPhaseState}
 import engine/strategy_phase/aggregate
 import engine/strategy_phase/command_handler

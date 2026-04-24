@@ -30,13 +30,3 @@ pub type Color {
   Yellow
 }
 
-pub type Strategy {
-  Leadership
-  Diplomacy
-  Politics
-  Construction
-  Trade
-  Warfare
-  Technology
-  Imperial
-}

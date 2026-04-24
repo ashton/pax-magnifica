@@ -1,4 +1,4 @@
-import core/models/common.{Imperial, Leadership, Trade, Warfare}
+import core/models/strategy.{Imperial, Leadership, Trade, Warfare}
 import engine/strategy_phase/event_handler
 import engine/strategy_phase/events.{
   StrategyCardPicked, StrategyCardTradeGoodsCleared, StrategyPhaseEnded,

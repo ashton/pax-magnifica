@@ -1,4 +1,4 @@
-import core/models/common.{type Strategy}
+import core/models/strategy.{type Strategy}
 import gleam/dict.{type Dict}
 
 pub type StrategyPhaseState {

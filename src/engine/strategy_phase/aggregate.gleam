@@ -1,4 +1,4 @@
-import core/models/common.{type Strategy}
+import core/models/strategy.{type Strategy}
 import core/models/state/strategy_phase.{type StrategyPhaseState}
 import engine/strategy_phase/commands.{
   type StrategyPhaseCommand, PickStrategyCard, StartStrategyPhase,

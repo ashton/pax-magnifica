@@ -1,5 +1,5 @@
-import core/models/common.{type Strategy}
+import core/models/strategy.{type Strategy}
 
 pub type StrategyCard {
-  StrategyCard(card: Strategy, initiative: Int, trade_goods: Int)
+  StrategyCard(card: Strategy, trade_goods: Int, exhausted: Bool)
 }

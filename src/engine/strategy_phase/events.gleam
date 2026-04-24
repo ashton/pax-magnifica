@@ -1,4 +1,4 @@
-import core/models/common.{type Strategy}
+import core/models/strategy.{type Strategy}
 
 pub type StrategyPhaseEvent {
   StrategyPhaseStarted(game_id: String, player_order: List(String))

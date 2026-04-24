@@ -1,16 +1,22 @@
-import core/models/common.{
-  Construction, Diplomacy, Imperial, Leadership, Politics, Technology, Trade,
+import core/models/strategy.{
+  type Strategy,
+  Construction,
+  Diplomacy,
+  Imperial,
+  Leadership,
+  Politics,
+  Technology,
+  Trade,
   Warfare,
 }
-import core/models/strategy_card.{StrategyCard}
 
-pub const all = [
-  StrategyCard(Leadership, 1, 0),
-  StrategyCard(Diplomacy, 2, 0),
-  StrategyCard(Politics, 3, 0),
-  StrategyCard(Construction, 4, 0),
-  StrategyCard(Trade, 5, 0),
-  StrategyCard(Warfare, 6, 0),
-  StrategyCard(Technology, 7, 0),
-  StrategyCard(Imperial, 8, 0),
+pub const all: List(Strategy) = [
+  Leadership,
+  Diplomacy,
+  Politics,
+  Construction,
+  Trade,
+  Warfare,
+  Technology,
+  Imperial,
 ]

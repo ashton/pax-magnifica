@@ -22,9 +22,8 @@ pub fn process_pick(
   let assert PickStrategyCard(game_id, player_id, card) = command
 
   let picked_cards = list.map(state.current_picks, fn(p) { p.1 })
-  let all_cards = list.map(strategy_cards.all, fn(sc) { sc.card })
   let remaining_after_pick =
-    all_cards
+    strategy_cards.all
     |> list.filter(fn(c) { c != card && !list.contains(picked_cards, c) })
 
   let card_tg =

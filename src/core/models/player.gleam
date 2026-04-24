@@ -1,4 +1,4 @@
-import core/models/common.{type Strategy}
+import core/models/strategy.{type Strategy}
 import core/models/faction.{type Faction}
 import core/models/objective.{type Objective}
 import core/models/planetary_system.{type Planet}
