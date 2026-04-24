@@ -1,3 +1,4 @@
+import core/models/action.{StrategicAction}
 import core/models/state/action_phase.{type ActionPhaseState}
 import engine/action_phase/commands.{
   type ActionPhaseCommand, Pass, StartActionPhase, TakeAction,
@@ -7,8 +8,7 @@ import gleam/list
 
 pub fn process_start(command: ActionPhaseCommand) -> List(ActionPhaseEvent) {
   let assert StartActionPhase(game_id, initiative_order) = command
-  let player_order = list.map(initiative_order, fn(p) { p.0 })
-  [events.ActionPhaseStarted(game_id, player_order)]
+  [events.ActionPhaseStarted(game_id, initiative_order)]
 }
 
 pub fn process_action(
@@ -16,7 +16,14 @@ pub fn process_action(
   command: ActionPhaseCommand,
 ) -> List(ActionPhaseEvent) {
   let assert TakeAction(game_id, player_id, action) = command
-  [events.PlayerTookAction(game_id, player_id, action)]
+  let base = [events.PlayerTookAction(game_id, player_id, action)]
+  let extra = case action {
+    StrategicAction(strategy: strat) -> [
+      events.StrategyCardExhausted(game_id, strat),
+    ]
+    _ -> []
+  }
+  list.flatten([base, extra])
 }
 
 pub fn process_pass(
