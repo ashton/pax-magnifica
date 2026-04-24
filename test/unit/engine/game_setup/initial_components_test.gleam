@@ -6,7 +6,6 @@ import core/models/unit.{
   CarrierAmount, CruiserAmount, DestroyerAmount, DreadnoughtAmount,
   FighterAmount, InfantryAmount, PDSAmount, SpaceDockAmount, WarSunAmount,
 }
-import engine/game_setup/aggregate
 import engine/game_setup/commands.{SetPlayerInitialComponents}
 import game/planets
 import game/technologies
@@ -14,7 +13,7 @@ import gleam/list
 
 fn components_for(faction) {
   let assert SetPlayerInitialComponents(_, _, techs, units, starting_planets, _) =
-    aggregate.setup_player_initial_components("game_1", "p1", faction)
+    commands.setup_player_initial_components("game_1", "p1", faction)
   #(techs, units, starting_planets)
 }
 

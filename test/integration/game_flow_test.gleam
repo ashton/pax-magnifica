@@ -2,8 +2,7 @@ import core/models/game_setup.{Standard}
 import core/models/map.{Map}
 import core/models/player.{User}
 import core/models/state.{Initial, Lobby, MapSetup}
-import engine/game_setup/aggregate as game_setup_aggregate
-import engine/game_setup/commands.{CreateGame}
+import engine/game_setup/commands.{CreateGame, create_game as game_setup_create_game}
 import engine/lobby/aggregate as lobby_aggregate
 import engine/lobby/command_handler as lobby_command_handler
 import engine/lobby/commands as lobby_commands
@@ -64,7 +63,7 @@ pub fn game_setup_creates_game_command_test() {
   use <- unitest.tag("integration")
 
   let player_count = 3
-  let cmd = game_setup_aggregate.create_game(player_count, Standard)
+  let cmd = game_setup_create_game(player_count, Standard)
 
   let assert CreateGame(game_id, 3, Standard) = cmd
   assert string.length(game_id) > 0
@@ -129,7 +128,7 @@ pub fn full_game_flow_test() {
   assert list.length(users) == player_count
 
   // 3. Game is setup
-  let setup_cmd = game_setup_aggregate.create_game(player_count, Standard)
+  let setup_cmd = game_setup_create_game(player_count, Standard)
   let assert CreateGame(setup_game_id, 3, Standard) = setup_cmd
   assert string.length(setup_game_id) > 0
 

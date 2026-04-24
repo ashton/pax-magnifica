@@ -12,7 +12,7 @@ import game/technologies
 import gleam/list
 
 pub fn validate_create_game_with_valid_data_test() {
-  let cmd = aggregate.create_game(6, Standard)
+  let cmd = commands.create_game(6, Standard)
   let assert Ok(result) = aggregate.validate_command(cmd)
   assert result == cmd
 }
@@ -39,7 +39,7 @@ pub fn validate_create_game_with_min_players_test() {
 }
 
 pub fn validate_join_game_test() {
-  let cmd = aggregate.join_game("game_1", "player_1", Blue, Hacan)
+  let cmd = commands.join_game("game_1", "player_1", Blue, Hacan)
   let assert Ok(result) = aggregate.validate_command(cmd)
   assert result == cmd
 }
@@ -56,7 +56,7 @@ pub fn validate_join_game_with_empty_player_id_test() {
 
 pub fn validate_add_secret_objective_to_player_test() {
   let cmd =
-    aggregate.add_secret_objective_to_player(
+    commands.add_secret_objective_to_player(
       "game_1",
       "player_1",
       SecretObjective("obj_1"),
@@ -73,26 +73,26 @@ pub fn validate_add_secret_objective_to_player_with_empty_fields_test() {
 pub fn deal_secret_objectives_returns_command_test() {
   let objectives = [SecretObjective("obj_1"), SecretObjective("obj_2")]
   let assert Ok(cmd) =
-    aggregate.deal_secret_objectives("game_1", "player_1", objectives)
+    commands.deal_secret_objectives("game_1", "player_1", objectives)
   let assert commands.DealSecretObjectives("game_1", "player_1", objs) = cmd
   assert objs == objectives
 }
 
 pub fn deal_secret_objectives_requires_exactly_two_test() {
   let assert Error(_) =
-    aggregate.deal_secret_objectives("game_1", "player_1", [
+    commands.deal_secret_objectives("game_1", "player_1", [
       SecretObjective("obj_1"),
     ])
 }
 
 pub fn deal_secret_objectives_rejects_empty_list_test() {
   let assert Error(_) =
-    aggregate.deal_secret_objectives("game_1", "player_1", [])
+    commands.deal_secret_objectives("game_1", "player_1", [])
 }
 
 pub fn deal_secret_objectives_rejects_more_than_two_test() {
   let assert Error(_) =
-    aggregate.deal_secret_objectives("game_1", "player_1", [
+    commands.deal_secret_objectives("game_1", "player_1", [
       SecretObjective("obj_1"),
       SecretObjective("obj_2"),
       SecretObjective("obj_3"),
@@ -100,7 +100,7 @@ pub fn deal_secret_objectives_rejects_more_than_two_test() {
 }
 
 pub fn validate_start_game_test() {
-  let cmd = aggregate.start_game()
+  let cmd = commands.start_game()
   let assert Ok(result) = aggregate.validate_command(cmd)
   assert result == StartGame
 }
@@ -112,12 +112,12 @@ pub fn milty_setup_type_is_accepted_test() {
 
 pub fn appoint_speaker_picks_first_player_test() {
   let assert Ok(cmd) =
-    aggregate.appoint_speaker("game_1", ["alice", "bob", "charlie"])
+    commands.appoint_speaker("game_1", ["alice", "bob", "charlie"])
   let assert AppointSpeaker("game_1", "alice") = cmd
 }
 
 pub fn validate_appoint_speaker_test() {
-  let assert Ok(cmd) = aggregate.appoint_speaker("game_1", ["alice", "bob"])
+  let assert Ok(cmd) = commands.appoint_speaker("game_1", ["alice", "bob"])
   let assert Ok(result) = aggregate.validate_command(cmd)
   assert result == cmd
 }
@@ -133,19 +133,19 @@ pub fn validate_appoint_speaker_with_empty_player_id_test() {
 }
 
 pub fn appoint_speaker_with_empty_players_returns_error_test() {
-  let assert Error(_) = aggregate.appoint_speaker("game_1", [])
+  let assert Error(_) = commands.appoint_speaker("game_1", [])
 }
 
 pub fn setup_player_initial_components_resolves_arborec_technologies_test() {
   let assert SetPlayerInitialComponents(_, _, techs, _, _, _) =
-    aggregate.setup_player_initial_components("game_1", "player_1", Arborec)
+    commands.setup_player_initial_components("game_1", "player_1", Arborec)
 
   assert list.contains(techs, technologies.magen_defense_grid)
 }
 
 pub fn setup_player_initial_components_resolves_arborec_units_test() {
   let assert SetPlayerInitialComponents(_, _, _, units, _, _) =
-    aggregate.setup_player_initial_components("game_1", "player_1", Arborec)
+    commands.setup_player_initial_components("game_1", "player_1", Arborec)
 
   assert list.contains(units, CarrierAmount(1))
   assert list.contains(units, CruiserAmount(1))
@@ -157,5 +157,5 @@ pub fn setup_player_initial_components_resolves_arborec_units_test() {
 
 pub fn setup_player_initial_components_carries_ids_test() {
   let assert SetPlayerInitialComponents("game_1", "player_1", _, _, _, _) =
-    aggregate.setup_player_initial_components("game_1", "player_1", Arborec)
+    commands.setup_player_initial_components("game_1", "player_1", Arborec)
 }

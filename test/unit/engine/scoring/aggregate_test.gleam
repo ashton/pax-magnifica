@@ -8,7 +8,7 @@ import gleam/list
 
 pub fn award_victory_points_returns_command_test() {
   let cmd =
-    aggregate.award_victory_points(
+    commands.award_victory_points(
       "game_1",
       "player_1",
       PublicObjectiveScored("obj_1"),
@@ -19,7 +19,7 @@ pub fn award_victory_points_returns_command_test() {
 }
 
 pub fn validate_award_victory_points_valid_test() {
-  let cmd = aggregate.award_victory_points("game_1", "player_1", Imperial, 1)
+  let cmd = commands.award_victory_points("game_1", "player_1", Imperial, 1)
   let assert Ok(result) = aggregate.validate_command(cmd)
   assert result == cmd
 }
@@ -53,7 +53,7 @@ pub fn award_victory_points_accepts_all_sources_test() {
     Other("special"),
   ]
   assert list.all(sources, fn(source) {
-    let cmd = aggregate.award_victory_points("game_1", "player_1", source, 1)
+    let cmd = commands.award_victory_points("game_1", "player_1", source, 1)
     case aggregate.validate_command(cmd) {
       Ok(_) -> True
       Error(_) -> False

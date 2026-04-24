@@ -1,7 +1,9 @@
 import core/models/state/strategic_action.{StrategicActionState}
 import core/models/strategy.{Leadership}
-import engine/strategic_action/aggregate
 import engine/strategic_action/command_handler
+import engine/strategic_action/commands.{
+  resolve_secondary, skip_secondary, start_strategic_action,
+}
 import engine/strategic_action/events.{
   SecondaryAbilityResolved, SecondaryAbilitySkipped, StrategicActionEnded,
   StrategicActionStarted,
@@ -21,7 +23,7 @@ fn started_state(secondary_order, responded) {
 
 pub fn start_emits_strategic_action_started_test() {
   let cmd =
-    aggregate.start_strategic_action(game_id, "alice", Leadership, ["bob"])
+    start_strategic_action(game_id, "alice", Leadership, ["bob"])
   let assert Ok(event) = command_handler.process_start(cmd) |> list.first()
   assert event
     == StrategicActionStarted(game_id, "alice", Leadership, ["bob"])
@@ -29,7 +31,7 @@ pub fn start_emits_strategic_action_started_test() {
 
 pub fn resolve_emits_secondary_ability_resolved_test() {
   let state = started_state(["bob", "charlie"], [])
-  let cmd = aggregate.resolve_secondary(game_id, "bob")
+  let cmd = resolve_secondary(game_id, "bob")
   let assert Ok(event) =
     command_handler.process_secondary(state, cmd) |> list.first()
   assert event == SecondaryAbilityResolved(game_id, "bob")
@@ -37,7 +39,7 @@ pub fn resolve_emits_secondary_ability_resolved_test() {
 
 pub fn skip_emits_secondary_ability_skipped_test() {
   let state = started_state(["bob", "charlie"], [])
-  let cmd = aggregate.skip_secondary(game_id, "charlie")
+  let cmd = skip_secondary(game_id, "charlie")
   let assert Ok(event) =
     command_handler.process_secondary(state, cmd) |> list.first()
   assert event == SecondaryAbilitySkipped(game_id, "charlie")
@@ -46,14 +48,14 @@ pub fn skip_emits_secondary_ability_skipped_test() {
 pub fn last_response_emits_strategic_action_ended_test() {
   // bob is the last to respond
   let state = started_state(["bob", "charlie"], ["charlie"])
-  let cmd = aggregate.resolve_secondary(game_id, "bob")
+  let cmd = resolve_secondary(game_id, "bob")
   let events = command_handler.process_secondary(state, cmd)
   assert list.contains(events, StrategicActionEnded(game_id))
 }
 
 pub fn non_last_response_does_not_end_action_test() {
   let state = started_state(["bob", "charlie"], [])
-  let cmd = aggregate.resolve_secondary(game_id, "bob")
+  let cmd = resolve_secondary(game_id, "bob")
   let events = command_handler.process_secondary(state, cmd)
   assert !list.contains(events, StrategicActionEnded(game_id))
 }

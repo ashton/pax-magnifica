@@ -26,7 +26,7 @@ fn state_for(player_order, passed) {
 pub fn start_action_phase_sorts_by_initiative_test() {
   // Imperial=8, Leadership=1, Trade=5 — should sort to [alice, charlie, bob]
   let cmd =
-    aggregate.start_action_phase(game_id, [
+    commands.start_action_phase(game_id, [
       #("alice", sc(Leadership, False)),
       #("bob", sc(Imperial, False)),
       #("charlie", sc(Trade, False)),
@@ -51,7 +51,7 @@ pub fn validate_start_empty_game_id_test() {
 
 pub fn validate_start_valid_test() {
   let cmd =
-    aggregate.start_action_phase(game_id, [#("alice", sc(Leadership, False))])
+    commands.start_action_phase(game_id, [#("alice", sc(Leadership, False))])
   let assert Ok(_) = aggregate.validate_start(cmd)
 }
 
@@ -59,13 +59,13 @@ pub fn validate_start_valid_test() {
 
 pub fn validate_take_action_first_player_test() {
   let state = state_for(["alice", "bob", "charlie"], [])
-  let cmd = aggregate.take_action(game_id, "alice", TacticalAction)
+  let cmd = commands.take_action(game_id, "alice", TacticalAction)
   let assert Ok(_) = aggregate.validate_action(state, cmd)
 }
 
 pub fn validate_take_action_out_of_turn_test() {
   let state = state_for(["alice", "bob", "charlie"], [])
-  let cmd = aggregate.take_action(game_id, "bob", TacticalAction)
+  let cmd = commands.take_action(game_id, "bob", TacticalAction)
   let assert Error(_) = aggregate.validate_action(state, cmd)
 }
 
@@ -77,7 +77,7 @@ pub fn validate_take_action_after_previous_acted_test() {
       last_player: Some("alice"),
       player_cards: [],
     )
-  let cmd = aggregate.take_action(game_id, "bob", TacticalAction)
+  let cmd = commands.take_action(game_id, "bob", TacticalAction)
   let assert Ok(_) = aggregate.validate_action(state, cmd)
 }
 
@@ -89,14 +89,14 @@ pub fn validate_take_action_wraps_to_start_test() {
       last_player: Some("bob"),
       player_cards: [],
     )
-  let cmd = aggregate.take_action(game_id, "alice", ComponentAction)
+  let cmd = commands.take_action(game_id, "alice", ComponentAction)
   let assert Ok(_) = aggregate.validate_action(state, cmd)
 }
 
 pub fn validate_take_action_passed_player_cannot_act_test() {
   let state = state_for(["alice", "bob"], ["alice"])
   let state = ActionPhaseState(..state, last_player: Some("bob"))
-  let cmd = aggregate.take_action(game_id, "alice", TacticalAction)
+  let cmd = commands.take_action(game_id, "alice", TacticalAction)
   let assert Error(_) = aggregate.validate_action(state, cmd)
 }
 
@@ -109,7 +109,7 @@ pub fn validate_take_action_skips_passed_players_test() {
       last_player: Some("charlie"),
       player_cards: [],
     )
-  let cmd = aggregate.take_action(game_id, "bob", TacticalAction)
+  let cmd = commands.take_action(game_id, "bob", TacticalAction)
   let assert Ok(_) = aggregate.validate_action(state, cmd)
 }
 
@@ -129,13 +129,13 @@ pub fn validate_strategic_action_valid_test() {
       last_player: None,
       player_cards: [#("alice", sc(Leadership, False))],
     )
-  let cmd = aggregate.take_action(game_id, "alice", StrategicAction(Leadership))
+  let cmd = commands.take_action(game_id, "alice", StrategicAction(Leadership))
   let assert Ok(_) = aggregate.validate_action(state, cmd)
 }
 
 pub fn validate_strategic_action_no_card_test() {
   let state = state_for(["alice", "bob"], [])
-  let cmd = aggregate.take_action(game_id, "alice", StrategicAction(Leadership))
+  let cmd = commands.take_action(game_id, "alice", StrategicAction(Leadership))
   let assert Error(_) = aggregate.validate_action(state, cmd)
 }
 
@@ -147,7 +147,7 @@ pub fn validate_strategic_action_wrong_card_test() {
       last_player: None,
       player_cards: [#("alice", sc(Trade, False))],
     )
-  let cmd = aggregate.take_action(game_id, "alice", StrategicAction(Leadership))
+  let cmd = commands.take_action(game_id, "alice", StrategicAction(Leadership))
   let assert Error(_) = aggregate.validate_action(state, cmd)
 }
 
@@ -159,7 +159,7 @@ pub fn validate_strategic_action_exhausted_card_test() {
       last_player: None,
       player_cards: [#("alice", sc(Leadership, True))],
     )
-  let cmd = aggregate.take_action(game_id, "alice", StrategicAction(Leadership))
+  let cmd = commands.take_action(game_id, "alice", StrategicAction(Leadership))
   let assert Error(_) = aggregate.validate_action(state, cmd)
 }
 
@@ -167,20 +167,20 @@ pub fn validate_strategic_action_exhausted_card_test() {
 
 pub fn validate_pass_valid_test() {
   let state = state_for(["alice", "bob"], [])
-  let cmd = aggregate.pass(game_id, "alice")
+  let cmd = commands.pass(game_id, "alice")
   let assert Ok(_) = aggregate.validate_pass(state, cmd)
 }
 
 pub fn validate_pass_out_of_turn_test() {
   let state = state_for(["alice", "bob"], [])
-  let cmd = aggregate.pass(game_id, "bob")
+  let cmd = commands.pass(game_id, "bob")
   let assert Error(_) = aggregate.validate_pass(state, cmd)
 }
 
 pub fn validate_pass_already_passed_test() {
   let state = state_for(["alice", "bob"], ["alice"])
   let state = ActionPhaseState(..state, last_player: Some("bob"))
-  let cmd = aggregate.pass(game_id, "alice")
+  let cmd = commands.pass(game_id, "alice")
   let assert Error(_) = aggregate.validate_pass(state, cmd)
 }
 

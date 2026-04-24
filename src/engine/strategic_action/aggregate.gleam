@@ -1,34 +1,10 @@
 import core/models/state/strategic_action.{type StrategicActionState}
-import core/models/strategy.{type Strategy}
 import engine/strategic_action/commands.{
   type StrategicActionCommand, ResolveSecondaryAbility, SkipSecondaryAbility,
   StartStrategicAction,
 }
 import gleam/list
 import gleam/string
-
-pub fn start_strategic_action(
-  game_id: String,
-  player_id: String,
-  strategy: Strategy,
-  secondary_order: List(String),
-) -> StrategicActionCommand {
-  commands.StartStrategicAction(game_id, player_id, strategy, secondary_order)
-}
-
-pub fn resolve_secondary(
-  game_id: String,
-  player_id: String,
-) -> StrategicActionCommand {
-  commands.ResolveSecondaryAbility(game_id, player_id)
-}
-
-pub fn skip_secondary(
-  game_id: String,
-  player_id: String,
-) -> StrategicActionCommand {
-  commands.SkipSecondaryAbility(game_id, player_id)
-}
 
 pub fn validate_start(
   command: StrategicActionCommand,

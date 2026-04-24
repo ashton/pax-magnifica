@@ -8,3 +8,12 @@ pub type ScoringCommand {
     amount: Int,
   )
 }
+
+pub fn award_victory_points(
+  game_id: String,
+  player_id: String,
+  source: VictoryPointSource,
+  amount: Int,
+) -> ScoringCommand {
+  AwardVictoryPoints(game_id, player_id, source, amount)
+}

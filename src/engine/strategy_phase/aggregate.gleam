@@ -1,4 +1,3 @@
-import core/models/strategy.{type Strategy}
 import core/models/state/strategy_phase.{type StrategyPhaseState}
 import engine/strategy_phase/commands.{
   type StrategyPhaseCommand, PickStrategyCard, StartStrategyPhase,
@@ -6,21 +5,6 @@ import engine/strategy_phase/commands.{
 import gleam/list
 import gleam/result
 import gleam/string
-
-pub fn start_strategy_phase(
-  game_id: String,
-  player_order: List(String),
-) -> StrategyPhaseCommand {
-  commands.StartStrategyPhase(game_id, player_order)
-}
-
-pub fn pick_strategy_card(
-  game_id: String,
-  player_id: String,
-  card: Strategy,
-) -> StrategyPhaseCommand {
-  commands.PickStrategyCard(game_id, player_id, card)
-}
 
 pub fn validate_start(
   command: StrategyPhaseCommand,

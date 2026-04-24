@@ -1,38 +1,13 @@
-import core/models/action.{type PlayerAction, StrategicAction}
+import core/models/action.{StrategicAction}
 import core/models/strategy
-import core/models/strategy_card.{type StrategyCard}
 import core/models/state/action_phase.{type ActionPhaseState}
 import engine/action_phase/commands.{
   type ActionPhaseCommand, Pass, StartActionPhase, TakeAction,
 }
-import gleam/int
 import gleam/list
 import gleam/option
 import gleam/result
 import gleam/string
-
-pub fn start_action_phase(
-  game_id: String,
-  initiative_order: List(#(String, StrategyCard)),
-) -> ActionPhaseCommand {
-  let sorted =
-    list.sort(initiative_order, fn(a, b) {
-      int.compare(strategy.initiative(a.1.card), strategy.initiative(b.1.card))
-    })
-  commands.StartActionPhase(game_id, sorted)
-}
-
-pub fn take_action(
-  game_id: String,
-  player_id: String,
-  action: PlayerAction,
-) -> ActionPhaseCommand {
-  commands.TakeAction(game_id, player_id, action)
-}
-
-pub fn pass(game_id: String, player_id: String) -> ActionPhaseCommand {
-  commands.Pass(game_id, player_id)
-}
 
 pub fn validate_start(
   command: ActionPhaseCommand,

@@ -1,15 +1,5 @@
-import core/models/victory_point.{type VictoryPointSource}
 import engine/scoring/commands.{type ScoringCommand, AwardVictoryPoints}
 import gleam/string
-
-pub fn award_victory_points(
-  game_id: String,
-  player_id: String,
-  source: VictoryPointSource,
-  amount: Int,
-) -> ScoringCommand {
-  commands.AwardVictoryPoints(game_id, player_id, source, amount)
-}
 
 pub fn validate_command(
   command: ScoringCommand,

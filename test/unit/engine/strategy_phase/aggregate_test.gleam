@@ -17,12 +17,12 @@ fn state_with_picks(picks) {
 // ── StartStrategyPhase ────────────────────────────────────────────────────────
 
 pub fn start_strategy_phase_returns_command_test() {
-  let cmd = aggregate.start_strategy_phase(game_id, ["alice", "bob"])
+  let cmd = commands.start_strategy_phase(game_id, ["alice", "bob"])
   let assert StartStrategyPhase("game_1", ["alice", "bob"]) = cmd
 }
 
 pub fn validate_start_strategy_phase_valid_test() {
-  let cmd = aggregate.start_strategy_phase(game_id, ["alice", "bob"])
+  let cmd = commands.start_strategy_phase(game_id, ["alice", "bob"])
   let assert Ok(_) = aggregate.validate_start(cmd)
 }
 
@@ -39,32 +39,32 @@ pub fn validate_start_strategy_phase_empty_game_id_test() {
 // ── PickStrategyCard ──────────────────────────────────────────────────────────
 
 pub fn pick_strategy_card_returns_command_test() {
-  let cmd = aggregate.pick_strategy_card(game_id, "alice", Leadership)
+  let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
   let assert PickStrategyCard("game_1", "alice", Leadership) = cmd
 }
 
 pub fn validate_pick_valid_test() {
   let state = state_with_picks([])
-  let cmd = aggregate.pick_strategy_card(game_id, "alice", Leadership)
+  let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
   let assert Ok(_) = aggregate.validate_pick(state, cmd)
 }
 
 pub fn validate_pick_card_already_taken_test() {
   let state = state_with_picks([#("alice", Leadership)])
-  let cmd = aggregate.pick_strategy_card(game_id, "bob", Leadership)
+  let cmd = commands.pick_strategy_card(game_id, "bob", Leadership)
   let assert Error(_) = aggregate.validate_pick(state, cmd)
 }
 
 pub fn validate_pick_out_of_turn_test() {
   let state = state_with_picks([])
   // alice is first — bob cannot pick before alice
-  let cmd = aggregate.pick_strategy_card(game_id, "bob", Trade)
+  let cmd = commands.pick_strategy_card(game_id, "bob", Trade)
   let assert Error(_) = aggregate.validate_pick(state, cmd)
 }
 
 pub fn validate_pick_second_player_after_first_picks_test() {
   let state = state_with_picks([#("alice", Leadership)])
-  let cmd = aggregate.pick_strategy_card(game_id, "bob", Trade)
+  let cmd = commands.pick_strategy_card(game_id, "bob", Trade)
   let assert Ok(_) = aggregate.validate_pick(state, cmd)
 }
 
@@ -83,6 +83,6 @@ pub fn validate_pick_empty_player_id_test() {
 pub fn validate_pick_player_already_picked_test() {
   let state = state_with_picks([#("alice", Leadership)])
   // alice already picked — cannot pick again
-  let cmd = aggregate.pick_strategy_card(game_id, "alice", Warfare)
+  let cmd = commands.pick_strategy_card(game_id, "alice", Warfare)
   let assert Error(_) = aggregate.validate_pick(state, cmd)
 }
