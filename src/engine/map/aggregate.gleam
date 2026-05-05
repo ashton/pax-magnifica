@@ -18,7 +18,7 @@ fn validate_player_count(player_count: Int) -> Result(Int, String) {
   }
 }
 
-fn validate(command: MapCommand) -> Result(MapCommand, String) {
+pub fn validate_command(command: MapCommand) -> Result(MapCommand, String) {
   case command {
     CreateMapGrid(player_count) ->
       validate_player_count(player_count)
@@ -31,7 +31,7 @@ fn validate(command: MapCommand) -> Result(MapCommand, String) {
 }
 
 pub fn handle(command: MapCommand) -> Result(List(MapEvent), String) {
-  use _ <- result.try(validate(command))
+  use _ <- result.try(validate_command(command))
   case command {
     CreateMapGrid(player_count) -> {
       let assert Ok(g) = grid.new(player_count)

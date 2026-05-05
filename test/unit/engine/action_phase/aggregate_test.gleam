@@ -142,7 +142,13 @@ pub fn handle_action_empty_ids_returns_error_test() {
 // ── StrategicAction ───────────────────────────────────────────────────────────
 
 pub fn handle_strategic_action_emits_card_exhausted_test() {
-  let state = state_for(["alice", "bob"], [])
+  let state =
+    ActionPhaseState(
+      player_order: ["alice", "bob"],
+      passed_players: [],
+      last_player: None,
+      player_cards: [#("alice", sc(Leadership, False))],
+    )
   let cmd = commands.take_action(game_id, "alice", StrategicAction(Leadership))
   let assert Ok(events) = aggregate.handle_action(state, cmd)
   assert list.contains(events, StrategyCardExhausted(game_id, Leadership))

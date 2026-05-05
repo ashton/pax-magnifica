@@ -1,4 +1,4 @@
-import core/models/strategy.{Leadership, Trade}
+import core/models/strategy.{Leadership}
 import core/models/strategy_card.{StrategyCard}
 import core/value_objects/player
 

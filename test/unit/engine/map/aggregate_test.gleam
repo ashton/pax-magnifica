@@ -11,7 +11,7 @@ import gleam/list
 import gleam/string
 
 pub fn handle_create_map_grid_valid_test() {
-  let command = commands.create_map_grid(player_count: 6)
+  let command = commands.create_map_grid(player_count: 3)
   let assert Ok(_) = aggregate.handle(command)
 }
 

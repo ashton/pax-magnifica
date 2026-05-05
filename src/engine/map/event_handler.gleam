@@ -1,6 +1,6 @@
 import core/models/map as game_map
 import core/models/state.{type State, MapSetup}
-import core/models/state/map.{type MapState, MapState}
+import core/models/state/map.{MapState}
 import engine/map/events.{type MapEvent, GridDefined, MapCreated, TileSet}
 
 pub fn apply(state: State, event: MapEvent) -> State {

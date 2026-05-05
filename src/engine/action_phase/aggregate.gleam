@@ -86,12 +86,11 @@ fn produce_action_events(
   player_id: String,
   action: PlayerAction,
 ) -> List(ActionPhaseEvent) {
-  let base = [events.PlayerTookAction(game_id, player_id, action)]
   let extra = case action {
     StrategicAction(strategy: strat) -> [events.StrategyCardExhausted(game_id, strat)]
     _ -> []
   }
-  list.flatten([base, extra])
+  [events.PlayerTookAction(game_id, player_id, action), ..extra]
 }
 
 fn produce_pass_events(
@@ -107,7 +106,7 @@ fn produce_pass_events(
     [] -> [events.ActionPhaseEnded(game_id)]
     _ -> []
   }
-  list.flatten([[events.PlayerPassed(game_id, player_id)], end_events])
+  [events.PlayerPassed(game_id, player_id), ..end_events]
 }
 
 fn next_player(state: ActionPhaseState) -> String {

@@ -12,6 +12,10 @@ fn validate(command: LobbyCommand) -> Result(LobbyCommand, String) {
   }
 }
 
+pub fn validate_command(command: LobbyCommand) -> Result(LobbyCommand, String) {
+  validate(command)
+}
+
 pub fn handle(command: LobbyCommand) -> Result(List(LobbyEvent), String) {
   use _ <- result.try(validate(command))
   case command {

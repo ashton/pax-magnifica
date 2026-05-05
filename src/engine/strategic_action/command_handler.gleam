@@ -40,5 +40,5 @@ pub fn process_secondary(
     [] -> [events.StrategicActionEnded(game_id)]
     _ -> []
   }
-  list.flatten([[response_event], end_events])
+  [response_event, ..end_events]
 }

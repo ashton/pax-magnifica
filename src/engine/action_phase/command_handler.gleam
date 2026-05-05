@@ -16,14 +16,13 @@ pub fn process_action(
   command: ActionPhaseCommand,
 ) -> List(ActionPhaseEvent) {
   let assert TakeAction(game_id, player_id, action) = command
-  let base = [events.PlayerTookAction(game_id, player_id, action)]
   let extra = case action {
     StrategicAction(strategy: strat) -> [
       events.StrategyCardExhausted(game_id, strat),
     ]
     _ -> []
   }
-  list.flatten([base, extra])
+  [events.PlayerTookAction(game_id, player_id, action), ..extra]
 }
 
 pub fn process_pass(
@@ -39,5 +38,5 @@ pub fn process_pass(
     [] -> [events.ActionPhaseEnded(game_id)]
     _ -> []
   }
-  list.flatten([[events.PlayerPassed(game_id, player_id)], end_events])
+  [events.PlayerPassed(game_id, player_id), ..end_events]
 }
