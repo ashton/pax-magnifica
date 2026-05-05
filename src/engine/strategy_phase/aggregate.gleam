@@ -25,18 +25,19 @@ pub fn validate_pick(
   use _ <- result.try(player.new_id(player_id))
   let picked_cards = list.map(state.current_picks, fn(p) { p.1 })
   let picked_players = list.map(state.current_picks, fn(p) { p.0 })
-  case list.contains(picked_cards, card) {
+  use _ <- result.try(case list.contains(picked_cards, card) {
     True -> Error("Strategy card has already been picked")
-    False ->
-      case list.contains(picked_players, player_id) {
-        True -> Error("Player has already picked a strategy card this round")
-        False ->
-          case next_player(state) == player_id {
-            True -> Ok(command)
-            False -> Error("It is not this player's turn to pick")
-          }
-      }
-  }
+    False -> Ok(Nil)
+  })
+  use _ <- result.try(case list.contains(picked_players, player_id) {
+    True -> Error("Player has already picked a strategy card this round")
+    False -> Ok(Nil)
+  })
+  use _ <- result.try(case next_player(state) == player_id {
+    True -> Ok(Nil)
+    False -> Error("It is not this player's turn to pick")
+  })
+  Ok(command)
 }
 
 fn next_player(state: StrategyPhaseState) -> String {
