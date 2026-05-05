@@ -4,8 +4,11 @@ import engine/game_setup/commands.{
   type GameSetupCommand, AddSecretObjectiveToPlayer, AppointSpeaker, CreateGame,
   DealSecretObjectives, JoinGame, SetPlayerInitialComponents, StartGame,
 }
+import engine/game_setup/events.{type GameSetupEvent, PlayerGainedCommandTokens}
 import gleam/int
 import gleam/result
+
+const default_victory_points = 10
 
 fn validate_player_count(player_count: Int) -> Result(Int, String) {
   case player_count >= 3, player_count <= 6 {
@@ -25,7 +28,7 @@ fn validate_ids(game_id: String, player_id: String) -> Result(Nil, String) {
   Ok(Nil)
 }
 
-pub fn validate_command(
+fn validate(
   command: GameSetupCommand,
 ) -> Result(GameSetupCommand, String) {
   case command {
@@ -55,5 +58,51 @@ pub fn validate_command(
       |> result.replace(command)
 
     StartGame -> Ok(command)
+  }
+}
+
+pub fn handle(
+  command: GameSetupCommand,
+) -> Result(List(GameSetupEvent), String) {
+  use _ <- result.try(validate(command))
+  case command {
+    CreateGame(game_id, player_count, setup_type) ->
+      Ok([
+        events.GameCreated(
+          game_id,
+          player_count,
+          default_victory_points,
+          setup_type,
+        ),
+      ])
+
+    JoinGame(game_id, player_id, color, faction) ->
+      Ok([events.PlayerJoined(game_id, player_id, color, faction)])
+
+    DealSecretObjectives(game_id, player_id, objectives) ->
+      Ok([events.SecretObjectivesDealt(game_id, player_id, objectives)])
+
+    AddSecretObjectiveToPlayer(game_id, player_id, objective) ->
+      Ok([events.PlayerAddedSecretObjective(game_id, player_id, objective)])
+
+    AppointSpeaker(game_id, player_id) ->
+      Ok([events.SpeakerAppointed(game_id, player_id)])
+
+    SetPlayerInitialComponents(
+      game_id,
+      player_id,
+      techs,
+      units,
+      starting_planets,
+      starting_command_tokens,
+    ) ->
+      Ok([
+        events.PlayerStartingTechnologiesSetup(game_id, player_id, techs),
+        events.PlayerStartingUnitsSetup(game_id, player_id, units),
+        events.PlayerStartingPlanetsSetup(game_id, player_id, starting_planets),
+        PlayerGainedCommandTokens(game_id, player_id, starting_command_tokens),
+      ])
+
+    StartGame -> Ok([])
   }
 }
