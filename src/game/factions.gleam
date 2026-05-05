@@ -267,7 +267,7 @@ pub fn make_muaat() -> faction.Faction {
             PreReq(kind: Warfare, amount: 3),
             PreReq(kind: Cybernetic, amount: 1),
           ],
-          unit: custom_upgraded_war_sun |> unit.Ship,
+          unit: custom_upgraded_war_sun |> unit.ShipUnit,
         ),
       ],
       starting_units: [
@@ -381,7 +381,7 @@ pub fn make_sol() -> faction.Faction {
         ),
         UnitUpgrade(
           requirements: [PreReq(kind: Propulsion, amount: 2)],
-          unit: custom_upgraded_carrier |> unit.Ship,
+          unit: custom_upgraded_carrier |> unit.ShipUnit,
         ),
       ],
       starting_units: [
@@ -397,7 +397,7 @@ pub fn make_sol() -> faction.Faction {
     data.ships
     |> list.map(fn(item) {
       case item {
-        unit.Carrier(..) -> custom_carrier
+        unit.Ship(kind: unit.Carrier(_), ..) -> custom_carrier
         _ -> item
       }
     })
@@ -487,7 +487,7 @@ pub fn make_lizix() -> faction.Faction {
             PreReq(kind: Propulsion, amount: 2),
             PreReq(kind: Cybernetic, amount: 1),
           ],
-          unit: custom_upgraded_dreadnought |> unit.Ship,
+          unit: custom_upgraded_dreadnought |> unit.ShipUnit,
         ),
       ],
       starting_units: [
@@ -504,7 +504,7 @@ pub fn make_lizix() -> faction.Faction {
     data.ships
     |> list.map(fn(item) {
       case item {
-        unit.Dreadnought(..) -> custom_dreadnought
+        unit.Ship(kind: unit.Dreadnought(_), ..) -> custom_dreadnought
         _ -> item
       }
     })
@@ -593,7 +593,7 @@ pub fn make_naalu() -> faction.Faction {
             PreReq(kind: Biotic, amount: 1),
             PreReq(kind: Propulsion, amount: 1),
           ],
-          unit: custom_upgraded_fighter |> unit.Ship,
+          unit: custom_upgraded_fighter |> unit.ShipUnit,
         ),
       ],
       starting_units: [
@@ -611,7 +611,7 @@ pub fn make_naalu() -> faction.Faction {
     data.ships
     |> list.map(fn(item) {
       case item {
-        unit.Fighter(..) -> custom_fighter
+        unit.Ship(kind: unit.Fighter(_), ..) -> custom_fighter
         _ -> item
       }
     })
@@ -697,7 +697,7 @@ pub fn make_sardakk() -> faction.Faction {
             PreReq(kind: Propulsion, amount: 2),
             PreReq(kind: Cybernetic, amount: 1),
           ],
-          unit: custom_upgraded_dreadnought |> unit.Ship,
+          unit: custom_upgraded_dreadnought |> unit.ShipUnit,
         ),
       ],
       starting_units: [
@@ -713,7 +713,7 @@ pub fn make_sardakk() -> faction.Faction {
     data.ships
     |> list.map(fn(item) {
       case item {
-        unit.Dreadnought(..) -> custom_dreadnought
+        unit.Ship(kind: unit.Dreadnought(_), ..) -> custom_dreadnought
         _ -> item
       }
     })

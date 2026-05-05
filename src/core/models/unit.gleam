@@ -21,90 +21,25 @@ pub type UnitClass {
   Minor
 }
 
-pub type UnitKind {
-  FighterKind
-  InfantryKind
-  CarrierKind
-  DestroyerKind
-  CruiserKind
-  DreadnoughtKind
-  WarSunKind
-  FlagshipKind
-  PDSKind
-  SpaceDockKind
-}
-
-pub type Structure {
-  SpaceDock(
-    name: String,
-    movement: Int,
-    capacity: Int,
-    abilities: List(Ability),
-  )
-  PDS(name: String, abilities: List(Ability))
+pub type ShipKind {
+  FlagShip(capacity: Int)
+  WarSun(capacity: Int)
+  Cruiser(capacity: Int)
+  Dreadnought(capacity: Int)
+  Destroyer
+  Carrier(capacity: Int)
+  Fighter(reference_amount: Int)
 }
 
 pub type Ship {
-  FlagShip(
-    name: String,
-    class: UnitClass,
-    cost: Int,
-    combat: Hit,
-    movement: Int,
-    capacity: Int,
-    abilities: List(Ability),
-  )
-  WarSun(
-    name: String,
-    class: UnitClass,
-    cost: Int,
-    combat: Hit,
-    movement: Int,
-    capacity: Int,
-    abilities: List(Ability),
-  )
-  Cruiser(
-    name: String,
-    class: UnitClass,
-    cost: Int,
-    combat: Hit,
-    movement: Int,
-    capacity: Int,
-    abilities: List(Ability),
-  )
-  Dreadnought(
-    name: String,
-    class: UnitClass,
-    cost: Int,
-    combat: Hit,
-    movement: Int,
-    capacity: Int,
-    abilities: List(Ability),
-  )
-  Destroyer(
+  Ship(
     name: String,
     class: UnitClass,
     cost: Int,
     combat: Hit,
     movement: Int,
     abilities: List(Ability),
-  )
-  Carrier(
-    name: String,
-    class: UnitClass,
-    cost: Int,
-    combat: Hit,
-    movement: Int,
-    capacity: Int,
-    abilities: List(Ability),
-  )
-  Fighter(
-    name: String,
-    class: UnitClass,
-    cost: Int,
-    movement: Int,
-    reference_amount: Int,
-    combat: Hit,
+    kind: ShipKind,
   )
 }
 
@@ -118,8 +53,18 @@ pub type GroundForce {
   )
 }
 
+pub type Structure {
+  SpaceDock(
+    name: String,
+    movement: Int,
+    capacity: Int,
+    abilities: List(Ability),
+  )
+  PDS(name: String, abilities: List(Ability))
+}
+
 pub type Unit {
-  Ship(Ship)
+  ShipUnit(Ship)
   GroundForce(GroundForce)
   Structure(Structure)
 }

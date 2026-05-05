@@ -10,12 +10,12 @@ pub fn make_fighter(
   movement movement: Option(Int),
   combat combat: Option(Hit),
 ) -> unit.Ship {
-  unit.Fighter(
+  unit.Ship(
     name: name |> or("Fighter I"),
     class: unit.Minor,
     cost: cost |> or(1),
     movement: movement |> or(0),
-    reference_amount: amount_produced |> or(2),
+    abilities: [],
     combat: combat
       |> or(Hit(
         dice_amount: Some(1),
@@ -24,6 +24,7 @@ pub fn make_fighter(
         range: None,
         reroll_misses: False,
       )),
+    kind: unit.Fighter(reference_amount: amount_produced |> or(2)),
   )
 }
 
@@ -35,12 +36,11 @@ pub fn make_dreadnought(
   combat combat: Option(Hit),
   abilities abilities: Option(List(unit.Ability)),
 ) -> unit.Ship {
-  unit.Dreadnought(
-    name: name |> or("Dreadnough I"),
+  unit.Ship(
+    name: name |> or("Dreadnought I"),
     class: unit.Major,
     cost: cost |> or(4),
     movement: movement |> or(1),
-    capacity: capacity |> or(1),
     combat: combat
       |> or(Hit(
         dice_amount: Some(1),
@@ -60,6 +60,7 @@ pub fn make_dreadnought(
           reroll_misses: False,
         )),
       ]),
+    kind: unit.Dreadnought(capacity: capacity |> or(1)),
   )
 }
 
@@ -69,7 +70,7 @@ pub fn make_destroyer(
   movement movement: Option(Int),
   combat combat: Option(Hit),
 ) -> unit.Ship {
-  unit.Destroyer(
+  unit.Ship(
     name: name |> or("Destroyer I"),
     class: unit.Major,
     cost: cost |> or(1),
@@ -91,6 +92,7 @@ pub fn make_destroyer(
         reroll_misses: False,
       )),
     ],
+    kind: unit.Destroyer,
   )
 }
 
@@ -101,12 +103,11 @@ pub fn make_cruiser(
   movement movement: Option(Int),
   combat combat: Option(Hit),
 ) -> unit.Ship {
-  unit.Cruiser(
+  unit.Ship(
     name: name |> or("Cruiser I"),
     class: unit.Major,
     cost: cost |> or(2),
     movement: movement |> or(2),
-    capacity: capacity |> or(0),
     combat: combat
       |> or(Hit(
         dice_amount: Some(1),
@@ -116,6 +117,7 @@ pub fn make_cruiser(
         reroll_misses: False,
       )),
     abilities: [],
+    kind: unit.Cruiser(capacity: capacity |> or(0)),
   )
 }
 
@@ -127,12 +129,11 @@ pub fn make_carrier(
   combat combat: Option(Hit),
   abilities abilities: List(unit.Ability),
 ) -> unit.Ship {
-  unit.Carrier(
+  unit.Ship(
     name: name |> or("Carrier I"),
     class: unit.Major,
     cost: cost |> or(3),
     movement: movement |> or(1),
-    capacity: capacity |> or(4),
     combat: combat
       |> or(Hit(
         dice_amount: Some(1),
@@ -142,6 +143,7 @@ pub fn make_carrier(
         reroll_misses: False,
       )),
     abilities: abilities,
+    kind: unit.Carrier(capacity: capacity |> or(4)),
   )
 }
 
@@ -153,12 +155,11 @@ pub fn make_war_sun(
   combat combat: Option(Hit),
   abilities abilities: Option(List(unit.Ability)),
 ) -> unit.Ship {
-  unit.WarSun(
+  unit.Ship(
     name: name |> or("War Sun"),
     class: unit.Major,
     cost: cost |> or(12),
     movement: movement |> or(2),
-    capacity: capacity |> or(6),
     combat: combat
       |> or(Hit(
         dice_amount: Some(3),
@@ -179,6 +180,7 @@ pub fn make_war_sun(
           reroll_misses: False,
         )),
       ]),
+    kind: unit.WarSun(capacity: capacity |> or(6)),
   )
 }
 
