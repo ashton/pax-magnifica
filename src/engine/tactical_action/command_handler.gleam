@@ -20,7 +20,10 @@ pub fn process_move_units(
   state: TacticalActionState,
   command: TacticalActionCommand,
 ) -> List(TacticalActionEvent) {
-  let assert MoveUnits(game_id, player_id, from, units, _enemy_fleets) = command
+  let assert MoveUnits(game_id, player_id, moves) = command
   let assert Ok(#(active_hex, _)) = list.first(state.activation_history)
-  [events.UnitsMoved(game_id, player_id, from: from, to: active_hex, units: units)]
+  list.flat_map(moves, fn(move) {
+    let #(from, units) = move
+    [events.UnitsMoved(game_id, player_id, from: from, to: active_hex, units: units)]
+  })
 }

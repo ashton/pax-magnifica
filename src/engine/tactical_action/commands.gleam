@@ -6,9 +6,7 @@ pub type TacticalActionCommand {
   MoveUnits(
     game_id: String,
     player_id: String,
-    from: Hex,
-    units: List(Unit),
-    enemy_fleets: List(#(Hex, String)),
+    moves: List(#(Hex, List(Unit))),
   )
 }
 
@@ -23,9 +21,7 @@ pub fn activate_system(
 pub fn move_units(
   game_id: String,
   player_id: String,
-  from: Hex,
-  units: List(Unit),
-  enemy_fleets: List(#(Hex, String)),
+  moves: List(#(Hex, List(Unit))),
 ) -> TacticalActionCommand {
-  MoveUnits(game_id, player_id, from, units, enemy_fleets)
+  MoveUnits(game_id, player_id, moves)
 }

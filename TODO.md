@@ -9,6 +9,10 @@
 
 - [ ] **`RevokeVictoryPoints`**: Command and event for removing VPs from a player (e.g. losing Custodians token). Needs `PlayerLostVictoryPoints` event and fold into scoring state.
 
+## Combat
+
+- [ ] **Nebula combat bonus**: If a space combat occurs in a nebula, the defender applies +1 to each combat roll of their ships during that combat. Needs to be wired into the combat resolution logic when it is implemented.
+
 ## Known gaps (from setup rules analysis)
 
 - [ ] **`StartGame` command**: Currently has no fields — cannot produce a valid `GameStarted(game_id, players, game_board)` event. Needs redesign.

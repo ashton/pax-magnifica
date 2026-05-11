@@ -1,4 +1,5 @@
 import core/models/hex/hex.{type Hex}
+import core/models/planetary_system.{type Anomaly, Nebula}
 import core/models/unit.{type Unit}
 import gleam/int
 import gleam/list
@@ -60,14 +61,24 @@ pub fn capacity(units: List(Unit)) -> Result(Nil, String) {
   }
 }
 
-// Validates movement range and resolves where the fleet ends up, accounting
-// for enemy fleets blocking intermediate systems. Ships route around blocked
-// systems when their movement allows it.
+// Validates movement range and resolves where the fleet ends up.
+//
+// Nebula rules applied here:
+//   - Ships starting from a nebula treat their move value as 1.
+//   - Nebulae on intermediate hexes are hard-blocked (ships cannot transit
+//     through them). If no path exists avoiding nebulae, the move is invalid.
+//   - Moving into a nebula is allowed only when it is the activated system
+//     (the destination `to`), which is naturally satisfied by excluding `to`
+//     from the hard-blocked set.
+//
+// Enemy fleets are soft-blocked: ships stop at the first enemy and combat
+// begins, but only when at least one nebula-free path exists.
 pub fn resolve_path(
   from: Hex,
   to: Hex,
   units: List(Unit),
   enemy_fleets: List(#(Hex, String)),
+  anomalies: List(#(Hex, Anomaly)),
 ) -> Result(Outcome, String) {
   use distance <- result.try(
     hex.distance(from, to)
@@ -84,17 +95,56 @@ pub fn resolve_path(
         _ -> Error(Nil)
       }
     })
-  use _ <- result.try(case list.all(self_propelled, fn(ship) { ship.movement >= distance }) {
+  // Rule 3: ships starting in a nebula treat their move value as 1.
+  let from_in_nebula =
+    list.any(anomalies, fn(a) {
+      case a {
+        #(h, Nebula) if h == from -> True
+        _ -> False
+      }
+    })
+  let effective_movement = fn(ship: unit.Ship) {
+    case from_in_nebula {
+      True -> 1
+      False -> ship.movement
+    }
+  }
+  use _ <- result.try(case
+    list.all(self_propelled, fn(ship) { effective_movement(ship) >= distance })
+  {
     True -> Ok(Nil)
     False -> Error("Some ships do not have enough movement to reach the activated system")
   })
   let min_movement =
     self_propelled
-    |> list.map(fn(s) { s.movement })
+    |> list.map(effective_movement)
     |> list.reduce(int.min)
     |> result.unwrap(distance)
+  // Rules 1+2: nebulae on intermediate hexes (not `from`, not `to`) hard-block transit.
+  let nebula_blocked =
+    list.filter_map(anomalies, fn(a) {
+      case a {
+        #(h, Nebula) if h != from && h != to -> Ok(h)
+        _ -> Error(Nil)
+      }
+    })
   let enemy_hex_list = list.map(enemy_fleets, fn(f) { f.0 })
-  case hex.has_path_avoiding(from, to, min_movement, enemy_hex_list) {
+  // Hard check: if no path exists avoiding nebulae, the move is invalid.
+  use _ <- result.try(case
+    hex.has_path_avoiding(from, to, min_movement, nebula_blocked)
+  {
+    True -> Ok(Nil)
+    False -> Error("Cannot reach the activated system: all paths are blocked by nebulae")
+  })
+  // Soft check: if a path exists avoiding both nebulae and enemies, ships reach destination.
+  case
+    hex.has_path_avoiding(
+      from,
+      to,
+      min_movement,
+      list.append(nebula_blocked, enemy_hex_list),
+    )
+  {
     True -> Ok(ReachDestination(to))
     False -> {
       use intermediate_hexes <- result.try(
