@@ -55,10 +55,47 @@ only then, generate the implementation, and at the end, ALWAYS run the tests to 
 - **`game_setup/`** — Aggregate for setup phase (standard vs. Milty Draft modes)
 - **`map/`** — Hexagonal board construction and validation
 - **`game/phases/lobby/`** — Orchestration of commands/events during the lobby phase
+- **`tactical_action/`** — System activation and unit movement during a player's tactical action
+
+#### Internal organization of complex bounded contexts
+
+When a bounded context grows complex, extract domain rules into sub-modules rather than splitting into separate contexts. Sub-modules keep the aggregate thin and readable while avoiding cross-context coordination overhead.
+
+```
+engine/tactical_action/
+  commands.gleam
+  events.gleam
+  aggregate.gleam          ← orchestrates; reads like a specification
+  event_handler.gleam
+  activation/
+    validation.gleam       ← activation-specific domain rules
+  movement/
+    validation.gleam       ← movement rules + Outcome type
+```
+
+The aggregate delegates validation to sub-modules and translates their results into events. Sub-modules own their domain types (e.g. `movement.Outcome`).
+
+**When to split into a separate bounded context instead:** when a concept can happen independently of the parent action (e.g. faction abilities that move ships outside the normal tactical action flow). Until then, keep it internal.
+
+#### Command enrichment pattern
+
+Aggregates must stay pure (state + command → events, no side-effects). When validation requires data from another bounded context (e.g. enemy fleet positions needed to validate movement), the **caller** enriches the command before dispatching:
+
+1. The read-side projection holds the cross-context data (e.g. `GameState.fleets: Dict(Hex, String)`)
+2. The actor/command handler queries it, filters to the relevant subset, and adds it to the command (e.g. `enemy_fleets: List(#(Hex, String))`)
+3. The aggregate validates using only what the command provides
+
+This keeps aggregates testable in isolation — tests pass the enriched data directly without needing to set up external state.
 
 ### Hexagonal Grid (`src/core/models/hex/`)
 
 TI4 uses a hex map. The implementation uses **axial coordinates** (`hex.gleam`), with cube coordinate conversion (`vector.gleam`), ring operations (`ring.gleam`), and a grid container (`grid.gleam`).
+
+Key functions in `hex.gleam`:
+- `distance/2` — hex distance between two positions
+- `neighbors/1` — the 6 adjacent hexes
+- `path/2` — intermediate hexes on the straight-line route (cube-coordinate lerp), excludes endpoints
+- `has_path_avoiding/4` — BFS check: does any path of ≤ N steps exist that avoids a given set of hexes (used for movement blocking)
 
 ### Adding a New Command/Event
 
