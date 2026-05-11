@@ -9,6 +9,7 @@ import engine/strategic_action/events.{
   StrategicActionStarted,
 }
 import gleam/list
+import unitest
 
 const game_id = "game_1"
 
@@ -22,6 +23,7 @@ fn started_state(secondary_order, responded) {
 }
 
 pub fn start_emits_strategic_action_started_test() {
+  use <- unitest.tags(["unit", "strategic_action", "command_handler"])
   let cmd =
     start_strategic_action(game_id, "alice", Leadership, ["bob"])
   let assert Ok(event) = command_handler.process_start(cmd) |> list.first()
@@ -30,6 +32,7 @@ pub fn start_emits_strategic_action_started_test() {
 }
 
 pub fn resolve_emits_secondary_ability_resolved_test() {
+  use <- unitest.tags(["unit", "strategic_action", "command_handler"])
   let state = started_state(["bob", "charlie"], [])
   let cmd = resolve_secondary(game_id, "bob")
   let assert Ok(event) =
@@ -38,6 +41,7 @@ pub fn resolve_emits_secondary_ability_resolved_test() {
 }
 
 pub fn skip_emits_secondary_ability_skipped_test() {
+  use <- unitest.tags(["unit", "strategic_action", "command_handler"])
   let state = started_state(["bob", "charlie"], [])
   let cmd = skip_secondary(game_id, "charlie")
   let assert Ok(event) =
@@ -46,6 +50,7 @@ pub fn skip_emits_secondary_ability_skipped_test() {
 }
 
 pub fn last_response_emits_strategic_action_ended_test() {
+  use <- unitest.tags(["unit", "strategic_action", "command_handler"])
   // bob is the last to respond
   let state = started_state(["bob", "charlie"], ["charlie"])
   let cmd = resolve_secondary(game_id, "bob")
@@ -54,6 +59,7 @@ pub fn last_response_emits_strategic_action_ended_test() {
 }
 
 pub fn non_last_response_does_not_end_action_test() {
+  use <- unitest.tags(["unit", "strategic_action", "command_handler"])
   let state = started_state(["bob", "charlie"], [])
   let cmd = resolve_secondary(game_id, "bob")
   let events = command_handler.process_secondary(state, cmd)

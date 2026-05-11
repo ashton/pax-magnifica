@@ -8,22 +8,26 @@ import gleam/dict
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/result
+import unitest
 
 const game_id = "game_1"
 
 pub fn apply_phase_started_sets_player_order_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   let event = StrategyPhaseStarted(game_id, ["alice", "bob", "charlie"])
   let assert Some(state) = event_handler.apply(None, event)
   assert state.player_order == ["alice", "bob", "charlie"]
 }
 
 pub fn apply_phase_started_clears_picks_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   let event = StrategyPhaseStarted(game_id, ["alice", "bob"])
   let assert Some(state) = event_handler.apply(None, event)
   assert state.current_picks == []
 }
 
 pub fn apply_phase_started_preserves_trade_goods_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   // simulate a prior state with accumulated TGs
   let prior = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(s1) = event_handler.apply(None, prior)
@@ -40,6 +44,7 @@ pub fn apply_phase_started_preserves_trade_goods_test() {
 }
 
 pub fn apply_card_picked_adds_to_picks_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   let base = StrategyPhaseStarted(game_id, ["alice", "bob"])
   let assert Some(state) = event_handler.apply(None, base)
   let assert Some(state) =
@@ -51,6 +56,7 @@ pub fn apply_card_picked_adds_to_picks_test() {
 }
 
 pub fn apply_trade_good_added_increments_count_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(state) = event_handler.apply(None, base)
   let assert Some(state) =
@@ -68,6 +74,7 @@ pub fn apply_trade_good_added_increments_count_test() {
 }
 
 pub fn apply_trade_goods_cleared_resets_to_zero_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(state) = event_handler.apply(None, base)
   let assert Some(state) =
@@ -85,6 +92,7 @@ pub fn apply_trade_goods_cleared_resets_to_zero_test() {
 }
 
 pub fn apply_phase_ended_clears_picks_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(state) = event_handler.apply(None, base)
   let assert Some(state) =
@@ -98,6 +106,7 @@ pub fn apply_phase_ended_clears_picks_test() {
 }
 
 pub fn apply_phase_ended_preserves_trade_goods_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(state) = event_handler.apply(None, base)
   let assert Some(state) =

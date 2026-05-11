@@ -8,6 +8,7 @@ import engine/strategy_phase/events.{
 }
 import gleam/dict
 import gleam/list
+import unitest
 
 const game_id = "game_1"
 
@@ -30,6 +31,7 @@ fn state_with_picks(picks) {
 // ── StartStrategyPhase ────────────────────────────────────────────────────────
 
 pub fn start_strategy_phase_emits_started_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let cmd = commands.start_strategy_phase(game_id, ["alice", "bob"])
   let assert Ok(event) =
     command_handler.process_start(cmd) |> list.first()
@@ -39,6 +41,7 @@ pub fn start_strategy_phase_emits_started_test() {
 // ── PickStrategyCard ──────────────────────────────────────────────────────────
 
 pub fn pick_emits_card_picked_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let state = empty_state(["alice", "bob"])
   let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
   let events = command_handler.process_pick(state, cmd)
@@ -46,6 +49,7 @@ pub fn pick_emits_card_picked_test() {
 }
 
 pub fn pick_card_with_no_trade_goods_does_not_clear_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let state = empty_state(["alice", "bob"])
   let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
   let events = command_handler.process_pick(state, cmd)
@@ -53,6 +57,7 @@ pub fn pick_card_with_no_trade_goods_does_not_clear_test() {
 }
 
 pub fn pick_card_with_trade_goods_emits_cleared_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let state =
     StrategyPhaseState(
       card_trade_goods: dict.from_list([#(Leadership, 2)]),
@@ -65,6 +70,7 @@ pub fn pick_card_with_trade_goods_emits_cleared_test() {
 }
 
 pub fn last_pick_emits_trade_good_for_remaining_cards_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   // only alice and bob; alice picks first, bob's pick is last
   let state = state_with_picks([#("alice", Leadership)])
   let state = StrategyPhaseState(..state, player_order: ["alice", "bob"])
@@ -82,6 +88,7 @@ pub fn last_pick_emits_trade_good_for_remaining_cards_test() {
 }
 
 pub fn last_pick_emits_phase_ended_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let state = state_with_picks([#("alice", Leadership)])
   let state = StrategyPhaseState(..state, player_order: ["alice", "bob"])
   let cmd = commands.pick_strategy_card(game_id, "bob", Trade)
@@ -90,6 +97,7 @@ pub fn last_pick_emits_phase_ended_test() {
 }
 
 pub fn non_last_pick_does_not_emit_phase_ended_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let state = empty_state(["alice", "bob", "charlie"])
   let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
   let events = command_handler.process_pick(state, cmd)
@@ -97,6 +105,7 @@ pub fn non_last_pick_does_not_emit_phase_ended_test() {
 }
 
 pub fn last_pick_does_not_add_tg_to_picked_cards_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let state = state_with_picks([#("alice", Leadership)])
   let state = StrategyPhaseState(..state, player_order: ["alice", "bob"])
   let cmd = commands.pick_strategy_card(game_id, "bob", Trade)
@@ -106,6 +115,7 @@ pub fn last_pick_does_not_add_tg_to_picked_cards_test() {
 }
 
 pub fn last_pick_includes_warfare_in_remaining_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let state = state_with_picks([#("alice", Leadership)])
   let state = StrategyPhaseState(..state, player_order: ["alice", "bob"])
   let cmd = commands.pick_strategy_card(game_id, "bob", Trade)

@@ -10,6 +10,7 @@ import engine/action_phase/events.{
 }
 import gleam/list
 import gleam/option.{None, Some}
+import unitest
 
 const game_id = "game_1"
 
@@ -27,6 +28,7 @@ fn state_for(player_order, passed, last) {
 }
 
 pub fn start_emits_action_phase_started_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   let alice_card = sc(Leadership)
   let bob_card = sc(Diplomacy)
   let cmd =
@@ -39,6 +41,7 @@ pub fn start_emits_action_phase_started_test() {
 }
 
 pub fn take_action_emits_player_took_action_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   let state = state_for(["alice", "bob"], [], None)
   let cmd = commands.take_action(game_id, "alice", TacticalAction)
   let assert Ok(event) =
@@ -47,6 +50,7 @@ pub fn take_action_emits_player_took_action_test() {
 }
 
 pub fn take_action_does_not_end_phase_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   let state = state_for(["alice", "bob"], [], None)
   let cmd = commands.take_action(game_id, "alice", TacticalAction)
   let events = command_handler.process_action(state, cmd)
@@ -54,6 +58,7 @@ pub fn take_action_does_not_end_phase_test() {
 }
 
 pub fn strategic_action_emits_strategy_card_exhausted_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   let state = state_for(["alice", "bob"], [], None)
   let cmd = commands.take_action(game_id, "alice", StrategicAction(Leadership))
   let events = command_handler.process_action(state, cmd)
@@ -61,6 +66,7 @@ pub fn strategic_action_emits_strategy_card_exhausted_test() {
 }
 
 pub fn tactical_action_does_not_exhaust_card_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   let state = state_for(["alice", "bob"], [], None)
   let cmd = commands.take_action(game_id, "alice", TacticalAction)
   let events = command_handler.process_action(state, cmd)
@@ -68,6 +74,7 @@ pub fn tactical_action_does_not_exhaust_card_test() {
 }
 
 pub fn pass_emits_player_passed_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   let state = state_for(["alice", "bob"], [], None)
   let cmd = commands.pass(game_id, "alice")
   let assert Ok(event) =
@@ -76,6 +83,7 @@ pub fn pass_emits_player_passed_test() {
 }
 
 pub fn last_pass_emits_action_phase_ended_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   // bob is the last remaining player, alice already passed
   let state = state_for(["alice", "bob"], ["alice"], Some("alice"))
   let cmd = commands.pass(game_id, "bob")
@@ -84,6 +92,7 @@ pub fn last_pass_emits_action_phase_ended_test() {
 }
 
 pub fn non_last_pass_does_not_end_phase_test() {
+  use <- unitest.tags(["unit", "action_phase", "command_handler"])
   let state = state_for(["alice", "bob", "charlie"], [], None)
   let cmd = commands.pass(game_id, "alice")
   let events = command_handler.process_pass(state, cmd)

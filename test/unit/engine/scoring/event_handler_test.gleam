@@ -3,8 +3,10 @@ import engine/scoring/event_handler
 import engine/scoring/events.{PlayerScoredVictoryPoints}
 import gleam/dict
 import gleam/option.{None, Some}
+import unitest
 
 pub fn apply_player_scored_initialises_score_test() {
+  use <- unitest.tags(["unit", "scoring", "event_handler"])
   let event = PlayerScoredVictoryPoints("game_1", "player_1", Imperial, 1)
   let assert Some(scores) = event_handler.apply(None, event)
   let assert Ok(vp) = dict.get(scores, "player_1")
@@ -12,6 +14,7 @@ pub fn apply_player_scored_initialises_score_test() {
 }
 
 pub fn apply_player_scored_accumulates_points_test() {
+  use <- unitest.tags(["unit", "scoring", "event_handler"])
   let state =
     Some(dict.from_list([#("player_1", 2)]))
   let event = PlayerScoredVictoryPoints("game_1", "player_1", Imperial, 3)
@@ -21,6 +24,7 @@ pub fn apply_player_scored_accumulates_points_test() {
 }
 
 pub fn apply_player_scored_tracks_multiple_players_test() {
+  use <- unitest.tags(["unit", "scoring", "event_handler"])
   let state = Some(dict.from_list([#("player_1", 3)]))
   let event =
     PlayerScoredVictoryPoints("game_1", "player_2", PublicObjectiveScored("obj_1"), 2)
@@ -32,6 +36,7 @@ pub fn apply_player_scored_tracks_multiple_players_test() {
 }
 
 pub fn apply_player_scored_custodians_worth_one_test() {
+  use <- unitest.tags(["unit", "scoring", "event_handler"])
   let event = PlayerScoredVictoryPoints("game_1", "player_1", Custodians, 1)
   let assert Some(scores) = event_handler.apply(None, event)
   let assert Ok(vp) = dict.get(scores, "player_1")

@@ -6,10 +6,12 @@ import engine/strategic_action/events.{
 }
 import gleam/list
 import gleam/option.{None, Some}
+import unitest
 
 const game_id = "game_1"
 
 pub fn apply_started_sets_state_test() {
+  use <- unitest.tags(["unit", "strategic_action", "event_handler"])
   let event =
     StrategicActionStarted(game_id, "alice", Leadership, ["bob", "charlie"])
   let assert Some(state) = event_handler.apply(None, event)
@@ -20,6 +22,7 @@ pub fn apply_started_sets_state_test() {
 }
 
 pub fn apply_secondary_resolved_adds_to_responded_test() {
+  use <- unitest.tags(["unit", "strategic_action", "event_handler"])
   let assert Some(state) =
     event_handler.apply(
       None,
@@ -31,6 +34,7 @@ pub fn apply_secondary_resolved_adds_to_responded_test() {
 }
 
 pub fn apply_secondary_skipped_adds_to_responded_test() {
+  use <- unitest.tags(["unit", "strategic_action", "event_handler"])
   let assert Some(state) =
     event_handler.apply(
       None,
@@ -42,6 +46,7 @@ pub fn apply_secondary_skipped_adds_to_responded_test() {
 }
 
 pub fn apply_ended_does_not_change_state_test() {
+  use <- unitest.tags(["unit", "strategic_action", "event_handler"])
   let assert Some(state) =
     event_handler.apply(
       None,
@@ -53,6 +58,7 @@ pub fn apply_ended_does_not_change_state_test() {
 }
 
 pub fn apply_on_none_returns_none_for_non_starting_events_test() {
+  use <- unitest.tags(["unit", "strategic_action", "event_handler"])
   assert None
     == event_handler.apply(None, SecondaryAbilityResolved(game_id, "bob"))
 }

@@ -10,6 +10,7 @@ import engine/game_setup/commands.{SetPlayerInitialComponents}
 import game/planets
 import game/technologies
 import gleam/list
+import unitest
 
 fn components_for(faction) {
   let assert SetPlayerInitialComponents(_, _, techs, units, starting_planets, _) =
@@ -20,12 +21,14 @@ fn components_for(faction) {
 // ── Arborec ──────────────────────────────────────────────────────────────────
 
 pub fn arborec_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Arborec)
   assert list.contains(techs, technologies.magen_defense_grid)
   assert list.length(techs) == 1
 }
 
 pub fn arborec_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Arborec)
   assert list.contains(units, CarrierAmount(1))
   assert list.contains(units, CruiserAmount(1))
@@ -38,6 +41,7 @@ pub fn arborec_starting_units_test() {
 // ── Letnev ───────────────────────────────────────────────────────────────────
 
 pub fn letnev_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Letnev)
   assert list.contains(techs, technologies.antimass_deflectors)
   assert list.contains(techs, technologies.plasma_scoring)
@@ -45,6 +49,7 @@ pub fn letnev_starting_technologies_test() {
 }
 
 pub fn letnev_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Letnev)
   assert list.contains(units, DreadnoughtAmount(1))
   assert list.contains(units, CarrierAmount(1))
@@ -57,12 +62,14 @@ pub fn letnev_starting_units_test() {
 // ── Saar ─────────────────────────────────────────────────────────────────────
 
 pub fn saar_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Saar)
   assert list.contains(techs, technologies.antimass_deflectors)
   assert list.length(techs) == 1
 }
 
 pub fn saar_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Saar)
   assert list.contains(units, DreadnoughtAmount(1))
   assert list.contains(units, CarrierAmount(1))
@@ -75,12 +82,14 @@ pub fn saar_starting_units_test() {
 // ── Muaat ────────────────────────────────────────────────────────────────────
 
 pub fn muaat_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Muaat)
   assert list.contains(techs, technologies.plasma_scoring)
   assert list.length(techs) == 1
 }
 
 pub fn muaat_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Muaat)
   assert list.contains(units, WarSunAmount(1))
   assert list.contains(units, FighterAmount(2))
@@ -91,6 +100,7 @@ pub fn muaat_starting_units_test() {
 // ── Hacan ────────────────────────────────────────────────────────────────────
 
 pub fn hacan_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Hacan)
   assert list.contains(techs, technologies.antimass_deflectors)
   assert list.contains(techs, technologies.sarween_tools)
@@ -98,6 +108,7 @@ pub fn hacan_starting_technologies_test() {
 }
 
 pub fn hacan_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Hacan)
   assert list.contains(units, CarrierAmount(2))
   assert list.contains(units, CruiserAmount(1))
@@ -109,6 +120,7 @@ pub fn hacan_starting_units_test() {
 // ── Sol ──────────────────────────────────────────────────────────────────────
 
 pub fn sol_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Sol)
   assert list.contains(techs, technologies.antimass_deflectors)
   assert list.contains(techs, technologies.neural_motivator)
@@ -116,6 +128,7 @@ pub fn sol_starting_technologies_test() {
 }
 
 pub fn sol_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Sol)
   assert list.contains(units, CarrierAmount(2))
   assert list.contains(units, DestroyerAmount(1))
@@ -127,12 +140,14 @@ pub fn sol_starting_units_test() {
 // ── Creuss ───────────────────────────────────────────────────────────────────
 
 pub fn creuss_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Creuss)
   assert list.contains(techs, technologies.gravity_drive)
   assert list.length(techs) == 1
 }
 
 pub fn creuss_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Creuss)
   assert list.contains(units, CarrierAmount(1))
   assert list.contains(units, DestroyerAmount(2))
@@ -144,6 +159,7 @@ pub fn creuss_starting_units_test() {
 // ── L1Z1X ────────────────────────────────────────────────────────────────────
 
 pub fn lizix_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Lizix)
   assert list.contains(techs, technologies.neural_motivator)
   assert list.contains(techs, technologies.plasma_scoring)
@@ -151,6 +167,7 @@ pub fn lizix_starting_technologies_test() {
 }
 
 pub fn lizix_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Lizix)
   assert list.contains(units, DreadnoughtAmount(1))
   assert list.contains(units, CarrierAmount(1))
@@ -163,6 +180,7 @@ pub fn lizix_starting_units_test() {
 // ── Mentak ───────────────────────────────────────────────────────────────────
 
 pub fn mentak_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Mentak)
   assert list.contains(techs, technologies.sarween_tools)
   assert list.contains(techs, technologies.plasma_scoring)
@@ -170,6 +188,7 @@ pub fn mentak_starting_technologies_test() {
 }
 
 pub fn mentak_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Mentak)
   assert list.contains(units, CarrierAmount(1))
   assert list.contains(units, CruiserAmount(2))
@@ -182,6 +201,7 @@ pub fn mentak_starting_units_test() {
 // ── Naalu ────────────────────────────────────────────────────────────────────
 
 pub fn naalu_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Naalu)
   assert list.contains(techs, technologies.sarween_tools)
   assert list.contains(techs, technologies.neural_motivator)
@@ -189,6 +209,7 @@ pub fn naalu_starting_technologies_test() {
 }
 
 pub fn naalu_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Naalu)
   assert list.contains(units, CarrierAmount(1))
   assert list.contains(units, CruiserAmount(1))
@@ -202,12 +223,14 @@ pub fn naalu_starting_units_test() {
 // ── Nekro ────────────────────────────────────────────────────────────────────
 
 pub fn nekro_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Nekro)
   assert list.contains(techs, technologies.dacxive_animators)
   assert list.length(techs) == 1
 }
 
 pub fn nekro_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Nekro)
   assert list.contains(units, DreadnoughtAmount(1))
   assert list.contains(units, CarrierAmount(1))
@@ -220,11 +243,13 @@ pub fn nekro_starting_units_test() {
 // ── Sardakk N'orr ────────────────────────────────────────────────────────────
 
 pub fn sardakk_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Sardakk)
   assert techs == []
 }
 
 pub fn sardakk_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Sardakk)
   assert list.contains(units, CarrierAmount(2))
   assert list.contains(units, CruiserAmount(1))
@@ -236,6 +261,7 @@ pub fn sardakk_starting_units_test() {
 // ── Jol-Nar ──────────────────────────────────────────────────────────────────
 
 pub fn jol_nar_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(JolNar)
   assert list.contains(techs, technologies.neural_motivator)
   assert list.contains(techs, technologies.antimass_deflectors)
@@ -245,6 +271,7 @@ pub fn jol_nar_starting_technologies_test() {
 }
 
 pub fn jol_nar_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(JolNar)
   assert list.contains(units, DreadnoughtAmount(1))
   assert list.contains(units, CarrierAmount(2))
@@ -257,12 +284,14 @@ pub fn jol_nar_starting_units_test() {
 // ── Winnu ────────────────────────────────────────────────────────────────────
 
 pub fn winnu_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   // Winnu choose 1 tech with no prerequisites during setup — no fixed starting tech
   let #(techs, _, _) = components_for(Winnu)
   assert techs == []
 }
 
 pub fn winnu_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Winnu)
   assert list.contains(units, CarrierAmount(1))
   assert list.contains(units, CruiserAmount(1))
@@ -275,12 +304,14 @@ pub fn winnu_starting_units_test() {
 // ── Xxcha ────────────────────────────────────────────────────────────────────
 
 pub fn xxcha_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Xxcha)
   assert list.contains(techs, technologies.graviton_laser_system)
   assert list.length(techs) == 1
 }
 
 pub fn xxcha_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Xxcha)
   assert list.contains(units, CarrierAmount(1))
   assert list.contains(units, CruiserAmount(2))
@@ -293,12 +324,14 @@ pub fn xxcha_starting_units_test() {
 // ── Yin ──────────────────────────────────────────────────────────────────────
 
 pub fn yin_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Yin)
   assert list.contains(techs, technologies.sarween_tools)
   assert list.length(techs) == 1
 }
 
 pub fn yin_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Yin)
   assert list.contains(units, CarrierAmount(2))
   assert list.contains(units, DestroyerAmount(1))
@@ -310,12 +343,14 @@ pub fn yin_starting_units_test() {
 // ── Yssaril ──────────────────────────────────────────────────────────────────
 
 pub fn yssaril_starting_technologies_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(techs, _, _) = components_for(Yssaril)
   assert list.contains(techs, technologies.neural_motivator)
   assert list.length(techs) == 1
 }
 
 pub fn yssaril_starting_units_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, units, _) = components_for(Yssaril)
   assert list.contains(units, CarrierAmount(2))
   assert list.contains(units, DestroyerAmount(1))
@@ -327,86 +362,103 @@ pub fn yssaril_starting_units_test() {
 // ── Starting planets ─────────────────────────────────────────────────────────
 
 pub fn arborec_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Arborec)
   assert p == [planets.nestphar]
 }
 
 pub fn letnev_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Letnev)
   assert p == [planets.arc_prime, planets.wren_terra]
 }
 
 pub fn saar_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Saar)
   assert p == [planets.lisis_ii, planets.ragh]
 }
 
 pub fn muaat_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Muaat)
   assert p == [planets.muaat]
 }
 
 pub fn hacan_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Hacan)
   assert p == [planets.arretze, planets.hercant, planets.kamdorn]
 }
 
 pub fn sol_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Sol)
   assert p == [planets.jord]
 }
 
 pub fn creuss_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Creuss)
   assert p == [planets.creuss]
 }
 
 pub fn lizix_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Lizix)
   assert p == [planets.triplezero]
 }
 
 pub fn mentak_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Mentak)
   assert p == [planets.moll_primus]
 }
 
 pub fn naalu_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Naalu)
   assert p == [planets.maaluuk, planets.druaa]
 }
 
 pub fn nekro_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Nekro)
   assert p == [planets.mordai_ii]
 }
 
 pub fn sardakk_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Sardakk)
   assert p == [planets.trenlak, planets.quinarra]
 }
 
 pub fn jol_nar_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(JolNar)
   assert p == [planets.jol, planets.nar]
 }
 
 pub fn winnu_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Winnu)
   assert p == [planets.winnu]
 }
 
 pub fn xxcha_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Xxcha)
   assert p == [planets.archon_ren, planets.archon_tau]
 }
 
 pub fn yin_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Yin)
   assert p == [planets.darien]
 }
 
 pub fn yssaril_starting_planets_test() {
+  use <- unitest.tags(["unit", "game_setup", "initial_components"])
   let #(_, _, p) = components_for(Yssaril)
   assert p == [planets.retillion, planets.shalloq]
 }

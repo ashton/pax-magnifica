@@ -12,14 +12,17 @@ import engine/game_setup/events.{
 }
 import game/technologies
 import gleam/list
+import unitest
 
 pub fn process_create_game_emits_game_created_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd = commands.create_game(6, Standard)
   let assert Ok(event) = command_handler.process(cmd) |> list.first()
   let assert GameCreated(_, 6, 10, Standard) = event
 }
 
 pub fn process_create_game_default_victory_points_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd = commands.create_game(3, Milty)
   let assert Ok(event) = command_handler.process(cmd) |> list.first()
   let assert GameCreated(_, _, victory_points, _) = event
@@ -27,18 +30,21 @@ pub fn process_create_game_default_victory_points_test() {
 }
 
 pub fn process_join_game_emits_player_joined_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd = commands.join_game("game_1", "player_1", Green, Arborec)
   let assert Ok(event) = command_handler.process(cmd) |> list.first()
   assert PlayerJoined("game_1", "player_1", Green, Arborec) == event
 }
 
 pub fn process_join_game_preserves_color_and_faction_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd = commands.join_game("game_1", "player_2", Red, Sol)
   let assert Ok(event) = command_handler.process(cmd) |> list.first()
   assert PlayerJoined("game_1", "player_2", Red, Sol) == event
 }
 
 pub fn process_add_secret_objective_to_player_emits_event_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let objective = SecretObjective("obj_42")
   let cmd =
     commands.add_secret_objective_to_player("game_1", "player_1", objective)
@@ -47,6 +53,7 @@ pub fn process_add_secret_objective_to_player_emits_event_test() {
 }
 
 pub fn process_deal_secret_objectives_emits_dealt_event_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let objectives = [SecretObjective("obj_1"), SecretObjective("obj_2")]
   let assert Ok(cmd) =
     commands.deal_secret_objectives("game_1", "player_1", objectives)
@@ -55,6 +62,7 @@ pub fn process_deal_secret_objectives_emits_dealt_event_test() {
 }
 
 pub fn process_appoint_speaker_emits_speaker_appointed_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let assert Ok(cmd) =
     commands.appoint_speaker("game_1", ["alice", "bob", "charlie"])
   let assert Ok(event) = command_handler.process(cmd) |> list.first()
@@ -62,6 +70,7 @@ pub fn process_appoint_speaker_emits_speaker_appointed_test() {
 }
 
 pub fn process_setup_player_initial_components_emits_four_events_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd =
     commands.setup_player_initial_components("game_1", "player_1", Arborec)
   let events = command_handler.process(cmd)
@@ -69,6 +78,7 @@ pub fn process_setup_player_initial_components_emits_four_events_test() {
 }
 
 pub fn process_setup_player_emits_command_tokens_event_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd =
     commands.setup_player_initial_components("game_1", "player_1", Arborec)
   let assert Ok(PlayerGainedCommandTokens("game_1", "player_1", tokens)) =
@@ -85,6 +95,7 @@ pub fn process_setup_player_emits_command_tokens_event_test() {
 }
 
 pub fn process_setup_player_emits_technologies_event_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd =
     commands.setup_player_initial_components("game_1", "player_1", Arborec)
   let assert Ok(PlayerStartingTechnologiesSetup("game_1", "player_1", techs)) =
@@ -99,6 +110,7 @@ pub fn process_setup_player_emits_technologies_event_test() {
 }
 
 pub fn process_setup_player_emits_units_event_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd =
     commands.setup_player_initial_components("game_1", "player_1", Arborec)
   let assert Ok(PlayerStartingUnitsSetup("game_1", "player_1", units)) =
@@ -113,6 +125,7 @@ pub fn process_setup_player_emits_units_event_test() {
 }
 
 pub fn process_setup_player_emits_planets_event_test() {
+  use <- unitest.tags(["unit", "game_setup", "command_handler"])
   let cmd =
     commands.setup_player_initial_components("game_1", "player_1", Arborec)
   let assert Ok(PlayerStartingPlanetsSetup("game_1", "player_1", planets)) =

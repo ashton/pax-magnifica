@@ -2,13 +2,16 @@ import core/models/hex/hex
 import engine/map/commands.{CompleteMap, CreateMapGrid, SetTile}
 import game/systems
 import gleam/dict
+import unitest
 
 pub fn create_map_grid_test() {
+  use <- unitest.tags(["unit", "map", "commands"])
   let assert CreateMapGrid(ring_amount) = commands.create_map_grid(3)
   assert 3 == ring_amount
 }
 
 pub fn set_tile_test() {
+  use <- unitest.tags(["unit", "map", "commands"])
   let assert Ok(h) = hex.new(0, 0)
   let expectation = SetTile("map_id", systems.mecatol_rex_system, h)
   let subject = commands.set_tile("map_id", systems.mecatol_rex_system, h)
@@ -17,6 +20,7 @@ pub fn set_tile_test() {
 }
 
 pub fn complete_map_test() {
+  use <- unitest.tags(["unit", "map", "commands"])
   let assert Ok(h) = hex.new(0, 0)
   let tiles = dict.from_list([#(h, systems.mecatol_rex_system)])
   let expectation = CompleteMap("game_id", tiles)

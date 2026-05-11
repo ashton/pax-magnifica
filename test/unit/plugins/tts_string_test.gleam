@@ -3,8 +3,10 @@ import game/systems
 import gleam/dict
 import gleam/result
 import plugins/tts_string.{map_from_tts_string}
+import unitest
 
 pub fn import_map_with_0_ringfrom_tts_string_test() {
+  use <- unitest.tags(["unit", "plugins", "tts_string"])
   let expectation = {
     use h <- result.try(hex.from_pair(#(0, 0)))
     dict.from_list([#(h, systems.mecatol_rex_system)])
@@ -15,6 +17,7 @@ pub fn import_map_with_0_ringfrom_tts_string_test() {
 }
 
 pub fn import_map_with_1_ringfrom_tts_string_test() {
+  use <- unitest.tags(["unit", "plugins", "tts_string"])
   let expectation = {
     use h0 <- result.try(hex.from_pair(#(0, 0)))
     use h1 <- result.try(hex.from_pair(#(0, -1)))
@@ -41,6 +44,7 @@ pub fn import_map_with_1_ringfrom_tts_string_test() {
 
 // Ring 2+ hexes are produced clockwise from direction 0, matching ring 1's convention.
 pub fn import_map_with_2_ringfrom_tts_string_test() {
+  use <- unitest.tags(["unit", "plugins", "tts_string"])
   let expectation = {
     use h0 <- result.try(hex.from_pair(#(0, 0)))
     use h1 <- result.try(hex.from_pair(#(0, -1)))
@@ -91,6 +95,7 @@ pub fn import_map_with_2_ringfrom_tts_string_test() {
 }
 
 pub fn import_map_with_3_ringfrom_tts_string_test() {
+  use <- unitest.tags(["unit", "plugins", "tts_string"])
   let expectation = {
     use h0 <- result.try(hex.from_pair(#(0, 0)))
     use h1 <- result.try(hex.from_pair(#(0, -1)))

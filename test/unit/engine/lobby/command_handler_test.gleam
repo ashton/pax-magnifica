@@ -3,8 +3,10 @@ import engine/lobby/command_handler
 import engine/lobby/commands
 import engine/lobby/events.{LobbyCreated, UserJoined}
 import gleam/list
+import unitest
 
 pub fn process_create_lobby_test() {
+  use <- unitest.tags(["unit", "lobby", "command_handler"])
   let command = commands.create_lobby("game_1")
 
   let assert Ok(event) = command_handler.process(command) |> list.first()
@@ -12,6 +14,7 @@ pub fn process_create_lobby_test() {
 }
 
 pub fn process_join_lobby_test() {
+  use <- unitest.tags(["unit", "lobby", "command_handler"])
   let user = User("Alice")
   let command = commands.join_lobby("game_1", user)
 

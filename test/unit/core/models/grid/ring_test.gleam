@@ -2,18 +2,22 @@ import core/models/hex/hex
 import core/models/hex/ring
 import gleam/list
 import gleam/result
+import unitest
 
 pub fn create_test() {
+  use <- unitest.tags(["unit", "hex_grid", "ring"])
   assert ring.create(radius: 2) |> result.is_ok()
 }
 
 pub fn radius_test() {
+  use <- unitest.tags(["unit", "hex_grid", "ring"])
   let assert Ok(r) = ring.create(radius: 2)
 
   assert 2 == ring.radius(r)
 }
 
 pub fn ring_radius_zero_test() {
+  use <- unitest.tags(["unit", "hex_grid", "ring"])
   let assert Ok(expected) = hex.new(0, 0)
 
   let assert Ok(subject) = ring.create(radius: 0)
@@ -21,6 +25,7 @@ pub fn ring_radius_zero_test() {
 }
 
 pub fn ring_radius_one_test() {
+  use <- unitest.tags(["unit", "hex_grid", "ring"])
   let assert Ok(expectation) =
     [#(-1, 0), #(-1, 1), #(0, -1), #(0, 1), #(1, -1), #(1, 0)]
     |> list.map(hex.from_pair)
@@ -40,6 +45,7 @@ pub fn ring_radius_one_test() {
 // order that ring.create(1) produces via dict.to_list on direction indices.
 // This test asserts the expected clockwise order and fails because of that bug.
 pub fn ring_radius_two_clockwise_order_test() {
+  use <- unitest.tags(["unit", "hex_grid", "ring"])
   let assert Ok(expectation) =
     [
       #(0, -2),

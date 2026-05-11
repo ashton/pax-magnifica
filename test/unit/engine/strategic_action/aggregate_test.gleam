@@ -5,6 +5,7 @@ import engine/strategic_action/commands.{
   ResolveSecondaryAbility, StartStrategicAction, resolve_secondary,
   skip_secondary, start_strategic_action,
 }
+import unitest
 
 const game_id = "game_1"
 
@@ -20,22 +21,26 @@ fn started_state() {
 // ── StartStrategicAction ──────────────────────────────────────────────────────
 
 pub fn validate_start_valid_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let cmd =
     start_strategic_action(game_id, "alice", Leadership, ["bob", "charlie"])
   let assert Ok(_) = aggregate.validate_start(cmd)
 }
 
 pub fn validate_start_empty_game_id_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let cmd = StartStrategicAction("", "alice", Leadership, ["bob"])
   let assert Error(_) = aggregate.validate_start(cmd)
 }
 
 pub fn validate_start_empty_player_id_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let cmd = StartStrategicAction(game_id, "", Leadership, ["bob"])
   let assert Error(_) = aggregate.validate_start(cmd)
 }
 
 pub fn validate_start_empty_secondary_order_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let cmd = StartStrategicAction(game_id, "alice", Leadership, [])
   let assert Error(_) = aggregate.validate_start(cmd)
 }
@@ -43,18 +48,21 @@ pub fn validate_start_empty_secondary_order_test() {
 // ── ResolveSecondaryAbility ───────────────────────────────────────────────────
 
 pub fn validate_resolve_valid_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let state = started_state()
   let cmd = resolve_secondary(game_id, "bob")
   let assert Ok(_) = aggregate.validate_secondary(state, cmd)
 }
 
 pub fn validate_resolve_not_in_secondary_order_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let state = started_state()
   let cmd = resolve_secondary(game_id, "dave")
   let assert Error(_) = aggregate.validate_secondary(state, cmd)
 }
 
 pub fn validate_resolve_already_responded_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let state =
     StrategicActionState(..started_state(), responded_players: ["bob"])
   let cmd = resolve_secondary(game_id, "bob")
@@ -62,6 +70,7 @@ pub fn validate_resolve_already_responded_test() {
 }
 
 pub fn validate_resolve_empty_ids_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let state = started_state()
   let cmd = ResolveSecondaryAbility("", "bob")
   let assert Error(_) = aggregate.validate_secondary(state, cmd)
@@ -70,12 +79,14 @@ pub fn validate_resolve_empty_ids_test() {
 // ── SkipSecondaryAbility ──────────────────────────────────────────────────────
 
 pub fn validate_skip_valid_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let state = started_state()
   let cmd = skip_secondary(game_id, "charlie")
   let assert Ok(_) = aggregate.validate_secondary(state, cmd)
 }
 
 pub fn validate_skip_already_responded_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let state =
     StrategicActionState(..started_state(), responded_players: ["charlie"])
   let cmd = skip_secondary(game_id, "charlie")
@@ -83,12 +94,14 @@ pub fn validate_skip_already_responded_test() {
 }
 
 pub fn validate_skip_initiating_player_cannot_skip_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   let state = started_state()
   let cmd = skip_secondary(game_id, "alice")
   let assert Error(_) = aggregate.validate_secondary(state, cmd)
 }
 
 pub fn validate_skip_wrong_strategy_type_does_not_affect_validation_test() {
+  use <- unitest.tags(["unit", "strategic_action", "aggregate"])
   // validation is purely about who has/hasn't responded, not the card type
   let state =
     StrategicActionState(

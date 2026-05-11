@@ -8,6 +8,7 @@ import engine/action_phase/events.{
 }
 import gleam/list
 import gleam/option.{None, Some}
+import unitest
 
 const game_id = "game_1"
 
@@ -16,6 +17,7 @@ fn sc(strategy) {
 }
 
 pub fn apply_phase_started_sets_player_order_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership)), #("bob", sc(Trade))]
   let event = ActionPhaseStarted(game_id, cards)
   let assert Some(state) = event_handler.apply(None, event)
@@ -23,6 +25,7 @@ pub fn apply_phase_started_sets_player_order_test() {
 }
 
 pub fn apply_phase_started_sets_player_cards_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership)), #("bob", sc(Trade))]
   let event = ActionPhaseStarted(game_id, cards)
   let assert Some(state) = event_handler.apply(None, event)
@@ -30,6 +33,7 @@ pub fn apply_phase_started_sets_player_cards_test() {
 }
 
 pub fn apply_phase_started_clears_passed_and_last_player_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership))]
   let assert Some(state) = event_handler.apply(None, ActionPhaseStarted(game_id, cards))
   assert state.passed_players == []
@@ -37,6 +41,7 @@ pub fn apply_phase_started_clears_passed_and_last_player_test() {
 }
 
 pub fn apply_player_took_action_updates_last_player_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership)), #("bob", sc(Trade))]
   let assert Some(state) = event_handler.apply(None, ActionPhaseStarted(game_id, cards))
   let assert Some(state) =
@@ -45,6 +50,7 @@ pub fn apply_player_took_action_updates_last_player_test() {
 }
 
 pub fn apply_strategy_card_exhausted_marks_card_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership)), #("bob", sc(Trade))]
   let assert Some(state) = event_handler.apply(None, ActionPhaseStarted(game_id, cards))
   let assert Some(state) =
@@ -54,6 +60,7 @@ pub fn apply_strategy_card_exhausted_marks_card_test() {
 }
 
 pub fn apply_strategy_card_exhausted_does_not_affect_other_cards_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership)), #("bob", sc(Trade))]
   let assert Some(state) = event_handler.apply(None, ActionPhaseStarted(game_id, cards))
   let assert Some(state) =
@@ -63,6 +70,7 @@ pub fn apply_strategy_card_exhausted_does_not_affect_other_cards_test() {
 }
 
 pub fn apply_player_passed_adds_to_passed_list_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership)), #("bob", sc(Trade))]
   let assert Some(state) = event_handler.apply(None, ActionPhaseStarted(game_id, cards))
   let assert Some(state) =
@@ -72,6 +80,7 @@ pub fn apply_player_passed_adds_to_passed_list_test() {
 }
 
 pub fn apply_action_phase_ended_does_not_change_state_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership))]
   let assert Some(state) = event_handler.apply(None, ActionPhaseStarted(game_id, cards))
   let assert Some(ended_state) =
@@ -80,10 +89,12 @@ pub fn apply_action_phase_ended_does_not_change_state_test() {
 }
 
 pub fn apply_on_none_returns_none_for_non_starting_events_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   assert None == event_handler.apply(None, PlayerPassed(game_id, "alice"))
 }
 
 pub fn apply_strategic_action_event_updates_last_player_test() {
+  use <- unitest.tags(["unit", "action_phase", "event_handler"])
   let cards = [#("alice", sc(Leadership)), #("bob", sc(Trade))]
   let assert Some(state) = event_handler.apply(None, ActionPhaseStarted(game_id, cards))
   let assert Some(state) =

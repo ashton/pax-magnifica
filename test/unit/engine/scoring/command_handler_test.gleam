@@ -3,14 +3,17 @@ import engine/scoring/command_handler
 import engine/scoring/commands
 import engine/scoring/events.{PlayerScoredVictoryPoints}
 import gleam/list
+import unitest
 
 pub fn process_award_victory_points_emits_event_test() {
+  use <- unitest.tags(["unit", "scoring", "command_handler"])
   let cmd = commands.award_victory_points("game_1", "player_1", Imperial, 1)
   let assert Ok(event) = command_handler.process(cmd) |> list.first()
   assert PlayerScoredVictoryPoints("game_1", "player_1", Imperial, 1) == event
 }
 
 pub fn process_award_victory_points_carries_source_test() {
+  use <- unitest.tags(["unit", "scoring", "command_handler"])
   let cmd =
     commands.award_victory_points(
       "game_1",
@@ -25,6 +28,7 @@ pub fn process_award_victory_points_carries_source_test() {
 }
 
 pub fn process_award_victory_points_custodians_test() {
+  use <- unitest.tags(["unit", "scoring", "command_handler"])
   let cmd =
     commands.award_victory_points("game_1", "player_1", Custodians, 1)
   let assert Ok(PlayerScoredVictoryPoints("game_1", "player_1", Custodians, 1)) =

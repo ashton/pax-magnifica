@@ -4,8 +4,10 @@
 // --- Clockwise ---
 
 import core/models/hex/hex
+import unitest
 
 pub fn rotate_clockwise_around_self_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   let assert Ok(subject) = hex.new(1, -1)
 
   let assert Ok(result) = hex.rotate_clockwise(subject, around: subject)
@@ -14,6 +16,7 @@ pub fn rotate_clockwise_around_self_test() {
 }
 
 pub fn rotate_clockwise_one_step_from_origin_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   // Direction 0 neighbor (0,-1) rotated one step CW around origin → direction 1 (1,-1)
   let assert Ok(center) = hex.new(0, 0)
   let assert Ok(subject) = hex.new(0, -1)
@@ -25,6 +28,7 @@ pub fn rotate_clockwise_one_step_from_origin_test() {
 }
 
 pub fn rotate_clockwise_six_times_returns_to_start_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   // Six 60° clockwise rotations form a full circle — must return to start
   let assert Ok(center) = hex.new(0, 0)
   let assert Ok(subject) = hex.new(2, -1)
@@ -39,6 +43,7 @@ pub fn rotate_clockwise_six_times_returns_to_start_test() {
 }
 
 pub fn rotate_clockwise_non_origin_center_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   // subject (1,0), center (1,-1): relative cube (0,1,-1) → rotated (-1,1,0) → absolute (0,0,0)
   let assert Ok(center) = hex.new(1, -1)
   let assert Ok(subject) = hex.new(1, 0)
@@ -52,6 +57,7 @@ pub fn rotate_clockwise_non_origin_center_test() {
 // --- Counter-clockwise ---
 
 pub fn rotate_counter_clockwise_around_self_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   let assert Ok(subject) = hex.new(1, -1)
 
   let assert Ok(result) = hex.rotate_counter_clockwise(subject, around: subject)
@@ -60,6 +66,7 @@ pub fn rotate_counter_clockwise_around_self_test() {
 }
 
 pub fn rotate_counter_clockwise_one_step_from_origin_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   // Direction 1 neighbor (1,-1) rotated one step CCW around origin → direction 0 (0,-1)
   let assert Ok(center) = hex.new(0, 0)
   let assert Ok(subject) = hex.new(1, -1)
@@ -71,6 +78,7 @@ pub fn rotate_counter_clockwise_one_step_from_origin_test() {
 }
 
 pub fn rotate_counter_clockwise_six_times_returns_to_start_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   // Six 60° counter-clockwise rotations form a full circle — must return to start
   let assert Ok(center) = hex.new(0, 0)
   let assert Ok(subject) = hex.new(2, -1)
@@ -85,6 +93,7 @@ pub fn rotate_counter_clockwise_six_times_returns_to_start_test() {
 }
 
 pub fn rotate_counter_clockwise_non_origin_center_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   // subject (1,0), center (1,-1): relative cube (0,1,-1) → (-z,-x,-y) = (1,0,-1) → absolute (2,-1,-1) = hex(2,-1)
   let assert Ok(center) = hex.new(1, -1)
   let assert Ok(subject) = hex.new(1, 0)
@@ -98,6 +107,7 @@ pub fn rotate_counter_clockwise_non_origin_center_test() {
 // --- Inverse relationship ---
 
 pub fn rotate_clockwise_then_counter_clockwise_is_identity_test() {
+  use <- unitest.tags(["unit", "hex_grid", "hex_rotation"])
   // CW followed by CCW must yield the original hex
   let assert Ok(center) = hex.new(0, 0)
   let assert Ok(subject) = hex.new(1, -2)

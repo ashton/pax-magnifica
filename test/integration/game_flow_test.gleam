@@ -19,7 +19,7 @@ import unitest
 
 /// Step 1: Create a game (lobby)
 pub fn create_lobby_test() {
-  use <- unitest.tag("integration")
+  use <- unitest.tags(["integration", "game_flow"])
 
   let game_id = "test_game"
   let cmd = lobby_commands.create_lobby(game_id)
@@ -34,7 +34,7 @@ pub fn create_lobby_test() {
 
 /// Step 2: Multiple users join the lobby
 pub fn users_join_lobby_test() {
-  use <- unitest.tag("integration")
+  use <- unitest.tags(["integration", "game_flow"])
 
   let game_id = "test_game"
   let alice = User("Alice")
@@ -60,7 +60,7 @@ pub fn users_join_lobby_test() {
 
 /// Step 3: Game is setup (game setup command is created with a new ID)
 pub fn game_setup_creates_game_command_test() {
-  use <- unitest.tag("integration")
+  use <- unitest.tags(["integration", "game_flow"])
 
   let player_count = 3
   let cmd = game_setup_create_game(player_count, Standard)
@@ -71,7 +71,7 @@ pub fn game_setup_creates_game_command_test() {
 
 /// Step 4: Map is created using the TTS plugin string
 pub fn map_created_from_tts_string_test() {
-  use <- unitest.tag("integration")
+  use <- unitest.tags(["integration", "game_flow"])
 
   // A 3-ring map has 19 hexes; Mecatol is auto-prepended, so we supply 18 tiles
   let tts = "19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36"
@@ -100,7 +100,7 @@ pub fn map_created_from_tts_string_test() {
 
 /// Full integration: all steps chained together
 pub fn full_game_flow_test() {
-  use <- unitest.tag("integration")
+  use <- unitest.tags(["integration", "game_flow"])
 
   let game_id = "integration_game"
   let player_count = 3

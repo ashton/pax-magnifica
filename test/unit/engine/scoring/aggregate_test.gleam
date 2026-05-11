@@ -6,8 +6,10 @@ import engine/scoring/aggregate
 import engine/scoring/commands.{AwardVictoryPoints}
 import engine/scoring/events.{PlayerScoredVictoryPoints}
 import gleam/list
+import unitest
 
 pub fn award_victory_points_returns_command_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd =
     commands.award_victory_points(
       "game_1",
@@ -24,6 +26,7 @@ pub fn award_victory_points_returns_command_test() {
 }
 
 pub fn handle_emits_player_scored_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd = commands.award_victory_points("game_1", "player_1", Imperial, 1)
   let assert Ok(events) = aggregate.handle(cmd)
   let assert Ok(event) = list.first(events)
@@ -31,6 +34,7 @@ pub fn handle_emits_player_scored_test() {
 }
 
 pub fn handle_carries_source_and_amount_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd =
     commands.award_victory_points(
       "game_1",
@@ -46,6 +50,7 @@ pub fn handle_carries_source_and_amount_test() {
 }
 
 pub fn handle_custodians_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd = commands.award_victory_points("game_1", "player_1", Custodians, 1)
   let assert Ok(events) = aggregate.handle(cmd)
   let assert Ok(event) = list.first(events)
@@ -53,26 +58,31 @@ pub fn handle_custodians_test() {
 }
 
 pub fn handle_empty_game_id_returns_error_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd = AwardVictoryPoints("", "player_1", Imperial, 1)
   let assert Error(_) = aggregate.handle(cmd)
 }
 
 pub fn handle_empty_player_id_returns_error_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd = AwardVictoryPoints("game_1", "", Imperial, 1)
   let assert Error(_) = aggregate.handle(cmd)
 }
 
 pub fn handle_zero_amount_returns_error_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd = AwardVictoryPoints("game_1", "player_1", Imperial, 0)
   let assert Error(_) = aggregate.handle(cmd)
 }
 
 pub fn handle_negative_amount_returns_error_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let cmd = AwardVictoryPoints("game_1", "player_1", Imperial, -1)
   let assert Error(_) = aggregate.handle(cmd)
 }
 
 pub fn handle_accepts_all_victory_point_sources_test() {
+  use <- unitest.tags(["unit", "scoring", "aggregate"])
   let sources = [
     PublicObjectiveScored("obj_1"),
     SecretObjectiveScored(SecretObjective("secret_1")),

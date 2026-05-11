@@ -9,8 +9,10 @@ import gleam/bool
 import gleam/dict
 import gleam/list
 import gleam/string
+import unitest
 
 pub fn process_create_map_grid_command_test() {
+  use <- unitest.tags(["unit", "map", "command_handler"])
   let command = commands.create_map_grid(3)
 
   let assert Ok(subject) = process(command) |> list.first()
@@ -21,6 +23,7 @@ pub fn process_create_map_grid_command_test() {
 }
 
 pub fn process_set_tile_command_test() {
+  use <- unitest.tags(["unit", "map", "command_handler"])
   let assert Ok(h) = hex.new(0, 0)
   let command = commands.set_tile("map_id", systems.mecatol_rex_system, h)
   let event = events.tile_set("map_id", systems.mecatol_rex_system, h)
@@ -31,6 +34,7 @@ pub fn process_set_tile_command_test() {
 }
 
 pub fn process_complete_command_test() {
+  use <- unitest.tags(["unit", "map", "command_handler"])
   let assert Ok(h) = hex.new(0, 0)
   let tiles = dict.from_list([#(h, systems.mecatol_rex_system)])
   let map = map.new(tiles)

@@ -13,8 +13,10 @@ import engine/game_setup/events.{
   SpeakerAppointed, SystemTilePlaced,
 }
 import gleam/option.{None, Some}
+import unitest
 
 pub fn apply_game_created_initialises_state_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let event = GameCreated("game_1", 6, 10, Standard)
   let assert Some(gs) = event_handler.apply(None, event)
 
@@ -25,6 +27,7 @@ pub fn apply_game_created_initialises_state_test() {
 }
 
 pub fn apply_game_created_sets_empty_speaker_and_map_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let event = GameCreated("game_1", 4, 10, Standard)
   let assert Some(gs) = event_handler.apply(None, event)
 
@@ -33,6 +36,7 @@ pub fn apply_game_created_sets_empty_speaker_and_map_test() {
 }
 
 pub fn apply_player_joined_adds_player_id_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let state =
     Some(GameSetup(
       game_id: "game_1",
@@ -49,6 +53,7 @@ pub fn apply_player_joined_adds_player_id_test() {
 }
 
 pub fn apply_player_joined_appends_to_existing_players_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let state =
     Some(GameSetup(
       game_id: "game_1",
@@ -65,6 +70,7 @@ pub fn apply_player_joined_appends_to_existing_players_test() {
 }
 
 pub fn apply_speaker_appointed_sets_speaker_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let state =
     Some(GameSetup(
       game_id: "game_1",
@@ -81,6 +87,7 @@ pub fn apply_speaker_appointed_sets_speaker_test() {
 }
 
 pub fn apply_galaxy_build_completed_transitions_to_preparing_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let state =
     Some(GameSetup(
       game_id: "game_1",
@@ -97,6 +104,7 @@ pub fn apply_galaxy_build_completed_transitions_to_preparing_test() {
 }
 
 pub fn apply_game_setup_completed_transitions_to_setup_complete_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let state =
     Some(GameSetup(
       game_id: "game_1",
@@ -113,6 +121,7 @@ pub fn apply_game_setup_completed_transitions_to_setup_complete_test() {
 }
 
 pub fn apply_game_started_transitions_to_setup_complete_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let state =
     Some(GameSetup(
       game_id: "game_1",
@@ -129,6 +138,7 @@ pub fn apply_game_started_transitions_to_setup_complete_test() {
 }
 
 pub fn apply_data_events_do_not_change_phase_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let state =
     Some(GameSetup(
       game_id: "game_1",
@@ -188,6 +198,7 @@ pub fn apply_data_events_do_not_change_phase_test() {
 }
 
 pub fn apply_on_none_state_returns_none_for_non_creating_events_test() {
+  use <- unitest.tags(["unit", "game_setup", "event_handler"])
   let event = PlayerJoined("game_1", "player_1", Green, Sol)
   assert None == event_handler.apply(None, event)
 }
