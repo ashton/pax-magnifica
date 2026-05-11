@@ -92,7 +92,7 @@ pub fn make_destroyer(
         reroll_misses: False,
       )),
     ],
-    kind: unit.Destroyer,
+    kind: unit.Destroyer(capacity: 0),
   )
 }
 

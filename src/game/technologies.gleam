@@ -162,7 +162,7 @@ pub const destroyer_upgrade = UnitUpgrade(
       range: None,
       reroll_misses: False,
     ),
-    kind: unit.Destroyer,
+    kind: unit.Destroyer(capacity: 0),
   )),
 )
 

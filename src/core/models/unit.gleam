@@ -26,9 +26,9 @@ pub type ShipKind {
   WarSun(capacity: Int)
   Cruiser(capacity: Int)
   Dreadnought(capacity: Int)
-  Destroyer
+  Destroyer(capacity: Int)
   Carrier(capacity: Int)
-  Fighter(reference_amount: Int)
+  Fighter(capacity: Int, reference_amount: Int)
 }
 
 pub type Ship {
