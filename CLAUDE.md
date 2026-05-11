@@ -104,6 +104,67 @@ Key functions in `hex.gleam`:
 3. Implement the command handler (validates state → returns events).
 4. Implement the event handler (folds event into state).
 
+### Test Organization
+
+#### File layout
+
+```
+test/
+  helpers/          — shared test helpers imported by multiple test files
+    hex.gleam       — hex position fixtures (origin, adjacent, far, …)
+    units.gleam     — unit factory functions (carrier, cruiser, fighter, …)
+    state.gleam     — TacticalActionState builder
+    context.gleam   — MovementContext builders + pub const enemy_id
+    anomalies.gleam — anomaly-based MovementContext builders
+  integration/      — end-to-end flow tests
+  unit/             — mirrors src/ structure
+    core/…
+    engine/…
+    plugins/…
+```
+
+Split test files by functional concern within a bounded context. For example, `tactical_action` has `system_activation_test.gleam` and `movement_test.gleam` instead of one monolithic `aggregate_test.gleam`. When a test file exceeds ~150 lines of test functions, consider splitting it.
+
+#### Tags
+
+Every test function must start with `use <- unitest.tags([...])` (first line of the body). Tags follow a three-level scheme:
+
+```gleam
+use <- unitest.tags(["<kind>", "<context>", "<module>"])
+```
+
+| Level | Values |
+|---|---|
+| kind | `unit`, `integration` |
+| context | see table below |
+| module | file name without `_test.gleam` (e.g. `movement`, `aggregate`) |
+
+Context tag reference:
+
+| Path | Context tag |
+|---|---|
+| `test/unit/core/models/grid/` | `hex_grid` |
+| `test/unit/core/value_objects/` | `value_objects` |
+| `test/unit/engine/action_phase/` | `action_phase` |
+| `test/unit/engine/game_setup/` | `game_setup` |
+| `test/unit/engine/lobby/` | `lobby` |
+| `test/unit/engine/map/` | `map` |
+| `test/unit/engine/scoring/` | `scoring` |
+| `test/unit/engine/strategic_action/` | `strategic_action` |
+| `test/unit/engine/strategy_phase/` | `strategy_phase` |
+| `test/unit/engine/tactical_action/` | `tactical_action` |
+| `test/unit/plugins/` | `plugins` |
+| `test/integration/` | use filename as context, omit module tag |
+
+Run a subset of tests by tag:
+
+```bash
+gleam test -- --tag tactical_action   # all tests for a bounded context
+gleam test -- --tag movement          # all tests for a specific module
+gleam test -- --tag unit              # all unit tests
+gleam test -- --tag integration       # all integration tests
+```
+
 ### README
 
 `README.md` contains the full DDD blueprint: Bounded Contexts, Ubiquitous Language glossary, and the complete Command/Event catalog. Read it for domain terminology and design intent before making significant domain changes.
