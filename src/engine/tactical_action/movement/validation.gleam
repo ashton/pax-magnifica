@@ -1,5 +1,5 @@
 import core/models/hex/hex.{type Hex}
-import core/models/planetary_system.{type Anomaly, Nebula}
+import core/models/planetary_system.{type Anomaly, Nebula, Supernova}
 import core/models/unit.{type Unit}
 import gleam/int
 import gleam/list
@@ -120,21 +120,35 @@ pub fn resolve_path(
     |> list.map(effective_movement)
     |> list.reduce(int.min)
     |> result.unwrap(distance)
-  // Rules 1+2: nebulae on intermediate hexes (not `from`, not `to`) hard-block transit.
-  let nebula_blocked =
+  // Supernova: ships can never enter one, even as the destination.
+  use _ <- result.try(case
+    list.any(anomalies, fn(a) {
+      case a {
+        #(h, Supernova) if h == to -> True
+        _ -> False
+      }
+    })
+  {
+    True -> Error("Cannot move into a supernova")
+    False -> Ok(Nil)
+  })
+  // Hard-blocked hexes: nebulae on intermediate hexes + supernovae on any hex
+  // (both excluding `from` since ships are departing from there, not transiting).
+  let hard_blocked =
     list.filter_map(anomalies, fn(a) {
       case a {
         #(h, Nebula) if h != from && h != to -> Ok(h)
+        #(h, Supernova) if h != from -> Ok(h)
         _ -> Error(Nil)
       }
     })
   let enemy_hex_list = list.map(enemy_fleets, fn(f) { f.0 })
-  // Hard check: if no path exists avoiding nebulae, the move is invalid.
+  // Hard check: if no path exists avoiding hard-blocked hexes, the move is invalid.
   use _ <- result.try(case
-    hex.has_path_avoiding(from, to, min_movement, nebula_blocked)
+    hex.has_path_avoiding(from, to, min_movement, hard_blocked)
   {
     True -> Ok(Nil)
-    False -> Error("Cannot reach the activated system: all paths are blocked by nebulae")
+    False -> Error("Cannot reach the activated system: all paths are blocked by anomalies")
   })
   // Soft check: if a path exists avoiding both nebulae and enemies, ships reach destination.
   case
@@ -142,7 +156,7 @@ pub fn resolve_path(
       from,
       to,
       min_movement,
-      list.append(nebula_blocked, enemy_hex_list),
+      list.append(hard_blocked, enemy_hex_list),
     )
   {
     True -> Ok(ReachDestination(to))

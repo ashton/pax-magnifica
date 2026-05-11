@@ -1,6 +1,6 @@
 import core/models/common.{Hit}
 import core/models/hex/hex
-import core/models/planetary_system.{Nebula}
+import core/models/planetary_system.{Nebula, Supernova}
 import core/models/state/tactical_action.{TacticalActionState}
 import core/models/unit
 import engine/tactical_action/aggregate
@@ -68,6 +68,10 @@ fn enemies_at(hexes: List(hex.Hex)) {
 
 fn nebula_at(h: hex.Hex) {
   MovementContext(enemy_fleets: [], anomalies: [#(h, Nebula)])
+}
+
+fn supernova_at(h: hex.Hex) {
+  MovementContext(enemy_fleets: [], anomalies: [#(h, Supernova)])
 }
 
 // ── Unit helpers ──────────────────────────────────────────────────────────────
@@ -440,6 +444,31 @@ pub fn ships_can_move_into_active_system_that_is_a_nebula_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let cmd = commands.move_units(game_id, player_id, [#(adjacent(), [carrier(movement: 1, capacity: 4)])])
   let assert Ok(events) = aggregate.handle_move_units(state, cmd, nebula_at(origin()))
+  let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
+  assert destination == origin()
+}
+
+// ── Supernova rules ───────────────────────────────────────────────────────────
+
+pub fn ships_cannot_move_into_a_supernova_test() {
+  // Supernova as the activated system — no ships may enter, even as the destination
+  let state = state_with(history: [#(origin(), player_id)])
+  let cmd = commands.move_units(game_id, player_id, [#(adjacent(), [carrier(movement: 1, capacity: 4)])])
+  let assert Error(_) = aggregate.handle_move_units(state, cmd, supernova_at(origin()))
+}
+
+pub fn ships_cannot_move_through_a_supernova_test() {
+  // far() to origin() only passes through adjacent() — supernova there blocks all paths
+  let state = state_with(history: [#(origin(), player_id)])
+  let cmd = commands.move_units(game_id, player_id, [#(far(), [cruiser(movement: 2)])])
+  let assert Error(_) = aggregate.handle_move_units(state, cmd, supernova_at(adjacent()))
+}
+
+pub fn ships_route_around_supernova_when_alternative_path_exists_test() {
+  // two_paths_from() has two intermediates; supernova at adjacent() — routes via alt_intermediate()
+  let state = state_with(history: [#(origin(), player_id)])
+  let cmd = commands.move_units(game_id, player_id, [#(two_paths_from(), [cruiser(movement: 2)])])
+  let assert Ok(events) = aggregate.handle_move_units(state, cmd, supernova_at(adjacent()))
   let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
   assert destination == origin()
 }
