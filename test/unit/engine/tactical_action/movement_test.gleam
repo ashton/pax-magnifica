@@ -1,8 +1,6 @@
 import engine/tactical_action/aggregate
 import engine/tactical_action/commands
-import engine/tactical_action/events.{
-  CombatInitiated, SystemActivated, TacticTokenSpent, UnitsMoved,
-}
+import engine/tactical_action/events.{CombatInitiated, UnitsMoved}
 import gleam/list
 import helpers/anomalies
 import helpers/context
@@ -14,41 +12,7 @@ const game_id = "game_1"
 
 const player_id = "alice"
 
-// ── ActivateSystem ────────────────────────────────────────────────────────────
-
-pub fn activate_system_emits_system_activated_and_token_spent_test() {
-  let s = state.with_history([])
-  let cmd = commands.activate_system(game_id, player_id, h.origin())
-  let assert Ok(events) = aggregate.handle_activate(s, cmd)
-  assert list.contains(events, SystemActivated(game_id, player_id, h.origin()))
-  assert list.contains(events, TacticTokenSpent(game_id, player_id))
-}
-
-pub fn activate_system_empty_game_id_returns_error_test() {
-  let s = state.with_history([])
-  let cmd = commands.activate_system("", player_id, h.origin())
-  let assert Error(_) = aggregate.handle_activate(s, cmd)
-}
-
-pub fn activate_system_empty_player_id_returns_error_test() {
-  let s = state.with_history([])
-  let cmd = commands.activate_system(game_id, "", h.origin())
-  let assert Error(_) = aggregate.handle_activate(s, cmd)
-}
-
-pub fn activate_already_activated_system_returns_error_test() {
-  let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.activate_system(game_id, player_id, h.origin())
-  let assert Error(_) = aggregate.handle_activate(s, cmd)
-}
-
-pub fn activate_different_system_when_one_already_activated_succeeds_test() {
-  let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.activate_system(game_id, player_id, h.adjacent())
-  let assert Ok(_) = aggregate.handle_activate(s, cmd)
-}
-
-// ── MoveUnits: basic guards ───────────────────────────────────────────────────
+// ── basic guards ──────────────────────────────────────────────────────────────
 
 pub fn move_units_empty_moves_produces_no_events_test() {
   let s = state.with_history([#(h.origin(), player_id)])
@@ -110,7 +74,7 @@ pub fn move_units_with_structure_returns_error_test() {
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
-// ── movement range validation ─────────────────────────────────────────────────
+// ── movement range ────────────────────────────────────────────────────────────
 
 pub fn move_units_with_exact_movement_succeeds_test() {
   let s = state.with_history([#(h.origin(), player_id)])
@@ -145,7 +109,7 @@ pub fn move_units_fighters_not_checked_for_movement_test() {
   let assert Ok(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
-// ── capacity validation ───────────────────────────────────────────────────────
+// ── capacity ──────────────────────────────────────────────────────────────────
 
 pub fn move_units_fighters_within_capacity_succeeds_test() {
   let s = state.with_history([#(h.origin(), player_id)])
@@ -232,7 +196,6 @@ pub fn move_units_one_invalid_origin_fails_entire_command_test() {
     commands.move_units(game_id, player_id, [
       #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
       #(h.origin(), [units.cruiser(movement: 2)]),
-      // h.origin() is the activated system — invalid source
     ])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -294,7 +257,7 @@ pub fn move_units_all_paths_blocked_initiates_combat_at_first_enemy_test() {
   assert defender == context.enemy_id
 }
 
-// ── Nebula rules ──────────────────────────────────────────────────────────────
+// ── Nebula ────────────────────────────────────────────────────────────────────
 
 pub fn ships_in_nebula_treat_movement_as_1_test() {
   let s = state.with_history([#(h.origin(), player_id)])
@@ -332,7 +295,7 @@ pub fn ships_can_move_into_active_system_that_is_a_nebula_test() {
   assert destination == h.origin()
 }
 
-// ── Supernova rules ───────────────────────────────────────────────────────────
+// ── Supernova ─────────────────────────────────────────────────────────────────
 
 pub fn ships_cannot_move_into_a_supernova_test() {
   let s = state.with_history([#(h.origin(), player_id)])
