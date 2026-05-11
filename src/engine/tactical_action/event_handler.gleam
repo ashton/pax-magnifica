@@ -1,6 +1,7 @@
 import core/models/state/tactical_action.{type TacticalActionState, TacticalActionState}
 import engine/tactical_action/events.{
-  type TacticalActionEvent, ShipsMoved, SystemActivated, TacticTokenSpent,
+  type TacticalActionEvent, CombatInitiated, SystemActivated, TacticTokenSpent,
+  UnitsMoved,
 }
 
 pub fn apply(
@@ -15,6 +16,8 @@ pub fn apply(
 
     TacticTokenSpent(_, _) -> state
 
-    ShipsMoved(_, _, _, _, _) -> state
+    UnitsMoved(_, _, _, _, _) -> state
+
+    CombatInitiated(_, _, _, _) -> state
   }
 }

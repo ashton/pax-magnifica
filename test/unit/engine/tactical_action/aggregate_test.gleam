@@ -4,13 +4,17 @@ import core/models/state/tactical_action.{TacticalActionState}
 import core/models/unit
 import engine/tactical_action/aggregate
 import engine/tactical_action/commands
-import engine/tactical_action/events.{SystemActivated, TacticTokenSpent, UnitsMoved}
+import engine/tactical_action/events.{
+  CombatInitiated, SystemActivated, TacticTokenSpent, UnitsMoved,
+}
 import gleam/list
 import gleam/option.{None, Some}
 
 const game_id = "game_1"
 
 const player_id = "alice"
+
+const enemy_id = "bob"
 
 fn origin() {
   let assert Ok(h) = hex.new(0, 0)
@@ -24,6 +28,18 @@ fn adjacent() {
 
 fn far() {
   let assert Ok(h) = hex.new(2, -2)
+  h
+}
+
+// At distance 2 from origin() with two possible intermediate hexes:
+// adjacent()=(1,-1) and alt_intermediate()=(1,0)
+fn two_paths_from() {
+  let assert Ok(h) = hex.new(2, -1)
+  h
+}
+
+fn alt_intermediate() {
+  let assert Ok(h) = hex.new(1, 0)
   h
 }
 
@@ -63,7 +79,7 @@ fn fighter() -> unit.Unit {
     combat: Hit(dice_amount: Some(1), hit_on: 9, range: None, extra_dice: None, reroll_misses: False),
     movement: 0,
     abilities: [],
-    kind: unit.Fighter(reference_amount: 2),
+    kind: unit.Fighter(capacity: 0, reference_amount: 2),
   ))
 }
 
@@ -120,7 +136,7 @@ pub fn activate_different_system_when_one_already_activated_succeeds_test() {
 pub fn move_units_emits_units_moved_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 4)]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Ok(events) = aggregate.handle_move_units(state, cmd)
   let assert [UnitsMoved(_, _, from: from, to: to, units: moved)] = events
   assert from == adjacent()
@@ -130,43 +146,43 @@ pub fn move_units_emits_units_moved_test() {
 
 pub fn move_units_empty_game_id_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
-  let cmd = commands.move_units("", player_id, adjacent(), [carrier(movement: 1, capacity: 4)])
+  let cmd = commands.move_units("", player_id, adjacent(), [carrier(movement: 1, capacity: 4)], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_empty_player_id_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
-  let cmd = commands.move_units(game_id, "", adjacent(), [carrier(movement: 1, capacity: 4)])
+  let cmd = commands.move_units(game_id, "", adjacent(), [carrier(movement: 1, capacity: 4)], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_without_activated_system_returns_error_test() {
   let state = state_with(history: [])
-  let cmd = commands.move_units(game_id, player_id, adjacent(), [carrier(movement: 1, capacity: 4)])
+  let cmd = commands.move_units(game_id, player_id, adjacent(), [carrier(movement: 1, capacity: 4)], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_from_active_system_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, origin(), [carrier(movement: 1, capacity: 4)])
+  let cmd = commands.move_units(game_id, player_id, origin(), [carrier(movement: 1, capacity: 4)], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_from_previously_activated_system_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id), #(adjacent(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, adjacent(), [carrier(movement: 1, capacity: 4)])
+  let cmd = commands.move_units(game_id, player_id, adjacent(), [carrier(movement: 1, capacity: 4)], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_with_empty_list_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, adjacent(), [])
+  let cmd = commands.move_units(game_id, player_id, adjacent(), [], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_with_structure_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, adjacent(), [pds()])
+  let cmd = commands.move_units(game_id, player_id, adjacent(), [pds()], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
@@ -174,34 +190,34 @@ pub fn move_units_with_structure_returns_error_test() {
 
 pub fn move_units_with_exact_movement_succeeds_test() {
   let state = state_with(history: [#(origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, adjacent(), [carrier(movement: 1, capacity: 4)])
+  let cmd = commands.move_units(game_id, player_id, adjacent(), [carrier(movement: 1, capacity: 4)], [])
   let assert Ok(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_with_insufficient_movement_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, far(), [carrier(movement: 1, capacity: 4)])
+  let cmd = commands.move_units(game_id, player_id, far(), [carrier(movement: 1, capacity: 4)], [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_when_any_ship_lacks_movement_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [cruiser(movement: 2), carrier(movement: 1, capacity: 4)]
-  let cmd = commands.move_units(game_id, player_id, far(), units)
+  let cmd = commands.move_units(game_id, player_id, far(), units, [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_all_ships_with_enough_movement_succeeds_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [cruiser(movement: 2), cruiser(movement: 2)]
-  let cmd = commands.move_units(game_id, player_id, far(), units)
+  let cmd = commands.move_units(game_id, player_id, far(), units, [])
   let assert Ok(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_fighters_not_checked_for_movement_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 4), fighter(), fighter()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Ok(_) = aggregate.handle_move_units(state, cmd)
 }
 
@@ -210,42 +226,42 @@ pub fn move_units_fighters_not_checked_for_movement_test() {
 pub fn move_units_fighters_within_capacity_succeeds_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 4), fighter(), fighter()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Ok(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_fighter_exceeds_capacity_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 1), fighter(), fighter()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_infantry_within_capacity_succeeds_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 2), infantry(), infantry()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Ok(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_infantry_exceeds_capacity_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 1), infantry(), infantry()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_mixed_carried_within_capacity_succeeds_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 2), fighter(), infantry()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Ok(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_mixed_carried_exceeds_capacity_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [carrier(movement: 1, capacity: 2), fighter(), infantry(), fighter()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
 }
 
@@ -256,13 +272,95 @@ pub fn move_units_capacity_from_multiple_ships_adds_up_test() {
     carrier(movement: 1, capacity: 2),
     fighter(), fighter(), fighter(), fighter(),
   ]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Ok(_) = aggregate.handle_move_units(state, cmd)
 }
 
 pub fn move_units_no_capacity_for_infantry_returns_error_test() {
   let state = state_with(history: [#(origin(), player_id)])
   let units = [cruiser(movement: 2), infantry()]
-  let cmd = commands.move_units(game_id, player_id, adjacent(), units)
+  let cmd = commands.move_units(game_id, player_id, adjacent(), units, [])
   let assert Error(_) = aggregate.handle_move_units(state, cmd)
+}
+
+// ── blocking by enemy fleet ───────────────────────────────────────────────────
+
+pub fn move_units_through_enemy_fleet_stops_there_and_initiates_combat_test() {
+  // from=far (distance 2 from origin), path passes through adjacent — enemy there
+  let state = state_with(history: [#(origin(), player_id)])
+  let units = [cruiser(movement: 2)]
+  let cmd =
+    commands.move_units(game_id, player_id, far(), units, [
+      #(adjacent(), enemy_id),
+    ])
+  let assert Ok(events) = aggregate.handle_move_units(state, cmd)
+  let assert [
+    UnitsMoved(_, _, from: from, to: blocked_at, units: _),
+    CombatInitiated(_, combat_hex, attacker, defender),
+  ] = events
+  assert from == far()
+  assert blocked_at == adjacent()
+  assert combat_hex == adjacent()
+  assert attacker == player_id
+  assert defender == enemy_id
+}
+
+pub fn move_units_with_no_enemy_in_path_reaches_destination_test() {
+  // from=far, active=origin, no enemy fleet along path — ships reach origin
+  let state = state_with(history: [#(origin(), player_id)])
+  let units = [cruiser(movement: 2)]
+  let cmd = commands.move_units(game_id, player_id, far(), units, [])
+  let assert Ok(events) = aggregate.handle_move_units(state, cmd)
+  let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
+  assert destination == origin()
+}
+
+pub fn move_units_adjacent_with_enemy_at_destination_not_blocked_test() {
+  // distance 1 — no intermediate hexes, enemy at destination does not block
+  let state = state_with(history: [#(origin(), player_id)])
+  let units = [carrier(movement: 1, capacity: 4)]
+  let cmd =
+    commands.move_units(game_id, player_id, adjacent(), units, [
+      #(origin(), enemy_id),
+    ])
+  let assert Ok(events) = aggregate.handle_move_units(state, cmd)
+  let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
+  assert destination == origin()
+}
+
+pub fn move_units_routes_around_blocked_intermediate_hex_test() {
+  // two_paths_from()=(2,-1) is distance 2 from origin with two intermediate hexes:
+  // adjacent()=(1,-1) and alt_intermediate()=(1,0).
+  // Enemy only at adjacent — ships route via alt_intermediate and reach origin.
+  let state = state_with(history: [#(origin(), player_id)])
+  let units = [cruiser(movement: 2)]
+  let cmd =
+    commands.move_units(game_id, player_id, two_paths_from(), units, [
+      #(adjacent(), enemy_id),
+    ])
+  let assert Ok(events) = aggregate.handle_move_units(state, cmd)
+  let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
+  assert destination == origin()
+}
+
+pub fn move_units_all_paths_blocked_initiates_combat_at_first_enemy_test() {
+  // Both intermediate hexes blocked — no valid path, combat at first enemy on direct route.
+  // Direct path from two_paths_from() to origin() goes through adjacent()=(1,-1).
+  let state = state_with(history: [#(origin(), player_id)])
+  let units = [cruiser(movement: 2)]
+  let cmd =
+    commands.move_units(game_id, player_id, two_paths_from(), units, [
+      #(adjacent(), enemy_id),
+      #(alt_intermediate(), enemy_id),
+    ])
+  let assert Ok(events) = aggregate.handle_move_units(state, cmd)
+  let assert [
+    UnitsMoved(_, _, from: from, to: blocked_at, units: _),
+    CombatInitiated(_, combat_hex, attacker, defender),
+  ] = events
+  assert from == two_paths_from()
+  assert blocked_at == adjacent()
+  assert combat_hex == adjacent()
+  assert attacker == player_id
+  assert defender == enemy_id
 }

@@ -24,7 +24,7 @@ pub fn make_fighter(
         range: None,
         reroll_misses: False,
       )),
-    kind: unit.Fighter(reference_amount: amount_produced |> or(2)),
+    kind: unit.Fighter(capacity: 0, reference_amount: amount_produced |> or(2)),
   )
 }
 

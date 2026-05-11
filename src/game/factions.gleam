@@ -611,7 +611,7 @@ pub fn make_naalu() -> faction.Faction {
     data.ships
     |> list.map(fn(item) {
       case item {
-        unit.Ship(kind: unit.Fighter(_), ..) -> custom_fighter
+        unit.Ship(kind: unit.Fighter(_, _), ..) -> custom_fighter
         _ -> item
       }
     })

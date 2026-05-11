@@ -214,7 +214,7 @@ pub const fighter_upgrade = UnitUpgrade(
       range: None,
       reroll_misses: False,
     ),
-    kind: unit.Fighter(reference_amount: 2),
+    kind: unit.Fighter(capacity: 0, reference_amount: 2),
   )),
 )
 

@@ -1,13 +1,12 @@
-import core/models/hex/hex
 import core/models/state/tactical_action.{type TacticalActionState}
-import core/models/unit
 import core/value_objects/game
 import core/value_objects/player
+import engine/tactical_action/activation/validation as activation
 import engine/tactical_action/commands.{
-  type TacticalActionCommand, ActivateSystem, MoveShips,
+  type TacticalActionCommand, ActivateSystem, MoveUnits,
 }
 import engine/tactical_action/events.{type TacticalActionEvent}
-import gleam/list
+import engine/tactical_action/movement/validation as movement
 import gleam/result
 
 pub fn handle_activate(
@@ -17,46 +16,33 @@ pub fn handle_activate(
   let assert ActivateSystem(game_id, player_id, hex) = command
   use _ <- result.try(game.new_id(game_id))
   use _ <- result.try(player.new_id(player_id))
-  use _ <- result.try(case list.any(state.activation_history, fn(entry) { entry.0 == hex }) {
-    True -> Error("Player has already activated this system")
-    False -> Ok(Nil)
-  })
+  use _ <- result.try(activation.not_already_activated(state, hex))
   Ok([
     events.SystemActivated(game_id, player_id, hex),
     events.TacticTokenSpent(game_id, player_id),
   ])
 }
 
-pub fn handle_move_ships(
+pub fn handle_move_units(
   state: TacticalActionState,
   command: TacticalActionCommand,
 ) -> Result(List(TacticalActionEvent), String) {
-  let assert MoveShips(game_id, player_id, from, ships) = command
+  let assert MoveUnits(game_id, player_id, from, units, enemy_fleets) = command
   use _ <- result.try(game.new_id(game_id))
   use _ <- result.try(player.new_id(player_id))
-  use #(active_hex, _) <- result.try(
-    list.first(state.activation_history)
-    |> result.replace_error("No system has been activated yet"),
-  )
-  use _ <- result.try(case from == active_hex {
-    True -> Error("Cannot move ships from the activated system itself")
-    False -> Ok(Nil)
-  })
-  use _ <- result.try(case list.any(state.activation_history, fn(entry) { entry.0 == from }) {
-    True -> Error("Cannot move ships from a system that has already been activated")
-    False -> Ok(Nil)
-  })
-  use _ <- result.try(case ships {
-    [] -> Error("Must move at least one ship")
-    _ -> Ok(Nil)
-  })
-  use distance <- result.try(
-    hex.distance(from, active_hex)
-    |> result.replace_error("Could not calculate distance between systems"),
-  )
-  use _ <- result.try(case list.all(ships, fn(ship) { ship.movement >= distance }) {
-    True -> Ok(Nil)
-    False -> Error("Some ships do not have enough movement to reach the activated system")
-  })
-  Ok([events.ShipsMoved(game_id, player_id, from: from, to: active_hex, ships: ships)])
+  use active_hex <- result.try(activation.active_system(state))
+  use _ <- result.try(activation.valid_movement_source(state, from, active_hex))
+  use _ <- result.try(movement.not_empty(units))
+  use _ <- result.try(movement.no_structures(units))
+  use _ <- result.try(movement.capacity(units))
+  use outcome <- result.try(movement.resolve_path(from, active_hex, units, enemy_fleets))
+  case outcome {
+    movement.ReachDestination(to) ->
+      Ok([events.UnitsMoved(game_id, player_id, from: from, to: to, units: units)])
+    movement.BlockedAt(blocked_at, enemy_player_id) ->
+      Ok([
+        events.UnitsMoved(game_id, player_id, from: from, to: blocked_at, units: units),
+        events.CombatInitiated(game_id, blocked_at, player_id, enemy_player_id),
+      ])
+  }
 }

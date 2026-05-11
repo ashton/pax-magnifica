@@ -1,10 +1,9 @@
 import core/models/state/tactical_action.{type TacticalActionState}
 import engine/tactical_action/commands.{
-  type TacticalActionCommand, ActivateSystem, MoveShips,
+  type TacticalActionCommand, ActivateSystem, MoveUnits,
 }
 import engine/tactical_action/events.{type TacticalActionEvent}
 import gleam/list
-import gleam/result
 
 pub fn process_activate(
   _state: TacticalActionState,
@@ -17,11 +16,11 @@ pub fn process_activate(
   ]
 }
 
-pub fn process_move_ships(
+pub fn process_move_units(
   state: TacticalActionState,
   command: TacticalActionCommand,
 ) -> List(TacticalActionEvent) {
-  let assert MoveShips(game_id, player_id, from, ships) = command
+  let assert MoveUnits(game_id, player_id, from, units, _enemy_fleets) = command
   let assert Ok(#(active_hex, _)) = list.first(state.activation_history)
-  [events.ShipsMoved(game_id, player_id, from: from, to: active_hex, ships: ships)]
+  [events.UnitsMoved(game_id, player_id, from: from, to: active_hex, units: units)]
 }

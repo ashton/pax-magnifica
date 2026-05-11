@@ -1,6 +1,7 @@
 import core/models/hex/vector.{type Vector}
 import gleam/bool
 import gleam/dict
+import gleam/float
 import gleam/int
 import gleam/list
 import gleam/result
@@ -133,4 +134,91 @@ pub fn distance(one: Hex, other: Hex) -> Result(Int, String) {
     |> int.divide(2)
     |> result.replace_error("Unable to calculate distance")
   })
+}
+
+// Returns the intermediate hexes on the straight-line path from `from` to `to`,
+// excluding the endpoints. Used to detect blocking enemy fleets during movement.
+pub fn path(from: Hex, to: Hex) -> Result(List(Hex), String) {
+  use dist <- result.try(distance(from, to))
+  case dist <= 1 {
+    True -> Ok([])
+    False -> {
+      let Hex(fx, fy) = from
+      let Hex(tx, ty) = to
+      list.repeat(0, dist - 1)
+      |> list.index_map(fn(_, i) {
+        let i = i + 1
+        let t = int.to_float(i) /. int.to_float(dist)
+        let lx = int.to_float(fx) +. int.to_float(tx - fx) *. t
+        let ly = int.to_float(fy) +. int.to_float(ty - fy) *. t
+        let lz = 0.0 -. lx -. ly
+        cube_round(lx, ly, lz)
+      })
+      |> result.all()
+    }
+  }
+}
+
+// Returns True if there is any path from `from` to `to` of at most `max_steps`
+// that does not transit through any hex in `blocked`. The destination itself
+// is never treated as blocked — arriving there is always valid.
+pub fn has_path_avoiding(
+  from: Hex,
+  to: Hex,
+  max_steps: Int,
+  blocked: List(Hex),
+) -> Bool {
+  do_bfs([#(from, 0)], [from], to, max_steps, blocked)
+}
+
+fn do_bfs(
+  queue: List(#(Hex, Int)),
+  visited: List(Hex),
+  to: Hex,
+  max_steps: Int,
+  blocked: List(Hex),
+) -> Bool {
+  case queue {
+    [] -> False
+    [#(current, steps), ..rest] ->
+      case current == to {
+        True -> True
+        False ->
+          case steps >= max_steps {
+            True -> do_bfs(rest, visited, to, max_steps, blocked)
+            False -> {
+              let assert Ok(nbrs) = neighbors(current)
+              let candidates =
+                list.filter(nbrs, fn(h) {
+                  !list.contains(visited, h)
+                  && { h == to || !list.contains(blocked, h) }
+                })
+              do_bfs(
+                list.append(rest, list.map(candidates, fn(h) { #(h, steps + 1) })),
+                list.append(visited, candidates),
+                to,
+                max_steps,
+                blocked,
+              )
+            }
+          }
+      }
+  }
+}
+
+fn cube_round(fx: Float, fy: Float, fz: Float) -> Result(Hex, String) {
+  let rx = float.round(fx)
+  let ry = float.round(fy)
+  let rz = float.round(fz)
+  let x_diff = float.absolute_value(int.to_float(rx) -. fx)
+  let y_diff = float.absolute_value(int.to_float(ry) -. fy)
+  let z_diff = float.absolute_value(int.to_float(rz) -. fz)
+  case x_diff >. y_diff && x_diff >. z_diff {
+    True -> new(-ry - rz, ry)
+    False ->
+      case y_diff >. z_diff {
+        True -> new(rx, -rx - rz)
+        False -> new(rx, ry)
+      }
+  }
 }
