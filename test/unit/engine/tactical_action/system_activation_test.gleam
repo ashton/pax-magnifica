@@ -11,7 +11,7 @@ const game_id = "game_1"
 const player_id = "alice"
 
 pub fn activate_system_emits_system_activated_and_token_spent_test() {
-  use <- unitest.tags(["unit", "tactical_action", "system_activation"])
+  use <- unitest.tags(["unit", "tactical_action", "system_activation", "aggregate"])
   let s = state.with_history([])
   let cmd = commands.activate_system(game_id, player_id, h.origin())
   let assert Ok(events) = aggregate.handle_activate(s, cmd)
@@ -20,28 +20,28 @@ pub fn activate_system_emits_system_activated_and_token_spent_test() {
 }
 
 pub fn activate_system_empty_game_id_returns_error_test() {
-  use <- unitest.tags(["unit", "tactical_action", "system_activation"])
+  use <- unitest.tags(["unit", "tactical_action", "system_activation", "aggregate"])
   let s = state.with_history([])
   let cmd = commands.activate_system("", player_id, h.origin())
   let assert Error(_) = aggregate.handle_activate(s, cmd)
 }
 
 pub fn activate_system_empty_player_id_returns_error_test() {
-  use <- unitest.tags(["unit", "tactical_action", "system_activation"])
+  use <- unitest.tags(["unit", "tactical_action", "system_activation", "aggregate"])
   let s = state.with_history([])
   let cmd = commands.activate_system(game_id, "", h.origin())
   let assert Error(_) = aggregate.handle_activate(s, cmd)
 }
 
 pub fn activate_already_activated_system_returns_error_test() {
-  use <- unitest.tags(["unit", "tactical_action", "system_activation"])
+  use <- unitest.tags(["unit", "tactical_action", "system_activation", "aggregate"])
   let s = state.with_history([#(h.origin(), player_id)])
   let cmd = commands.activate_system(game_id, player_id, h.origin())
   let assert Error(_) = aggregate.handle_activate(s, cmd)
 }
 
 pub fn activate_different_system_when_one_already_activated_succeeds_test() {
-  use <- unitest.tags(["unit", "tactical_action", "system_activation"])
+  use <- unitest.tags(["unit", "tactical_action", "system_activation", "aggregate"])
   let s = state.with_history([#(h.origin(), player_id)])
   let cmd = commands.activate_system(game_id, player_id, h.adjacent())
   let assert Ok(_) = aggregate.handle_activate(s, cmd)
