@@ -9,6 +9,14 @@
 
 - [ ] **`RevokeVictoryPoints`**: Command and event for removing VPs from a player (e.g. losing Custodians token). Needs `PlayerLostVictoryPoints` event and fold into scoring state.
 
+## Unit Identity
+
+- [ ] **Unit IDs**: Units are currently value objects (fungible within type). As more features require tracking individual unit state — Sustain Damage, per-ship movement modifications from tech/abilities, precise transported-cargo assignment for gravity rift cascades — introduce a `UnitId` and unit lifecycle events (`UnitDeployed`, `UnitMoved`, `UnitRemoved`). This is a cross-cutting change that touches every bounded context and should be planned as a dedicated architectural pass.
+
+## Tactical Action — Gravity Rift
+
+- [ ] **Player reinforcements**: Units removed by gravity rift (and their cascaded transported units) should be returned to the player's reinforcement pool. Requires modeling the reinforcement pool and a `UnitsReturnedToReinforcements` event.
+
 ## Combat
 
 - [ ] **Nebula combat bonus**: If a space combat occurs in a nebula, the defender applies +1 to each combat roll of their ships during that combat. Needs to be wired into the combat resolution logic when it is implemented.

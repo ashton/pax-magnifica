@@ -1,5 +1,5 @@
 import core/models/hex/hex.{type Hex}
-import core/models/planetary_system.{type Anomaly, Nebula, Supernova}
+import core/models/planetary_system.{type Anomaly, GravityRift, Nebula, Supernova}
 import core/models/unit.{type Unit}
 import gleam/int
 import gleam/list
@@ -61,6 +61,27 @@ pub fn capacity(units: List(Unit)) -> Result(Nil, String) {
   }
 }
 
+// Returns the number of gravity rift hexes a fleet transits when moving from
+// `from` to `to`: the source hex plus any intermediate hexes, but never the
+// destination. Called by the aggregate with the actual destination (which may
+// be a blocked_at hex, not the active system) to determine dice_count.
+pub fn gravity_rift_transits(
+  from: Hex,
+  to: Hex,
+  anomalies: List(#(Hex, Anomaly)),
+) -> Int {
+  let rift_hexes =
+    list.filter_map(anomalies, fn(a) {
+      case a {
+        #(h, GravityRift) -> Ok(h)
+        _ -> Error(Nil)
+      }
+    })
+  let intermediates = hex.path(from, to) |> result.unwrap([])
+  [from, ..intermediates]
+  |> list.count(fn(h) { list.contains(rift_hexes, h) })
+}
+
 // Validates movement range and resolves where the fleet ends up.
 //
 // Nebula rules applied here:
@@ -70,6 +91,12 @@ pub fn capacity(units: List(Unit)) -> Result(Nil, String) {
 //   - Moving into a nebula is allowed only when it is the activated system
 //     (the destination `to`), which is naturally satisfied by excluding `to`
 //     from the hard-blocked set.
+//
+// Gravity rift rules applied here:
+//   - Each rift hex in [from] ∪ {intermediate hexes} (not `to`) adds +1 to
+//     the ship's effective movement (stacking per transit, per rule 6).
+//   - Multiple rift tokens in one system still count as one (rule 8), which is
+//     automatically satisfied since each hex has at most one anomaly type.
 //
 // Enemy fleets are soft-blocked: ships stop at the first enemy and combat
 // begins, but only when at least one nebula-free path exists.
@@ -103,11 +130,14 @@ pub fn resolve_path(
         _ -> False
       }
     })
+  // Gravity rift bonus: +1 per rift hex in [from] ∪ {intermediates} (not to).
+  let rift_bonus = gravity_rift_transits(from, to, anomalies)
   let effective_movement = fn(ship: unit.Ship) {
     case from_in_nebula {
       True -> 1
       False -> ship.movement
     }
+    + rift_bonus
   }
   use _ <- result.try(case
     list.all(self_propelled, fn(ship) { effective_movement(ship) >= distance })

@@ -26,3 +26,10 @@ pub fn alt_intermediate() -> Hex {
   let assert Ok(h) = hex.new(1, 0)
   h
 }
+
+// At distance 3 from origin(). Intermediate hexes (via hex.path) are far() and
+// adjacent() — useful for testing two-rift scenarios.
+pub fn three_away() -> Hex {
+  let assert Ok(h) = hex.new(3, -3)
+  h
+}
