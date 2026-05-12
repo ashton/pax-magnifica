@@ -1,6 +1,10 @@
 import core/models/hex/hex.{type Hex}
-import core/models/planetary_system.{type Anomaly, GravityRift, Nebula, Supernova}
+import core/models/planetary_system.{
+  type Anomaly, AsteroidField, GravityRift, Nebula, Supernova,
+}
+import core/models/technology.{type Technology}
 import core/models/unit.{type Unit}
+import game/technologies
 import gleam/int
 import gleam/list
 import gleam/result
@@ -98,6 +102,10 @@ pub fn gravity_rift_transits(
 //   - Multiple rift tokens in one system still count as one (rule 8), which is
 //     automatically satisfied since each hex has at most one anomaly type.
 //
+// Asteroid field rules applied here:
+//   - Ships cannot move through or into an asteroid field.
+//   - Exception: Antimass Deflectors technology removes this restriction.
+//
 // Enemy fleets are soft-blocked: ships stop at the first enemy and combat
 // begins, but only when at least one nebula-free path exists.
 pub fn resolve_path(
@@ -106,6 +114,7 @@ pub fn resolve_path(
   units: List(Unit),
   enemy_fleets: List(#(Hex, String)),
   anomalies: List(#(Hex, Anomaly)),
+  player_technologies: List(Technology),
 ) -> Result(Outcome, String) {
   use distance <- result.try(
     hex.distance(from, to)
@@ -150,6 +159,8 @@ pub fn resolve_path(
     |> list.map(effective_movement)
     |> list.reduce(int.min)
     |> result.unwrap(distance)
+  let has_antimass_deflectors =
+    list.contains(player_technologies, technologies.antimass_deflectors)
   // Supernova: ships can never enter one, even as the destination.
   use _ <- result.try(case
     list.any(anomalies, fn(a) {
@@ -162,16 +173,45 @@ pub fn resolve_path(
     True -> Error("Cannot move into a supernova")
     False -> Ok(Nil)
   })
-  // Hard-blocked hexes: nebulae on intermediate hexes + supernovae on any hex
-  // (both excluding `from` since ships are departing from there, not transiting).
-  let hard_blocked =
-    list.filter_map(anomalies, fn(a) {
-      case a {
-        #(h, Nebula) if h != from && h != to -> Ok(h)
-        #(h, Supernova) if h != from -> Ok(h)
-        _ -> Error(Nil)
+  // Asteroid field: ships cannot move through or into one without Antimass Deflectors.
+  use _ <- result.try(case has_antimass_deflectors {
+    True -> Ok(Nil)
+    False ->
+      case
+        list.any(anomalies, fn(a) {
+          case a {
+            #(h, AsteroidField) if h == to -> True
+            _ -> False
+          }
+        })
+      {
+        True -> Error("Cannot move into an asteroid field")
+        False -> Ok(Nil)
       }
-    })
+  })
+  // Hard-blocked hexes: nebulae on intermediate hexes + supernovae + asteroid
+  // fields (without Antimass Deflectors) on any hex, all excluding `from`.
+  let asteroid_blocked = case has_antimass_deflectors {
+    True -> []
+    False ->
+      list.filter_map(anomalies, fn(a) {
+        case a {
+          #(h, AsteroidField) if h != from -> Ok(h)
+          _ -> Error(Nil)
+        }
+      })
+  }
+  let hard_blocked =
+    list.append(
+      list.filter_map(anomalies, fn(a) {
+        case a {
+          #(h, Nebula) if h != from && h != to -> Ok(h)
+          #(h, Supernova) if h != from -> Ok(h)
+          _ -> Error(Nil)
+        }
+      }),
+      asteroid_blocked,
+    )
   let enemy_hex_list = list.map(enemy_fleets, fn(f) { f.0 })
   // Hard check: if no path exists avoiding hard-blocked hexes, the move is invalid.
   use _ <- result.try(case

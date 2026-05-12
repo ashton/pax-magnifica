@@ -7,16 +7,17 @@ import gleam/list
 pub const enemy_id = "bob"
 
 pub fn empty() -> MovementContext {
-  MovementContext(enemy_fleets: [], anomalies: [])
+  MovementContext(enemy_fleets: [], anomalies: [], player_technologies: [])
 }
 
 pub fn with_enemy_at(h: Hex) -> MovementContext {
-  MovementContext(enemy_fleets: [#(h, enemy_id)], anomalies: [])
+  MovementContext(enemy_fleets: [#(h, enemy_id)], anomalies: [], player_technologies: [])
 }
 
 pub fn with_enemies_at(hexes: List(Hex)) -> MovementContext {
   MovementContext(
     enemy_fleets: list.map(hexes, fn(h) { #(h, enemy_id) }),
     anomalies: [],
+    player_technologies: [],
   )
 }

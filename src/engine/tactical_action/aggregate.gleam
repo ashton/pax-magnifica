@@ -47,6 +47,7 @@ pub fn handle_move_units(
       units,
       ctx.enemy_fleets,
       ctx.anomalies,
+      ctx.player_technologies,
     ))
     case outcome {
       movement.ReachDestination(to) -> {

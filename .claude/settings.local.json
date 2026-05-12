@@ -4,7 +4,9 @@
       "Bash(wc -l /Users/matheus.ashton/dev/pessoal/ti4/src/**/*.gleam)",
       "Bash(gleam test:*)",
       "Bash(find /home/john/dev/ti4/test/unit/engine -type f -name *.gleam)",
-      "Bash(gleam build *)"
+      "Bash(gleam build *)",
+      "Read(//home/john/.cache/gleam/packages/gleam_stdlib-1.0.0/src/gleam/**)",
+      "Read(//home/john/.cache/gleam/**)"
     ]
   }
 }
