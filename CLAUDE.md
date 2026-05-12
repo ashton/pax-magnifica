@@ -79,13 +79,27 @@ The aggregate delegates validation to sub-modules and translates their results i
 
 #### Command enrichment pattern
 
-Aggregates must stay pure (state + command → events, no side-effects). When validation requires data from another bounded context (e.g. enemy fleet positions needed to validate movement), the **caller** enriches the command before dispatching:
+Aggregates must stay pure (state + command → events, no side-effects). When validation requires data from another bounded context (or player capabilities), the **caller** enriches the command before dispatching:
 
 1. The read-side projection holds the cross-context data (e.g. `GameState.fleets: Dict(Hex, String)`)
 2. The actor/command handler queries it, filters to the relevant subset, and adds it to the command (e.g. `enemy_fleets: List(#(Hex, String))`)
 3. The aggregate validates using only what the command provides
 
+Player capabilities follow the same pattern: pass the full domain type (e.g. `player_technologies: List(Technology)`), not a derived boolean (e.g. `has_antimass_deflectors: Bool`). The validation derives what it needs from the rich type.
+
+For movement commands, `MovementContext` is the standard enrichment struct. It currently carries `enemy_fleets`, `anomalies`, and `player_technologies`.
+
 This keeps aggregates testable in isolation — tests pass the enriched data directly without needing to set up external state.
+
+#### Two-step mechanics pattern
+
+Some mechanics require an external input between two phases (e.g. dice rolls for gravity rift damage). Model these as a pending-encounter cycle:
+
+1. Phase 1 emits an encounter event (e.g. `GravityRiftEncountered`) that adds a `(from, to)` pair to a `pending_*` field in state via the event handler.
+2. The actor performs the external action (rolls dice, asks the player) and dispatches a resolve command with the result (e.g. `ResolveGravityRift(units_removed:)`).
+3. Phase 2 validates the pending encounter exists, emits a resolved event (e.g. `GravityRiftResolved`), and the event handler removes the entry from `pending_*`.
+
+The aggregate stays pure — no randomness, no external calls. Gravity rift is the reference implementation.
 
 ### Hexagonal Grid (`src/core/models/hex/`)
 
@@ -115,7 +129,7 @@ test/
     units.gleam     — unit factory functions (carrier, cruiser, fighter, …)
     state.gleam     — TacticalActionState builder
     context.gleam   — MovementContext builders + pub const enemy_id
-    anomalies.gleam — anomaly-based MovementContext builders
+    anomalies.gleam — anomaly-based MovementContext builders (one helper per anomaly type)
   integration/      — end-to-end flow tests
   unit/             — mirrors src/ structure
     core/…
