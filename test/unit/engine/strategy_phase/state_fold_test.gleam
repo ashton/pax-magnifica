@@ -1,5 +1,5 @@
 import core/models/strategy.{Imperial, Leadership, Trade, Warfare}
-import engine/strategy_phase/event_handler
+import engine/strategy_phase/aggregate
 import engine/strategy_phase/events.{
   StrategyCardPicked, StrategyCardTradeGoodsCleared, StrategyPhaseEnded,
   StrategyPhaseStarted, TradeGoodAddedToStrategyCard,
@@ -13,42 +13,42 @@ import unitest
 const game_id = "game_1"
 
 pub fn apply_phase_started_sets_player_order_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   let event = StrategyPhaseStarted(game_id, ["alice", "bob", "charlie"])
-  let assert Some(state) = event_handler.apply(None, event)
+  let assert Some(state) = aggregate.apply(None, event)
   assert state.player_order == ["alice", "bob", "charlie"]
 }
 
 pub fn apply_phase_started_clears_picks_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   let event = StrategyPhaseStarted(game_id, ["alice", "bob"])
-  let assert Some(state) = event_handler.apply(None, event)
+  let assert Some(state) = aggregate.apply(None, event)
   assert state.current_picks == []
 }
 
 pub fn apply_phase_started_preserves_trade_goods_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   // simulate a prior state with accumulated TGs
   let prior = StrategyPhaseStarted(game_id, ["alice"])
-  let assert Some(s1) = event_handler.apply(None, prior)
+  let assert Some(s1) = aggregate.apply(None, prior)
   let s1_with_tg =
-    event_handler.apply(
+    aggregate.apply(
       Some(s1),
       TradeGoodAddedToStrategyCard(game_id, Warfare),
     )
   // new round starts — trade goods should persist
   let new_round = StrategyPhaseStarted(game_id, ["alice", "bob"])
-  let assert Some(s2) = event_handler.apply(s1_with_tg, new_round)
+  let assert Some(s2) = aggregate.apply(s1_with_tg, new_round)
   let assert Ok(tg) = dict.get(s2.card_trade_goods, Warfare)
   assert tg == 1
 }
 
 pub fn apply_card_picked_adds_to_picks_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   let base = StrategyPhaseStarted(game_id, ["alice", "bob"])
-  let assert Some(state) = event_handler.apply(None, base)
+  let assert Some(state) = aggregate.apply(None, base)
   let assert Some(state) =
-    event_handler.apply(
+    aggregate.apply(
       Some(state),
       StrategyCardPicked(game_id, "alice", Leadership),
     )
@@ -56,16 +56,16 @@ pub fn apply_card_picked_adds_to_picks_test() {
 }
 
 pub fn apply_trade_good_added_increments_count_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
-  let assert Some(state) = event_handler.apply(None, base)
+  let assert Some(state) = aggregate.apply(None, base)
   let assert Some(state) =
-    event_handler.apply(
+    aggregate.apply(
       Some(state),
       TradeGoodAddedToStrategyCard(game_id, Warfare),
     )
   let assert Some(state) =
-    event_handler.apply(
+    aggregate.apply(
       Some(state),
       TradeGoodAddedToStrategyCard(game_id, Warfare),
     )
@@ -74,16 +74,16 @@ pub fn apply_trade_good_added_increments_count_test() {
 }
 
 pub fn apply_trade_goods_cleared_resets_to_zero_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
-  let assert Some(state) = event_handler.apply(None, base)
+  let assert Some(state) = aggregate.apply(None, base)
   let assert Some(state) =
-    event_handler.apply(
+    aggregate.apply(
       Some(state),
       TradeGoodAddedToStrategyCard(game_id, Imperial),
     )
   let assert Some(state) =
-    event_handler.apply(
+    aggregate.apply(
       Some(state),
       StrategyCardTradeGoodsCleared(game_id, Imperial),
     )
@@ -92,30 +92,30 @@ pub fn apply_trade_goods_cleared_resets_to_zero_test() {
 }
 
 pub fn apply_phase_ended_clears_picks_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
-  let assert Some(state) = event_handler.apply(None, base)
+  let assert Some(state) = aggregate.apply(None, base)
   let assert Some(state) =
-    event_handler.apply(
+    aggregate.apply(
       Some(state),
       StrategyCardPicked(game_id, "alice", Leadership),
     )
   let assert Some(state) =
-    event_handler.apply(Some(state), StrategyPhaseEnded(game_id))
+    aggregate.apply(Some(state), StrategyPhaseEnded(game_id))
   assert state.current_picks == []
 }
 
 pub fn apply_phase_ended_preserves_trade_goods_test() {
-  use <- unitest.tags(["unit", "strategy_phase", "event_handler"])
+  use <- unitest.tags(["unit", "strategy_phase", "state_fold"])
   let base = StrategyPhaseStarted(game_id, ["alice"])
-  let assert Some(state) = event_handler.apply(None, base)
+  let assert Some(state) = aggregate.apply(None, base)
   let assert Some(state) =
-    event_handler.apply(
+    aggregate.apply(
       Some(state),
       TradeGoodAddedToStrategyCard(game_id, Trade),
     )
   let assert Some(state) =
-    event_handler.apply(Some(state), StrategyPhaseEnded(game_id))
+    aggregate.apply(Some(state), StrategyPhaseEnded(game_id))
   let assert Ok(tg) = dict.get(state.card_trade_goods, Trade)
   assert tg == 1
 }

@@ -1,4 +1,7 @@
-import core/models/state/tactical_action.{type TacticalActionState}
+import core/models/hex/hex.{type Hex}
+import core/models/state/tactical_action.{
+  type TacticalActionState, TacticalActionState,
+}
 import core/models/unit
 import core/value_objects/game
 import core/value_objects/player
@@ -6,7 +9,10 @@ import engine/tactical_action/activation/validation as activation
 import engine/tactical_action/commands.{
   type TacticalActionCommand, ActivateSystem, MoveUnits, ResolveGravityRift,
 }
-import engine/tactical_action/events.{type TacticalActionEvent}
+import engine/tactical_action/events.{
+  type TacticalActionEvent, CombatInitiated, GravityRiftEncountered,
+  GravityRiftResolved, SystemActivated, TacticTokenSpent, UnitsMoved,
+}
 import engine/tactical_action/movement/context.{type MovementContext}
 import engine/tactical_action/movement/validation as movement
 import gleam/list
@@ -100,6 +106,45 @@ fn rift_encountered_events(
       let dice_count = self_propelled_count(units) * rift_count
       [events.GravityRiftEncountered(game_id, player_id, from, to, rift_count, dice_count)]
     }
+  }
+}
+
+pub fn apply(
+  state: TacticalActionState,
+  event: TacticalActionEvent,
+) -> TacticalActionState {
+  case event {
+    SystemActivated(_, player_id, hex) ->
+      TacticalActionState(
+        ..state,
+        activation_history: [#(hex, player_id), ..state.activation_history],
+      )
+
+    TacticTokenSpent(_, _) -> state
+
+    UnitsMoved(_, _, _, _, _) -> state
+
+    CombatInitiated(_, _, _, _) -> state
+
+    GravityRiftEncountered(_, _, from, to, _, _) ->
+      TacticalActionState(
+        ..state,
+        pending_rift_encounters: [#(from, to), ..state.pending_rift_encounters],
+      )
+
+    GravityRiftResolved(_, _, from, to, _) ->
+      TacticalActionState(
+        ..state,
+        pending_rift_encounters: drop_first(state.pending_rift_encounters, #(from, to)),
+      )
+  }
+}
+
+fn drop_first(lst: List(#(Hex, Hex)), target: #(Hex, Hex)) -> List(#(Hex, Hex)) {
+  case lst {
+    [] -> []
+    [head, ..tail] if head == target -> tail
+    [head, ..tail] -> [head, ..drop_first(tail, target)]
   }
 }
 

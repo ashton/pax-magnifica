@@ -24,7 +24,7 @@ This is a **Twilight Imperium 4th Edition** game engine written in **Gleam** (fu
 ### Core Patterns
 
 - **Commands** describe intent (write side). **Events** describe facts (immutable, logged). State is reconstructed by reducing events — never mutated directly.
-- **Aggregates** validate commands and emit events. **Event handlers** fold events into state.
+- **Aggregates** own two responsibilities: (1) `handle_*` validates commands and emits events; (2) `apply(state, event) -> state` folds events back into state. State folding is the aggregate's job — `event_handler.gleam` is not used for this.
 - Game lifecycle is a **state machine**: `Initial → Lobby → PlayerSetup → MapSetup → Active → Ended`.
 - Each game runs as an isolated **OTP actor** managed by `SessionManager`.
 
@@ -42,7 +42,7 @@ only then, generate the implementation, and at the end, ALWAYS run the tests to 
 | Directory | Responsibility |
 |---|---|
 | `src/core/models/` | Pure domain types (Player, Game, Map, Hex, Factions, Units…) — no side effects |
-| `src/engine/` | Command handlers, event handlers, aggregates per bounded context |
+| `src/engine/` | Aggregates (validate + fold) and command handlers per bounded context |
 | `src/game/` | Static game data (all factions, planets, systems, technologies, units) |
 | `src/actors/` | OTP infrastructure: `SessionManager` (registry) and `GameManager` (per-game actor) |
 | `src/plugins/` | External adapters (e.g., Tabletop Simulator string parser) |
@@ -65,8 +65,7 @@ When a bounded context grows complex, extract domain rules into sub-modules rath
 engine/tactical_action/
   commands.gleam
   events.gleam
-  aggregate.gleam          ← orchestrates; reads like a specification
-  event_handler.gleam
+  aggregate.gleam          ← validates commands, emits events, and folds state via apply/2
   activation/
     validation.gleam       ← activation-specific domain rules
   movement/
@@ -95,9 +94,9 @@ This keeps aggregates testable in isolation — tests pass the enriched data dir
 
 Some mechanics require an external input between two phases (e.g. dice rolls for gravity rift damage). Model these as a pending-encounter cycle:
 
-1. Phase 1 emits an encounter event (e.g. `GravityRiftEncountered`) that adds a `(from, to)` pair to a `pending_*` field in state via the event handler.
+1. Phase 1 emits an encounter event (e.g. `GravityRiftEncountered`) that adds a `(from, to)` pair to a `pending_*` field in state via `aggregate.apply`.
 2. The actor performs the external action (rolls dice, asks the player) and dispatches a resolve command with the result (e.g. `ResolveGravityRift(units_removed:)`).
-3. Phase 2 validates the pending encounter exists, emits a resolved event (e.g. `GravityRiftResolved`), and the event handler removes the entry from `pending_*`.
+3. Phase 2 validates the pending encounter exists, emits a resolved event (e.g. `GravityRiftResolved`), and `aggregate.apply` removes the entry from `pending_*`.
 
 The aggregate stays pure — no randomness, no external calls. Gravity rift is the reference implementation.
 
@@ -115,8 +114,8 @@ Key functions in `hex.gleam`:
 
 1. Define the command type in the relevant `commands.gleam` inside the bounded context.
 2. Define the event type in the matching `events.gleam`.
-3. Implement the command handler (validates state → returns events).
-4. Implement the event handler (folds event into state).
+3. In `aggregate.gleam`, add a `handle_*` function that validates the command against state and returns the events.
+4. In the same `aggregate.gleam`, extend `apply(state, event) -> state` to fold the new event into state.
 
 ### Test Organization
 
@@ -138,6 +137,8 @@ test/
 ```
 
 Split test files by functional concern within a bounded context. For example, `tactical_action` has `system_activation_test.gleam` and `movement_test.gleam` instead of one monolithic `aggregate_test.gleam`. When a test file exceeds ~150 lines of test functions, consider splitting it.
+
+Tests for `aggregate.apply` (state folding) live in `state_fold_test.gleam` per bounded context, tagged with `"state_fold"` as the module tag.
 
 #### Tags
 

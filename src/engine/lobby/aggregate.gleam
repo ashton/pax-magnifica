@@ -1,6 +1,8 @@
+import core/models/state.{type State, Lobby}
 import core/value_objects/game
 import engine/lobby/commands.{type LobbyCommand, CreateLobby, JoinLobby}
-import engine/lobby/events.{type LobbyEvent}
+import engine/lobby/events.{type LobbyEvent, LobbyCreated, UserJoined}
+import gleam/list
 import gleam/result
 
 fn validate(command: LobbyCommand) -> Result(LobbyCommand, String) {
@@ -21,5 +23,13 @@ pub fn handle(command: LobbyCommand) -> Result(List(LobbyEvent), String) {
   case command {
     CreateLobby(id) -> Ok([events.LobbyCreated(id)])
     JoinLobby(lobby, user) -> Ok([events.UserJoined(lobby, user)])
+  }
+}
+
+pub fn apply(state: State, event: LobbyEvent) -> State {
+  case event {
+    LobbyCreated(_) -> Lobby(state: [])
+    UserJoined(_, user) ->
+      state.update_lobby(state, fn(users) { list.append(users, [user]) })
   }
 }

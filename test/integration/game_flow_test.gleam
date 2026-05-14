@@ -6,11 +6,9 @@ import engine/game_setup/commands.{CreateGame, create_game as game_setup_create_
 import engine/lobby/aggregate as lobby_aggregate
 import engine/lobby/command_handler as lobby_command_handler
 import engine/lobby/commands as lobby_commands
-import engine/lobby/event_handler as lobby_event_handler
 import engine/map/aggregate as map_aggregate
 import engine/map/command_handler as map_command_handler
 import engine/map/commands as map_commands
-import engine/map/event_handler as map_event_handler
 import gleam/dict
 import gleam/list
 import gleam/string
@@ -27,7 +25,7 @@ pub fn create_lobby_test() {
   let assert Ok(_) = lobby_aggregate.validate_command(cmd)
 
   let events = lobby_command_handler.process(cmd)
-  let state = list.fold(events, Initial, lobby_event_handler.apply)
+  let state = list.fold(events, Initial, lobby_aggregate.apply)
 
   assert Lobby(state: []) == state
 }
@@ -44,14 +42,14 @@ pub fn users_join_lobby_test() {
   let state =
     lobby_commands.create_lobby(game_id)
     |> lobby_command_handler.process()
-    |> list.fold(Initial, lobby_event_handler.apply)
+    |> list.fold(Initial, lobby_aggregate.apply)
 
   let state =
     [alice, bob, charlie]
     |> list.fold(state, fn(s, user) {
       lobby_commands.join_lobby(game_id, user)
       |> lobby_command_handler.process()
-      |> list.fold(s, lobby_event_handler.apply)
+      |> list.fold(s, lobby_aggregate.apply)
     })
 
   let assert Lobby(users) = state
@@ -84,14 +82,14 @@ pub fn map_created_from_tts_string_test() {
   let assert Ok(_) = map_aggregate.validate_command(create_grid_cmd)
   let state =
     map_command_handler.process(create_grid_cmd)
-    |> list.fold(Initial, map_event_handler.apply)
+    |> list.fold(Initial, map_aggregate.apply)
   let assert MapSetup(ms) = state
 
   // Complete the map using tiles parsed from the TTS string
   let state =
     map_commands.complete(ms.id, tiles)
     |> map_command_handler.process()
-    |> list.fold(state, map_event_handler.apply)
+    |> list.fold(state, map_aggregate.apply)
 
   let assert MapSetup(final_ms) = state
   let assert Map(final_tiles, _) = final_ms.map
@@ -113,7 +111,7 @@ pub fn full_game_flow_test() {
   let assert Ok(_) = lobby_aggregate.validate_command(create_cmd)
   let state =
     lobby_command_handler.process(create_cmd)
-    |> list.fold(Initial, lobby_event_handler.apply)
+    |> list.fold(Initial, lobby_aggregate.apply)
   let assert Lobby([]) = state
 
   // 2. Users join the lobby
@@ -122,7 +120,7 @@ pub fn full_game_flow_test() {
     |> list.fold(state, fn(s, user) {
       lobby_commands.join_lobby(game_id, user)
       |> lobby_command_handler.process()
-      |> list.fold(s, lobby_event_handler.apply)
+      |> list.fold(s, lobby_aggregate.apply)
     })
   let assert Lobby(users) = state
   assert list.length(users) == player_count
@@ -137,7 +135,7 @@ pub fn full_game_flow_test() {
   let assert Ok(_) = map_aggregate.validate_command(create_grid_cmd)
   let map_state =
     map_command_handler.process(create_grid_cmd)
-    |> list.fold(Initial, map_event_handler.apply)
+    |> list.fold(Initial, map_aggregate.apply)
   let assert MapSetup(ms) = map_state
 
   // 5. Parse TTS string and complete the map
@@ -149,7 +147,7 @@ pub fn full_game_flow_test() {
   let map_state =
     map_commands.complete(ms.id, tiles)
     |> map_command_handler.process()
-    |> list.fold(map_state, map_event_handler.apply)
+    |> list.fold(map_state, map_aggregate.apply)
 
   let assert MapSetup(final_ms) = map_state
   let assert Map(final_tiles, _) = final_ms.map

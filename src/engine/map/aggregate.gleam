@@ -1,7 +1,9 @@
 import core/models/hex/grid
-import core/models/map
+import core/models/map as game_map
+import core/models/state.{type State, MapSetup}
+import core/models/state/map.{MapState}
 import engine/map/commands.{type MapCommand, CompleteMap, CreateMapGrid, SetTile}
-import engine/map/events.{type MapEvent}
+import engine/map/events.{type MapEvent, GridDefined, MapCreated, TileSet}
 import gleam/int
 import gleam/result
 import utils/uuid
@@ -42,6 +44,22 @@ pub fn handle(command: MapCommand) -> Result(List(MapEvent), String) {
       Ok([events.tile_set(game, system, hex)])
 
     CompleteMap(game, tiles) ->
-      Ok([map.new(tiles) |> events.map_created(game, _)])
+      Ok([game_map.new(tiles) |> events.map_created(game, _)])
+  }
+}
+
+pub fn apply(state: State, event: MapEvent) -> State {
+  case event {
+    GridDefined(game, _grid) ->
+      MapSetup(state: MapState(id: game, map: game_map.default()))
+
+    TileSet(_, system, hex) ->
+      state.update_map(state, fn(ms) {
+        let assert Ok(updated_map) = game_map.add_tile(Ok(ms.map), hex, system)
+        MapState(..ms, map: updated_map)
+      })
+
+    MapCreated(_, completed_map) ->
+      state.update_map(state, fn(ms) { MapState(..ms, map: completed_map) })
   }
 }
