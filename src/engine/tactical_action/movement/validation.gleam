@@ -22,12 +22,14 @@ pub fn not_empty(units: List(Unit)) -> Result(Nil, String) {
 }
 
 pub fn no_structures(units: List(Unit)) -> Result(Nil, String) {
-  case list.any(units, fn(u) {
-    case u {
-      unit.Structure(_) -> True
-      _ -> False
-    }
-  }) {
+  case
+    list.any(units, fn(u) {
+      case u {
+        unit.Structure(_) -> True
+        _ -> False
+      }
+    })
+  {
     True -> Error("Cannot move structures")
     False -> Ok(Nil)
   }
@@ -52,16 +54,19 @@ pub fn capacity(units: List(Unit)) -> Result(Nil, String) {
       }
     })
   let needed =
-    list.length(list.filter(units, fn(u) {
-      case u {
-        unit.ShipUnit(unit.Ship(kind: unit.Fighter(..), ..)) -> True
-        unit.GroundForce(_) -> True
-        _ -> False
-      }
-    }))
+    list.length(
+      list.filter(units, fn(u) {
+        case u {
+          unit.ShipUnit(unit.Ship(kind: unit.Fighter(..), ..)) -> True
+          unit.GroundForce(_) -> True
+          _ -> False
+        }
+      }),
+    )
   case total >= needed {
     True -> Ok(Nil)
-    False -> Error("Not enough capacity to carry all fighters and ground forces")
+    False ->
+      Error("Not enough capacity to carry all fighters and ground forces")
   }
 }
 
@@ -148,12 +153,17 @@ pub fn resolve_path(
     }
     + rift_bonus
   }
-  use _ <- result.try(case
-    list.all(self_propelled, fn(ship) { effective_movement(ship) >= distance })
-  {
-    True -> Ok(Nil)
-    False -> Error("Some ships do not have enough movement to reach the activated system")
-  })
+  use _ <- result.try(
+    case
+      list.all(self_propelled, fn(ship) { effective_movement(ship) >= distance })
+    {
+      True -> Ok(Nil)
+      False ->
+        Error(
+          "Some ships do not have enough movement to reach the activated system",
+        )
+    },
+  )
   let min_movement =
     self_propelled
     |> list.map(effective_movement)
@@ -162,17 +172,19 @@ pub fn resolve_path(
   let has_antimass_deflectors =
     list.contains(player_technologies, technologies.antimass_deflectors)
   // Supernova: ships can never enter one, even as the destination.
-  use _ <- result.try(case
-    list.any(anomalies, fn(a) {
-      case a {
-        #(h, Supernova) if h == to -> True
-        _ -> False
-      }
-    })
-  {
-    True -> Error("Cannot move into a supernova")
-    False -> Ok(Nil)
-  })
+  use _ <- result.try(
+    case
+      list.any(anomalies, fn(a) {
+        case a {
+          #(h, Supernova) if h == to -> True
+          _ -> False
+        }
+      })
+    {
+      True -> Error("Cannot move into a supernova")
+      False -> Ok(Nil)
+    },
+  )
   // Asteroid field: ships cannot move through or into one without Antimass Deflectors.
   use _ <- result.try(case has_antimass_deflectors {
     True -> Ok(Nil)
@@ -214,12 +226,15 @@ pub fn resolve_path(
     )
   let enemy_hex_list = list.map(enemy_fleets, fn(f) { f.0 })
   // Hard check: if no path exists avoiding hard-blocked hexes, the move is invalid.
-  use _ <- result.try(case
-    hex.has_path_avoiding(from, to, min_movement, hard_blocked)
-  {
-    True -> Ok(Nil)
-    False -> Error("Cannot reach the activated system: all paths are blocked by anomalies")
-  })
+  use _ <- result.try(
+    case hex.has_path_avoiding(from, to, min_movement, hard_blocked) {
+      True -> Ok(Nil)
+      False ->
+        Error(
+          "Cannot reach the activated system: all paths are blocked by anomalies",
+        )
+    },
+  )
   // Soft check: if a path exists avoiding both nebulae and enemies, ships reach destination.
   case
     hex.has_path_avoiding(
@@ -241,7 +256,8 @@ pub fn resolve_path(
           |> result.map(fn(fleet) { #(h, fleet.1) })
         })
       {
-        Ok(#(blocked_at, enemy_player_id)) -> Ok(BlockedAt(blocked_at, enemy_player_id))
+        Ok(#(blocked_at, enemy_player_id)) ->
+          Ok(BlockedAt(blocked_at, enemy_player_id))
         Error(_) -> Ok(ReachDestination(to))
       }
     }

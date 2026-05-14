@@ -3,11 +3,7 @@ import core/models/unit.{type Unit}
 
 pub type TacticalActionCommand {
   ActivateSystem(game_id: String, player_id: String, hex: Hex)
-  MoveUnits(
-    game_id: String,
-    player_id: String,
-    moves: List(#(Hex, List(Unit))),
-  )
+  MoveUnits(game_id: String, player_id: String, moves: List(#(Hex, List(Unit))))
   ResolveGravityRift(
     game_id: String,
     player_id: String,

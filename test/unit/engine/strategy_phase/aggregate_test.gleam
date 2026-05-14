@@ -1,5 +1,5 @@
-import core/models/strategy.{Leadership, Trade, Warfare}
 import core/models/state/strategy_phase.{StrategyPhaseState}
+import core/models/strategy.{Leadership, Trade, Warfare}
 import engine/strategy_phase/aggregate
 import engine/strategy_phase/commands.{PickStrategyCard, StartStrategyPhase}
 import gleam/dict

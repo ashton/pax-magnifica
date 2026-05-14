@@ -11,7 +11,10 @@ fn state_with_passed(passed: List(String)) -> ActionPhaseState {
     passed_players: passed,
     last_player: None,
     player_cards: [
-      #("alice", StrategyCard(card: Leadership, trade_goods: 0, exhausted: False)),
+      #(
+        "alice",
+        StrategyCard(card: Leadership, trade_goods: 0, exhausted: False),
+      ),
       #("bob", StrategyCard(card: Trade, trade_goods: 0, exhausted: False)),
     ],
   )

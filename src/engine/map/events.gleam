@@ -13,11 +13,7 @@ pub fn grid_defined(game game: String, grid grid: grid.HexGrid) {
   GridDefined(game:, grid:)
 }
 
-pub fn tile_set(
-  game game: String,
-  system system: System,
-  hex hex: Hex,
-) {
+pub fn tile_set(game game: String, system system: System, hex hex: Hex) {
   TileSet(game:, system:, hex:)
 }
 

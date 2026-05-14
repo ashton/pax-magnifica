@@ -8,5 +8,7 @@ pub fn with_history(entries: List(#(Hex, String))) -> TacticalActionState {
 }
 
 pub fn with_pending_encounter(from: Hex, to: Hex) -> TacticalActionState {
-  TacticalActionState(activation_history: [], pending_rift_encounters: [#(from, to)])
+  TacticalActionState(activation_history: [], pending_rift_encounters: [
+    #(from, to),
+  ])
 }

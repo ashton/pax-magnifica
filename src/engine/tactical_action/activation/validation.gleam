@@ -29,7 +29,8 @@ pub fn valid_movement_source(
     False -> Ok(Nil)
   })
   case list.any(state.activation_history, fn(entry) { entry.0 == from }) {
-    True -> Error("Cannot move units from a system that has already been activated")
+    True ->
+      Error("Cannot move units from a system that has already been activated")
     False -> Ok(Nil)
   }
 }

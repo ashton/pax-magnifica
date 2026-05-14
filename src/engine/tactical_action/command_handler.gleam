@@ -24,6 +24,14 @@ pub fn process_move_units(
   let assert Ok(#(active_hex, _)) = list.first(state.activation_history)
   list.flat_map(moves, fn(move) {
     let #(from, units) = move
-    [events.UnitsMoved(game_id, player_id, from: from, to: active_hex, units: units)]
+    [
+      events.UnitsMoved(
+        game_id,
+        player_id,
+        from: from,
+        to: active_hex,
+        units: units,
+      ),
+    ]
   })
 }

@@ -29,4 +29,3 @@ pub type Color {
   Red
   Yellow
 }
-

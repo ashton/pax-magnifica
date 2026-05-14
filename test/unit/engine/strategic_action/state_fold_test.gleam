@@ -59,6 +59,5 @@ pub fn apply_ended_does_not_change_state_test() {
 
 pub fn apply_on_none_returns_none_for_non_starting_events_test() {
   use <- unitest.tags(["unit", "strategic_action", "state_fold"])
-  assert None
-    == aggregate.apply(None, SecondaryAbilityResolved(game_id, "bob"))
+  assert None == aggregate.apply(None, SecondaryAbilityResolved(game_id, "bob"))
 }

@@ -33,7 +33,10 @@ pub fn new_order_empty_returns_error_test() {
 
 pub fn new_cards_valid_test() {
   use <- unitest.tags(["unit", "value_objects", "player"])
-  let entry = #("alice", StrategyCard(card: Leadership, trade_goods: 0, exhausted: False))
+  let entry = #(
+    "alice",
+    StrategyCard(card: Leadership, trade_goods: 0, exhausted: False),
+  )
   let assert Ok(cards) = player.new_cards([entry])
   assert player.cards_values(cards) == [entry]
 }

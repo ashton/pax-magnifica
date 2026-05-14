@@ -37,35 +37,51 @@ pub fn move_units_emits_units_moved_test() {
 pub fn move_units_empty_game_id_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units("", player_id, [#(h.adjacent(), [units.carrier(movement: 1, capacity: 4)])])
+  let cmd =
+    commands.move_units("", player_id, [
+      #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
 pub fn move_units_empty_player_id_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, "", [#(h.adjacent(), [units.carrier(movement: 1, capacity: 4)])])
+  let cmd =
+    commands.move_units(game_id, "", [
+      #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
 pub fn move_units_without_activated_system_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([])
-  let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), [units.carrier(movement: 1, capacity: 4)])])
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
 pub fn move_units_from_active_system_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.origin(), [units.carrier(movement: 1, capacity: 4)])])
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.origin(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
 pub fn move_units_from_previously_activated_system_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
-  let s = state.with_history([#(h.origin(), player_id), #(h.adjacent(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), [units.carrier(movement: 1, capacity: 4)])])
+  let s =
+    state.with_history([#(h.origin(), player_id), #(h.adjacent(), player_id)])
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
@@ -79,7 +95,8 @@ pub fn move_units_with_empty_units_list_returns_error_test() {
 pub fn move_units_with_structure_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), [units.pds()])])
+  let cmd =
+    commands.move_units(game_id, player_id, [#(h.adjacent(), [units.pds()])])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
@@ -88,14 +105,20 @@ pub fn move_units_with_structure_returns_error_test() {
 pub fn move_units_with_exact_movement_succeeds_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), [units.carrier(movement: 1, capacity: 4)])])
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
   let assert Ok(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
 pub fn move_units_with_insufficient_movement_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.far(), [units.carrier(movement: 1, capacity: 4)])])
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.far(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
 
@@ -118,7 +141,11 @@ pub fn move_units_all_ships_with_enough_movement_succeeds_test() {
 pub fn move_units_fighters_not_checked_for_movement_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let u = [units.carrier(movement: 1, capacity: 4), units.fighter(), units.fighter()]
+  let u = [
+    units.carrier(movement: 1, capacity: 4),
+    units.fighter(),
+    units.fighter(),
+  ]
   let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), u)])
   let assert Ok(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -128,7 +155,11 @@ pub fn move_units_fighters_not_checked_for_movement_test() {
 pub fn move_units_fighters_within_capacity_succeeds_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let u = [units.carrier(movement: 1, capacity: 4), units.fighter(), units.fighter()]
+  let u = [
+    units.carrier(movement: 1, capacity: 4),
+    units.fighter(),
+    units.fighter(),
+  ]
   let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), u)])
   let assert Ok(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -136,7 +167,11 @@ pub fn move_units_fighters_within_capacity_succeeds_test() {
 pub fn move_units_fighter_exceeds_capacity_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let u = [units.carrier(movement: 1, capacity: 1), units.fighter(), units.fighter()]
+  let u = [
+    units.carrier(movement: 1, capacity: 1),
+    units.fighter(),
+    units.fighter(),
+  ]
   let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), u)])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -144,7 +179,11 @@ pub fn move_units_fighter_exceeds_capacity_returns_error_test() {
 pub fn move_units_infantry_within_capacity_succeeds_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let u = [units.carrier(movement: 1, capacity: 2), units.infantry(), units.infantry()]
+  let u = [
+    units.carrier(movement: 1, capacity: 2),
+    units.infantry(),
+    units.infantry(),
+  ]
   let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), u)])
   let assert Ok(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -152,7 +191,11 @@ pub fn move_units_infantry_within_capacity_succeeds_test() {
 pub fn move_units_infantry_exceeds_capacity_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let u = [units.carrier(movement: 1, capacity: 1), units.infantry(), units.infantry()]
+  let u = [
+    units.carrier(movement: 1, capacity: 1),
+    units.infantry(),
+    units.infantry(),
+  ]
   let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), u)])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -160,7 +203,11 @@ pub fn move_units_infantry_exceeds_capacity_returns_error_test() {
 pub fn move_units_mixed_carried_within_capacity_succeeds_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let u = [units.carrier(movement: 1, capacity: 2), units.fighter(), units.infantry()]
+  let u = [
+    units.carrier(movement: 1, capacity: 2),
+    units.fighter(),
+    units.infantry(),
+  ]
   let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), u)])
   let assert Ok(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -168,7 +215,12 @@ pub fn move_units_mixed_carried_within_capacity_succeeds_test() {
 pub fn move_units_mixed_carried_exceeds_capacity_returns_error_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let u = [units.carrier(movement: 1, capacity: 2), units.fighter(), units.infantry(), units.fighter()]
+  let u = [
+    units.carrier(movement: 1, capacity: 2),
+    units.fighter(),
+    units.infantry(),
+    units.fighter(),
+  ]
   let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), u)])
   let assert Error(_) = aggregate.handle_move_units(s, cmd, context.empty())
 }
@@ -232,8 +284,12 @@ pub fn move_units_one_invalid_origin_fails_entire_command_test() {
 pub fn move_units_through_enemy_fleet_stops_there_and_initiates_combat_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.far(), [units.cruiser(movement: 2)])])
-  let assert Ok(events) = aggregate.handle_move_units(s, cmd, context.with_enemy_at(h.adjacent()))
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.far(), [units.cruiser(movement: 2)]),
+    ])
+  let assert Ok(events) =
+    aggregate.handle_move_units(s, cmd, context.with_enemy_at(h.adjacent()))
   let assert [
     UnitsMoved(_, _, from: from, to: blocked_at, units: _),
     CombatInitiated(_, combat_hex, attacker, defender),
@@ -248,7 +304,10 @@ pub fn move_units_through_enemy_fleet_stops_there_and_initiates_combat_test() {
 pub fn move_units_with_no_enemy_in_path_reaches_destination_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.far(), [units.cruiser(movement: 2)])])
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.far(), [units.cruiser(movement: 2)]),
+    ])
   let assert Ok(events) = aggregate.handle_move_units(s, cmd, context.empty())
   let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
   assert destination == h.origin()
@@ -257,8 +316,12 @@ pub fn move_units_with_no_enemy_in_path_reaches_destination_test() {
 pub fn move_units_adjacent_with_enemy_at_destination_not_blocked_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), [units.carrier(movement: 1, capacity: 4)])])
-  let assert Ok(events) = aggregate.handle_move_units(s, cmd, context.with_enemy_at(h.origin()))
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
+  let assert Ok(events) =
+    aggregate.handle_move_units(s, cmd, context.with_enemy_at(h.origin()))
   let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
   assert destination == h.origin()
 }
@@ -266,8 +329,12 @@ pub fn move_units_adjacent_with_enemy_at_destination_not_blocked_test() {
 pub fn move_units_routes_around_blocked_intermediate_hex_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.two_paths_from(), [units.cruiser(movement: 2)])])
-  let assert Ok(events) = aggregate.handle_move_units(s, cmd, context.with_enemy_at(h.adjacent()))
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.two_paths_from(), [units.cruiser(movement: 2)]),
+    ])
+  let assert Ok(events) =
+    aggregate.handle_move_units(s, cmd, context.with_enemy_at(h.adjacent()))
   let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
   assert destination == h.origin()
 }
@@ -275,9 +342,16 @@ pub fn move_units_routes_around_blocked_intermediate_hex_test() {
 pub fn move_units_all_paths_blocked_initiates_combat_at_first_enemy_test() {
   use <- unitest.tags(["unit", "tactical_action", "movement"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.two_paths_from(), [units.cruiser(movement: 2)])])
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.two_paths_from(), [units.cruiser(movement: 2)]),
+    ])
   let assert Ok(events) =
-    aggregate.handle_move_units(s, cmd, context.with_enemies_at([h.adjacent(), h.alt_intermediate()]))
+    aggregate.handle_move_units(
+      s,
+      cmd,
+      context.with_enemies_at([h.adjacent(), h.alt_intermediate()]),
+    )
   let assert [
     UnitsMoved(_, _, from: from, to: blocked_at, units: _),
     CombatInitiated(_, combat_hex, attacker, defender),

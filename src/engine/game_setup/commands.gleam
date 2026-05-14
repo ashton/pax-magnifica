@@ -1,4 +1,6 @@
-import core/models/command_token.{type CommandTokenPool, FleetPool, StrategyPool, TacticPool}
+import core/models/command_token.{
+  type CommandTokenPool, FleetPool, StrategyPool, TacticPool,
+}
 import core/models/common.{type Color}
 import core/models/faction.{type FactionIdentifier}
 import core/models/game_setup.{type GameSetupType}

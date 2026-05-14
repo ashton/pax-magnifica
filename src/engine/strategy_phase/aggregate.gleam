@@ -1,8 +1,8 @@
-import core/value_objects/game
-import core/value_objects/player
 import core/models/state/strategy_phase.{
   type StrategyPhaseState, StrategyPhaseState,
 }
+import core/value_objects/game
+import core/value_objects/player
 import engine/strategy_phase/commands.{
   type StrategyPhaseCommand, PickStrategyCard, StartStrategyPhase,
 }
@@ -91,9 +91,7 @@ pub fn apply(
       })
 
     StrategyPhaseEnded(_) ->
-      option.map(state, fn(s) {
-        StrategyPhaseState(..s, current_picks: [])
-      })
+      option.map(state, fn(s) { StrategyPhaseState(..s, current_picks: []) })
   }
 }
 

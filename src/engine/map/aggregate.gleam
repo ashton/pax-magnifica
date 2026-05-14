@@ -40,8 +40,7 @@ pub fn handle(command: MapCommand) -> Result(List(MapEvent), String) {
       Ok([events.grid_defined(uuid.new(), g)])
     }
 
-    SetTile(game, system, hex) ->
-      Ok([events.tile_set(game, system, hex)])
+    SetTile(game, system, hex) -> Ok([events.tile_set(game, system, hex)])
 
     CompleteMap(game, tiles) ->
       Ok([game_map.new(tiles) |> events.map_created(game, _)])

@@ -39,9 +39,7 @@ fn validate_ids(game_id: String, player_id: String) -> Result(Nil, String) {
   Ok(Nil)
 }
 
-fn validate(
-  command: GameSetupCommand,
-) -> Result(GameSetupCommand, String) {
+fn validate(command: GameSetupCommand) -> Result(GameSetupCommand, String) {
   case command {
     CreateGame(game_id, player_count, _) ->
       game.new_id(game_id)
@@ -72,9 +70,7 @@ fn validate(
   }
 }
 
-pub fn handle(
-  command: GameSetupCommand,
-) -> Result(List(GameSetupEvent), String) {
+pub fn handle(command: GameSetupCommand) -> Result(List(GameSetupEvent), String) {
   use _ <- result.try(validate(command))
   case command {
     CreateGame(game_id, player_count, setup_type) ->
@@ -118,7 +114,10 @@ pub fn handle(
   }
 }
 
-pub fn apply(state: Option(GameSetup), event: GameSetupEvent) -> Option(GameSetup) {
+pub fn apply(
+  state: Option(GameSetup),
+  event: GameSetupEvent,
+) -> Option(GameSetup) {
   case event {
     GameCreated(game_id, player_count, _, _) ->
       Some(GameSetup(

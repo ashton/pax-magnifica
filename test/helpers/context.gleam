@@ -11,7 +11,11 @@ pub fn empty() -> MovementContext {
 }
 
 pub fn with_enemy_at(h: Hex) -> MovementContext {
-  MovementContext(enemy_fleets: [#(h, enemy_id)], anomalies: [], player_technologies: [])
+  MovementContext(
+    enemy_fleets: [#(h, enemy_id)],
+    anomalies: [],
+    player_technologies: [],
+  )
 }
 
 pub fn with_enemies_at(hexes: List(Hex)) -> MovementContext {

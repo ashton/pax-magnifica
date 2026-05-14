@@ -1,6 +1,6 @@
 import core/models/action.{type PlayerAction, StrategicAction}
-import core/models/strategy
 import core/models/state/action_phase.{type ActionPhaseState, ActionPhaseState}
+import core/models/strategy
 import core/models/strategy_card.{StrategyCard}
 import core/value_objects/game
 import core/value_objects/player
@@ -92,7 +92,9 @@ fn produce_action_events(
   action: PlayerAction,
 ) -> List(ActionPhaseEvent) {
   let extra = case action {
-    StrategicAction(strategy: strat) -> [events.StrategyCardExhausted(game_id, strat)]
+    StrategicAction(strategy: strat) -> [
+      events.StrategyCardExhausted(game_id, strat),
+    ]
     _ -> []
   }
   [events.PlayerTookAction(game_id, player_id, action), ..extra]

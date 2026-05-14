@@ -2,7 +2,9 @@ import core/models/game_setup.{Standard}
 import core/models/map.{Map}
 import core/models/player.{User}
 import core/models/state.{Initial, Lobby, MapSetup}
-import engine/game_setup/commands.{CreateGame, create_game as game_setup_create_game}
+import engine/game_setup/commands.{
+  CreateGame, create_game as game_setup_create_game,
+}
 import engine/lobby/aggregate as lobby_aggregate
 import engine/lobby/command_handler as lobby_command_handler
 import engine/lobby/commands as lobby_commands

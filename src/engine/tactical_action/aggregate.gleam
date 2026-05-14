@@ -41,37 +41,83 @@ pub fn handle_move_units(
   use _ <- result.try(game.new_id(game_id))
   use _ <- result.try(player.new_id(player_id))
   use active_hex <- result.try(activation.active_system(state))
-  use events_per_move <- result.try(list.try_map(moves, fn(move) {
-    let #(from, units) = move
-    use _ <- result.try(activation.valid_movement_source(state, from, active_hex))
-    use _ <- result.try(movement.not_empty(units))
-    use _ <- result.try(movement.no_structures(units))
-    use _ <- result.try(movement.capacity(units))
-    use outcome <- result.try(movement.resolve_path(
-      from,
-      active_hex,
-      units,
-      ctx.enemy_fleets,
-      ctx.anomalies,
-      ctx.player_technologies,
-    ))
-    case outcome {
-      movement.ReachDestination(to) -> {
-        let rift_evts =
-          rift_encountered_events(game_id, player_id, from, to, units, ctx.anomalies)
-        Ok([events.UnitsMoved(game_id, player_id, from: from, to: to, units: units), ..rift_evts])
+  use events_per_move <- result.try(
+    list.try_map(moves, fn(move) {
+      let #(from, units) = move
+      use _ <- result.try(activation.valid_movement_source(
+        state,
+        from,
+        active_hex,
+      ))
+      use _ <- result.try(movement.not_empty(units))
+      use _ <- result.try(movement.no_structures(units))
+      use _ <- result.try(movement.capacity(units))
+      use outcome <- result.try(movement.resolve_path(
+        from,
+        active_hex,
+        units,
+        ctx.enemy_fleets,
+        ctx.anomalies,
+        ctx.player_technologies,
+      ))
+      case outcome {
+        movement.ReachDestination(to) -> {
+          let rift_evts =
+            rift_encountered_events(
+              game_id,
+              player_id,
+              from,
+              to,
+              units,
+              ctx.anomalies,
+            )
+          Ok([
+            events.UnitsMoved(
+              game_id,
+              player_id,
+              from: from,
+              to: to,
+              units: units,
+            ),
+            ..rift_evts
+          ])
+        }
+        movement.BlockedAt(blocked_at, enemy_player_id) -> {
+          let rift_evts =
+            rift_encountered_events(
+              game_id,
+              player_id,
+              from,
+              blocked_at,
+              units,
+              ctx.anomalies,
+            )
+          Ok(
+            list.flatten([
+              [
+                events.UnitsMoved(
+                  game_id,
+                  player_id,
+                  from: from,
+                  to: blocked_at,
+                  units: units,
+                ),
+              ],
+              rift_evts,
+              [
+                events.CombatInitiated(
+                  game_id,
+                  blocked_at,
+                  player_id,
+                  enemy_player_id,
+                ),
+              ],
+            ]),
+          )
+        }
       }
-      movement.BlockedAt(blocked_at, enemy_player_id) -> {
-        let rift_evts =
-          rift_encountered_events(game_id, player_id, from, blocked_at, units, ctx.anomalies)
-        Ok(list.flatten([
-          [events.UnitsMoved(game_id, player_id, from: from, to: blocked_at, units: units)],
-          rift_evts,
-          [events.CombatInitiated(game_id, blocked_at, player_id, enemy_player_id)],
-        ]))
-      }
-    }
-  }))
+    }),
+  )
   Ok(list.flatten(events_per_move))
 }
 
@@ -79,15 +125,16 @@ pub fn handle_resolve_gravity_rift(
   state: TacticalActionState,
   command: TacticalActionCommand,
 ) -> Result(List(TacticalActionEvent), String) {
-  let assert ResolveGravityRift(game_id, player_id, from, to, units_removed) = command
+  let assert ResolveGravityRift(game_id, player_id, from, to, units_removed) =
+    command
   use _ <- result.try(game.new_id(game_id))
   use _ <- result.try(player.new_id(player_id))
-  use _ <- result.try(case
-    list.any(state.pending_rift_encounters, fn(e) { e == #(from, to) })
-  {
-    True -> Ok(Nil)
-    False -> Error("No pending gravity rift encounter for this from/to pair")
-  })
+  use _ <- result.try(
+    case list.any(state.pending_rift_encounters, fn(e) { e == #(from, to) }) {
+      True -> Ok(Nil)
+      False -> Error("No pending gravity rift encounter for this from/to pair")
+    },
+  )
   Ok([events.GravityRiftResolved(game_id, player_id, from, to, units_removed)])
 }
 
@@ -104,7 +151,16 @@ fn rift_encountered_events(
     False -> []
     True -> {
       let dice_count = self_propelled_count(units) * rift_count
-      [events.GravityRiftEncountered(game_id, player_id, from, to, rift_count, dice_count)]
+      [
+        events.GravityRiftEncountered(
+          game_id,
+          player_id,
+          from,
+          to,
+          rift_count,
+          dice_count,
+        ),
+      ]
     }
   }
 }
@@ -115,10 +171,10 @@ pub fn apply(
 ) -> TacticalActionState {
   case event {
     SystemActivated(_, player_id, hex) ->
-      TacticalActionState(
-        ..state,
-        activation_history: [#(hex, player_id), ..state.activation_history],
-      )
+      TacticalActionState(..state, activation_history: [
+        #(hex, player_id),
+        ..state.activation_history
+      ])
 
     TacticTokenSpent(_, _) -> state
 
@@ -127,15 +183,18 @@ pub fn apply(
     CombatInitiated(_, _, _, _) -> state
 
     GravityRiftEncountered(_, _, from, to, _, _) ->
-      TacticalActionState(
-        ..state,
-        pending_rift_encounters: [#(from, to), ..state.pending_rift_encounters],
-      )
+      TacticalActionState(..state, pending_rift_encounters: [
+        #(from, to),
+        ..state.pending_rift_encounters
+      ])
 
     GravityRiftResolved(_, _, from, to, _) ->
       TacticalActionState(
         ..state,
-        pending_rift_encounters: drop_first(state.pending_rift_encounters, #(from, to)),
+        pending_rift_encounters: drop_first(state.pending_rift_encounters, #(
+          from,
+          to,
+        )),
       )
   }
 }

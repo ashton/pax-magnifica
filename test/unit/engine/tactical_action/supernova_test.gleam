@@ -14,22 +14,34 @@ const player_id = "alice"
 pub fn ships_cannot_move_into_a_supernova_test() {
   use <- unitest.tags(["unit", "tactical_action", "supernova"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.adjacent(), [units.carrier(movement: 1, capacity: 4)])])
-  let assert Error(_) = aggregate.handle_move_units(s, cmd, anomalies.supernova_at(h.origin()))
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.adjacent(), [units.carrier(movement: 1, capacity: 4)]),
+    ])
+  let assert Error(_) =
+    aggregate.handle_move_units(s, cmd, anomalies.supernova_at(h.origin()))
 }
 
 pub fn ships_cannot_move_through_a_supernova_test() {
   use <- unitest.tags(["unit", "tactical_action", "supernova"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.far(), [units.cruiser(movement: 2)])])
-  let assert Error(_) = aggregate.handle_move_units(s, cmd, anomalies.supernova_at(h.adjacent()))
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.far(), [units.cruiser(movement: 2)]),
+    ])
+  let assert Error(_) =
+    aggregate.handle_move_units(s, cmd, anomalies.supernova_at(h.adjacent()))
 }
 
 pub fn ships_route_around_supernova_when_alternative_path_exists_test() {
   use <- unitest.tags(["unit", "tactical_action", "supernova"])
   let s = state.with_history([#(h.origin(), player_id)])
-  let cmd = commands.move_units(game_id, player_id, [#(h.two_paths_from(), [units.cruiser(movement: 2)])])
-  let assert Ok(events) = aggregate.handle_move_units(s, cmd, anomalies.supernova_at(h.adjacent()))
+  let cmd =
+    commands.move_units(game_id, player_id, [
+      #(h.two_paths_from(), [units.cruiser(movement: 2)]),
+    ])
+  let assert Ok(events) =
+    aggregate.handle_move_units(s, cmd, anomalies.supernova_at(h.adjacent()))
   let assert [UnitsMoved(_, _, _, to: destination, units: _)] = events
   assert destination == h.origin()
 }

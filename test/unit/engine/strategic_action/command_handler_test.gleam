@@ -24,11 +24,9 @@ fn started_state(secondary_order, responded) {
 
 pub fn start_emits_strategic_action_started_test() {
   use <- unitest.tags(["unit", "strategic_action", "command_handler"])
-  let cmd =
-    start_strategic_action(game_id, "alice", Leadership, ["bob"])
+  let cmd = start_strategic_action(game_id, "alice", Leadership, ["bob"])
   let assert Ok(event) = command_handler.process_start(cmd) |> list.first()
-  assert event
-    == StrategicActionStarted(game_id, "alice", Leadership, ["bob"])
+  assert event == StrategicActionStarted(game_id, "alice", Leadership, ["bob"])
 }
 
 pub fn resolve_emits_secondary_ability_resolved_test() {

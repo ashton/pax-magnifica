@@ -91,7 +91,9 @@ pub fn import_map_with_2_ringfrom_tts_string_test() {
   }
 
   assert expectation
-    == map_from_tts_string("33 30 43 40 36 26 35 45 27 46 31 47 37 21 34 22 38 29")
+    == map_from_tts_string(
+      "33 30 43 40 36 26 35 45 27 46 31 47 37 21 34 22 38 29",
+    )
 }
 
 pub fn import_map_with_3_ringfrom_tts_string_test() {

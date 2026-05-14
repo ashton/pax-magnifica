@@ -28,7 +28,8 @@ pub fn apply_tile_set_adds_tile_to_drafting_map_test() {
 
   let assert MapSetup(state: map_state) = aggregate.apply(initial, event)
 
-  assert Drafting(dict.from_list([#(h, systems.mecatol_rex_system)])) == map_state.map
+  assert Drafting(dict.from_list([#(h, systems.mecatol_rex_system)]))
+    == map_state.map
 }
 
 pub fn apply_map_created_replaces_map_test() {

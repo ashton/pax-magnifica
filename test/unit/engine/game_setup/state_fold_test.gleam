@@ -3,10 +3,10 @@ import core/models/faction.{Hacan, Sol}
 import core/models/game_setup.{
   GameSetup, Lobby, PreparingGame, SetupComplete, Standard,
 }
-import engine/game_setup/aggregate
 import core/models/objective.{SecretObjective}
+import engine/game_setup/aggregate
 import engine/game_setup/events.{
-  GameCreated, GameSetupCompleted, GameStarted, GalaxyBuildCompleted,
+  GalaxyBuildCompleted, GameCreated, GameSetupCompleted, GameStarted,
   PlayerAddedSecretObjective, PlayerGainedCommandTokens, PlayerJoined,
   PlayerStartingPlanetsSetup, PlayerStartingTechnologiesSetup,
   PlayerStartingUnitsSetup, PublicObjectivesRevealed, SecretObjectivesDealt,
@@ -165,17 +165,11 @@ pub fn apply_data_events_do_not_change_phase_test() {
   assert gs3b.phase == Lobby
 
   let assert Some(gs3c) =
-    aggregate.apply(
-      state,
-      PlayerStartingPlanetsSetup("game_1", "player_1", []),
-    )
+    aggregate.apply(state, PlayerStartingPlanetsSetup("game_1", "player_1", []))
   assert gs3c.phase == Lobby
 
   let assert Some(gs3d) =
-    aggregate.apply(
-      state,
-      PlayerGainedCommandTokens("game_1", "player_1", []),
-    )
+    aggregate.apply(state, PlayerGainedCommandTokens("game_1", "player_1", []))
   assert gs3d.phase == Lobby
 
   let assert Some(gs4) =
@@ -186,10 +180,7 @@ pub fn apply_data_events_do_not_change_phase_test() {
   assert gs4.phase == Lobby
 
   let assert Some(gs4b) =
-    aggregate.apply(
-      state,
-      SecretObjectivesDealt("game_1", "player_1", []),
-    )
+    aggregate.apply(state, SecretObjectivesDealt("game_1", "player_1", []))
   assert gs4b.phase == Lobby
 
   let assert Some(gs5) =

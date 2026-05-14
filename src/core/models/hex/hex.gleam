@@ -194,7 +194,10 @@ fn do_bfs(
                   && { h == to || !list.contains(blocked, h) }
                 })
               do_bfs(
-                list.append(rest, list.map(candidates, fn(h) { #(h, steps + 1) })),
+                list.append(
+                  rest,
+                  list.map(candidates, fn(h) { #(h, steps + 1) }),
+                ),
                 list.append(visited, candidates),
                 to,
                 max_steps,

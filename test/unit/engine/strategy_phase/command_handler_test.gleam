@@ -1,5 +1,5 @@
-import core/models/strategy.{Imperial, Leadership, Trade, Warfare}
 import core/models/state/strategy_phase.{StrategyPhaseState}
+import core/models/strategy.{Imperial, Leadership, Trade, Warfare}
 import engine/strategy_phase/command_handler
 import engine/strategy_phase/commands
 import engine/strategy_phase/events.{
@@ -33,8 +33,7 @@ fn state_with_picks(picks) {
 pub fn start_strategy_phase_emits_started_test() {
   use <- unitest.tags(["unit", "strategy_phase", "command_handler"])
   let cmd = commands.start_strategy_phase(game_id, ["alice", "bob"])
-  let assert Ok(event) =
-    command_handler.process_start(cmd) |> list.first()
+  let assert Ok(event) = command_handler.process_start(cmd) |> list.first()
   assert event == StrategyPhaseStarted(game_id, ["alice", "bob"])
 }
 
@@ -53,7 +52,10 @@ pub fn pick_card_with_no_trade_goods_does_not_clear_test() {
   let state = empty_state(["alice", "bob"])
   let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
   let events = command_handler.process_pick(state, cmd)
-  assert !list.contains(events, StrategyCardTradeGoodsCleared(game_id, Leadership))
+  assert !list.contains(
+    events,
+    StrategyCardTradeGoodsCleared(game_id, Leadership),
+  )
 }
 
 pub fn pick_card_with_trade_goods_emits_cleared_test() {
@@ -66,7 +68,10 @@ pub fn pick_card_with_trade_goods_emits_cleared_test() {
     )
   let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
   let events = command_handler.process_pick(state, cmd)
-  assert list.contains(events, StrategyCardTradeGoodsCleared(game_id, Leadership))
+  assert list.contains(
+    events,
+    StrategyCardTradeGoodsCleared(game_id, Leadership),
+  )
 }
 
 pub fn last_pick_emits_trade_good_for_remaining_cards_test() {
@@ -110,7 +115,10 @@ pub fn last_pick_does_not_add_tg_to_picked_cards_test() {
   let state = StrategyPhaseState(..state, player_order: ["alice", "bob"])
   let cmd = commands.pick_strategy_card(game_id, "bob", Trade)
   let events = command_handler.process_pick(state, cmd)
-  assert !list.contains(events, TradeGoodAddedToStrategyCard(game_id, Leadership))
+  assert !list.contains(
+    events,
+    TradeGoodAddedToStrategyCard(game_id, Leadership),
+  )
   assert !list.contains(events, TradeGoodAddedToStrategyCard(game_id, Trade))
 }
 

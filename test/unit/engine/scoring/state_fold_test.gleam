@@ -15,8 +15,7 @@ pub fn apply_player_scored_initialises_score_test() {
 
 pub fn apply_player_scored_accumulates_points_test() {
   use <- unitest.tags(["unit", "scoring", "state_fold"])
-  let state =
-    Some(dict.from_list([#("player_1", 2)]))
+  let state = Some(dict.from_list([#("player_1", 2)]))
   let event = PlayerScoredVictoryPoints("game_1", "player_1", Imperial, 3)
   let assert Some(scores) = aggregate.apply(state, event)
   let assert Ok(vp) = dict.get(scores, "player_1")
@@ -27,7 +26,12 @@ pub fn apply_player_scored_tracks_multiple_players_test() {
   use <- unitest.tags(["unit", "scoring", "state_fold"])
   let state = Some(dict.from_list([#("player_1", 3)]))
   let event =
-    PlayerScoredVictoryPoints("game_1", "player_2", PublicObjectiveScored("obj_1"), 2)
+    PlayerScoredVictoryPoints(
+      "game_1",
+      "player_2",
+      PublicObjectiveScored("obj_1"),
+      2,
+    )
   let assert Some(scores) = aggregate.apply(state, event)
   let assert Ok(p1) = dict.get(scores, "player_1")
   let assert Ok(p2) = dict.get(scores, "player_2")

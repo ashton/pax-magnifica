@@ -41,7 +41,9 @@ fn build_tiles(systems: List(System), grid: HexGrid) -> Dict(Hex, System) {
   |> dict.from_list()
 }
 
-pub fn map_from_tts_string(tts_string: String) -> Result(Dict(Hex, System), String) {
+pub fn map_from_tts_string(
+  tts_string: String,
+) -> Result(Dict(Hex, System), String) {
   let tile_numbers =
     // Mecatol rex is always in the map
     "18 "

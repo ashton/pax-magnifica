@@ -16,7 +16,11 @@ pub fn new(tiles: Dict(Hex, System)) -> Map {
   Map(tiles:, active_system: None)
 }
 
-pub fn add_tile(map: Result(Map, String), hex: Hex, system: System) -> Result(Map, String) {
+pub fn add_tile(
+  map: Result(Map, String),
+  hex: Hex,
+  system: System,
+) -> Result(Map, String) {
   case map {
     Ok(Drafting(tiles)) -> Ok(Drafting(tiles: dict.insert(tiles, hex, system)))
     Ok(_) -> Error("Only drafting maps can have tiles added")

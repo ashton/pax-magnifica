@@ -29,8 +29,7 @@ pub fn process_award_victory_points_carries_source_test() {
 
 pub fn process_award_victory_points_custodians_test() {
   use <- unitest.tags(["unit", "scoring", "command_handler"])
-  let cmd =
-    commands.award_victory_points("game_1", "player_1", Custodians, 1)
+  let cmd = commands.award_victory_points("game_1", "player_1", Custodians, 1)
   let assert Ok(PlayerScoredVictoryPoints("game_1", "player_1", Custodians, 1)) =
     command_handler.process(cmd) |> list.first()
 }

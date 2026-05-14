@@ -32,10 +32,7 @@ pub fn apply_phase_started_preserves_trade_goods_test() {
   let prior = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(s1) = aggregate.apply(None, prior)
   let s1_with_tg =
-    aggregate.apply(
-      Some(s1),
-      TradeGoodAddedToStrategyCard(game_id, Warfare),
-    )
+    aggregate.apply(Some(s1), TradeGoodAddedToStrategyCard(game_id, Warfare))
   // new round starts — trade goods should persist
   let new_round = StrategyPhaseStarted(game_id, ["alice", "bob"])
   let assert Some(s2) = aggregate.apply(s1_with_tg, new_round)
@@ -60,15 +57,9 @@ pub fn apply_trade_good_added_increments_count_test() {
   let base = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(state) = aggregate.apply(None, base)
   let assert Some(state) =
-    aggregate.apply(
-      Some(state),
-      TradeGoodAddedToStrategyCard(game_id, Warfare),
-    )
+    aggregate.apply(Some(state), TradeGoodAddedToStrategyCard(game_id, Warfare))
   let assert Some(state) =
-    aggregate.apply(
-      Some(state),
-      TradeGoodAddedToStrategyCard(game_id, Warfare),
-    )
+    aggregate.apply(Some(state), TradeGoodAddedToStrategyCard(game_id, Warfare))
   let assert Ok(tg) = dict.get(state.card_trade_goods, Warfare)
   assert tg == 2
 }
@@ -110,10 +101,7 @@ pub fn apply_phase_ended_preserves_trade_goods_test() {
   let base = StrategyPhaseStarted(game_id, ["alice"])
   let assert Some(state) = aggregate.apply(None, base)
   let assert Some(state) =
-    aggregate.apply(
-      Some(state),
-      TradeGoodAddedToStrategyCard(game_id, Trade),
-    )
+    aggregate.apply(Some(state), TradeGoodAddedToStrategyCard(game_id, Trade))
   let assert Some(state) =
     aggregate.apply(Some(state), StrategyPhaseEnded(game_id))
   let assert Ok(tg) = dict.get(state.card_trade_goods, Trade)

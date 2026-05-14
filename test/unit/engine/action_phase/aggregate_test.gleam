@@ -1,7 +1,7 @@
 import core/models/action.{ComponentAction, StrategicAction, TacticalAction}
+import core/models/state/action_phase.{ActionPhaseState}
 import core/models/strategy.{Imperial, Leadership, Trade}
 import core/models/strategy_card.{StrategyCard}
-import core/models/state/action_phase.{ActionPhaseState}
 import engine/action_phase/aggregate
 import engine/action_phase/commands.{Pass, StartActionPhase, TakeAction}
 import engine/action_phase/events.{
@@ -66,11 +66,12 @@ pub fn start_action_phase_sorts_by_initiative_test() {
       #("charlie", sc(Trade, False)),
     ])
   let assert StartActionPhase(_, order) = cmd
-  assert order == [
-    #("alice", sc(Leadership, False)),
-    #("charlie", sc(Trade, False)),
-    #("bob", sc(Imperial, False)),
-  ]
+  assert order
+    == [
+      #("alice", sc(Leadership, False)),
+      #("charlie", sc(Trade, False)),
+      #("bob", sc(Imperial, False)),
+    ]
 }
 
 // ── TakeAction ────────────────────────────────────────────────────────────────
@@ -80,7 +81,10 @@ pub fn handle_action_emits_player_took_action_test() {
   let state = state_for(["alice", "bob"], [])
   let cmd = commands.take_action(game_id, "alice", TacticalAction)
   let assert Ok(events) = aggregate.handle_action(state, cmd)
-  assert list.contains(events, PlayerTookAction(game_id, "alice", TacticalAction))
+  assert list.contains(
+    events,
+    PlayerTookAction(game_id, "alice", TacticalAction),
+  )
 }
 
 pub fn handle_action_does_not_end_phase_test() {

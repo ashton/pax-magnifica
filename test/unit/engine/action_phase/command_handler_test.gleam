@@ -1,7 +1,7 @@
 import core/models/action.{StrategicAction, TacticalAction}
+import core/models/state/action_phase.{ActionPhaseState}
 import core/models/strategy.{Diplomacy, Leadership}
 import core/models/strategy_card.{StrategyCard}
-import core/models/state/action_phase.{ActionPhaseState}
 import engine/action_phase/command_handler
 import engine/action_phase/commands
 import engine/action_phase/events.{
@@ -37,7 +37,8 @@ pub fn start_emits_action_phase_started_test() {
       #("bob", bob_card),
     ])
   let assert Ok(event) = command_handler.process_start(cmd) |> list.first()
-  assert event == ActionPhaseStarted(game_id, [#("alice", alice_card), #("bob", bob_card)])
+  assert event
+    == ActionPhaseStarted(game_id, [#("alice", alice_card), #("bob", bob_card)])
 }
 
 pub fn take_action_emits_player_took_action_test() {

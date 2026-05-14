@@ -8,9 +8,7 @@ import gleam/dict
 import gleam/list
 import gleam/result
 
-pub fn process_start(
-  command: StrategyPhaseCommand,
-) -> List(StrategyPhaseEvent) {
+pub fn process_start(command: StrategyPhaseCommand) -> List(StrategyPhaseEvent) {
   let assert StartStrategyPhase(game_id, player_order) = command
   [events.StrategyPhaseStarted(game_id, player_order)]
 }
@@ -26,8 +24,7 @@ pub fn process_pick(
     strategy_cards.all
     |> list.filter(fn(c) { c != card && !list.contains(picked_cards, c) })
 
-  let card_tg =
-    dict.get(state.card_trade_goods, card) |> result.unwrap(0)
+  let card_tg = dict.get(state.card_trade_goods, card) |> result.unwrap(0)
 
   let is_last_pick =
     list.length(state.current_picks) + 1 == list.length(state.player_order)

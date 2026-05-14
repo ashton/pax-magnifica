@@ -1,8 +1,8 @@
-import core/models/strategy.{type Strategy}
 import core/models/faction.{type Faction}
 import core/models/objective.{type Objective}
 import core/models/planetary_system.{type Planet}
 import core/models/promissory_notes.{type PromissoryNote}
+import core/models/strategy.{type Strategy}
 import core/models/technology.{type Technology}
 import gleam/option.{type Option, None}
 

@@ -866,10 +866,23 @@ pub fn make_yssaril() -> faction.Faction {
 }
 
 pub const all: List(faction.FactionIdentifier) = [
-  faction.Arborec, faction.Creuss, faction.Hacan, faction.JolNar, faction.Letnev,
-  faction.Lizix, faction.Mentak, faction.Muaat, faction.Naalu, faction.Nekro,
-  faction.Saar, faction.Sardakk, faction.Sol, faction.Winnu, faction.Xxcha,
-  faction.Yin, faction.Yssaril,
+  faction.Arborec,
+  faction.Creuss,
+  faction.Hacan,
+  faction.JolNar,
+  faction.Letnev,
+  faction.Lizix,
+  faction.Mentak,
+  faction.Muaat,
+  faction.Naalu,
+  faction.Nekro,
+  faction.Saar,
+  faction.Sardakk,
+  faction.Sol,
+  faction.Winnu,
+  faction.Xxcha,
+  faction.Yin,
+  faction.Yssaril,
 ]
 
 pub fn make(identifier: faction.FactionIdentifier) -> faction.Faction {
