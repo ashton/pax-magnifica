@@ -12,8 +12,29 @@ import engine/strategy_phase/events.{
 }
 import gleam/dict
 import gleam/list
-import gleam/option.{type Option, Some}
+import gleam/option.{type Option, None, Some}
 import gleam/result
+
+pub fn handle(
+  state: Option(StrategyPhaseState),
+  command: StrategyPhaseCommand,
+) -> Result(List(StrategyPhaseEvent), String) {
+  case command {
+    StartStrategyPhase(game_id, player_order) -> {
+      use _ <- result.try(validate_start(command))
+      Ok([events.StrategyPhaseStarted(game_id, player_order)])
+    }
+    PickStrategyCard(game_id, player_id, card) -> {
+      case state {
+        None -> Error("Strategy phase has not started")
+        Some(s) -> {
+          use _ <- result.try(validate_pick(s, command))
+          Ok([events.StrategyCardPicked(game_id, player_id, card)])
+        }
+      }
+    }
+  }
+}
 
 pub fn validate_start(
   command: StrategyPhaseCommand,

@@ -12,8 +12,45 @@ import engine/strategic_action/events.{
   StrategicActionEnded, StrategicActionStarted,
 }
 import gleam/list
-import gleam/option.{type Option, Some}
+import gleam/option.{type Option, None, Some}
 import gleam/result
+
+pub fn handle(
+  state: Option(StrategicActionState),
+  command: StrategicActionCommand,
+) -> Result(List(StrategicActionEvent), String) {
+  case command {
+    StartStrategicAction(game_id, player_id, strategy, secondary_order) -> {
+      use _ <- result.try(validate_start(command))
+      Ok([
+        events.StrategicActionStarted(
+          game_id,
+          player_id,
+          strategy,
+          secondary_order,
+        ),
+      ])
+    }
+    ResolveSecondaryAbility(game_id, player_id) -> {
+      case state {
+        None -> Error("Strategic action has not started")
+        Some(s) -> {
+          use _ <- result.try(validate_secondary(s, command))
+          Ok([events.SecondaryAbilityResolved(game_id, player_id)])
+        }
+      }
+    }
+    SkipSecondaryAbility(game_id, player_id) -> {
+      case state {
+        None -> Error("Strategic action has not started")
+        Some(s) -> {
+          use _ <- result.try(validate_secondary(s, command))
+          Ok([events.SecondaryAbilitySkipped(game_id, player_id)])
+        }
+      }
+    }
+  }
+}
 
 pub fn validate_start(
   command: StrategicActionCommand,

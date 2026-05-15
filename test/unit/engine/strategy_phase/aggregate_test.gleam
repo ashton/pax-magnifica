@@ -2,7 +2,9 @@ import core/models/state/strategy_phase.{StrategyPhaseState}
 import core/models/strategy.{Leadership, Trade, Warfare}
 import engine/strategy_phase/aggregate
 import engine/strategy_phase/commands.{PickStrategyCard, StartStrategyPhase}
+import engine/strategy_phase/events
 import gleam/dict
+import gleam/option.{None, Some}
 import unitest
 
 const game_id = "game_1"
@@ -98,4 +100,34 @@ pub fn validate_pick_player_already_picked_test() {
   // alice already picked — cannot pick again
   let cmd = commands.pick_strategy_card(game_id, "alice", Warfare)
   let assert Error(_) = aggregate.validate_pick(state, cmd)
+}
+
+// ── handle ───────────────────────────────────────────────────────────────────
+
+pub fn handle_start_emits_strategy_phase_started_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "aggregate"])
+  let cmd = commands.start_strategy_phase(game_id, ["alice", "bob"])
+  let assert Ok([events.StrategyPhaseStarted("game_1", ["alice", "bob"])]) =
+    aggregate.handle(None, cmd)
+}
+
+pub fn handle_start_invalid_returns_error_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "aggregate"])
+  let cmd = StartStrategyPhase("", ["alice"])
+  let assert Error(_) = aggregate.handle(None, cmd)
+}
+
+pub fn handle_pick_emits_strategy_card_picked_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "aggregate"])
+  let state = state_with_picks([])
+  let cmd = commands.pick_strategy_card(game_id, "alice", Leadership)
+  let assert Ok([events.StrategyCardPicked("game_1", "alice", Leadership)]) =
+    aggregate.handle(Some(state), cmd)
+}
+
+pub fn handle_pick_invalid_returns_error_test() {
+  use <- unitest.tags(["unit", "strategy_phase", "aggregate"])
+  let state = state_with_picks([#("alice", Leadership)])
+  let cmd = commands.pick_strategy_card(game_id, "alice", Warfare)
+  let assert Error(_) = aggregate.handle(Some(state), cmd)
 }
