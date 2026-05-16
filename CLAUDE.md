@@ -37,6 +37,9 @@ When adding new functionalities ALWAYS use Test Driven Development, generate AT 
 When changing existent functionalities, ALWAYS check if there test cases for that functionality already, BEFORE generating the implementation, try to improve the current test cases or add missing test cases if there is some,
 only then, generate the implementation, and at the end, ALWAYS run the tests to make sure the change didn't break anything.
 
+#### Code format
+Before commit changes ALWAYS format the code using `gleam format`.
+
 ### Layer Structure
 
 | Directory | Responsibility |
