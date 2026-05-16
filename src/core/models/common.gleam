@@ -29,3 +29,7 @@ pub type Color {
   Red
   Yellow
 }
+
+pub type Edition {
+  BaseGame
+}
