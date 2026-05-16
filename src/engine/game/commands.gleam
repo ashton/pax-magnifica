@@ -3,6 +3,7 @@ import engine/action_phase/commands as action_phase_commands
 import engine/game_setup/commands as game_setup_commands
 import engine/lobby/commands as lobby_commands
 import engine/map/commands as map_commands
+import engine/planets/commands as planets_commands
 import engine/scoring/commands as scoring_commands
 import engine/strategic_action/commands as strategic_action_commands
 import engine/strategy_phase/commands as strategy_phase_commands
@@ -17,5 +18,6 @@ pub type GameCommand {
   StrategicActionCommand(strategic_action_commands.StrategicActionCommand)
   TacticalActionCommand(tactical_action_commands.TacticalActionCommand)
   ActionCardsCommand(action_cards_commands.ActionCardsCommand)
+  PlanetsCommand(planets_commands.PlanetsCommand)
   ScoringCommand(scoring_commands.ScoringCommand)
 }

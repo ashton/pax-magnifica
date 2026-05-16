@@ -48,6 +48,12 @@ pub fn action_cards() {
   )
 }
 
+pub fn planets() {
+  ocular.lens(get: fn(e: GameEntity) { e.planets }, set: fn(v, e: GameEntity) {
+    GameEntity(..e, planets: v)
+  })
+}
+
 pub fn scoring() {
   ocular.lens(get: fn(e: GameEntity) { e.scoring }, set: fn(v, e: GameEntity) {
     GameEntity(..e, scoring: v)

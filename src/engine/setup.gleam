@@ -1,3 +1,4 @@
+import engine/effects/reactor
 import engine/game/aggregate
 import engine/game/entity
 import eventsourcing
@@ -25,6 +26,8 @@ pub fn start() {
     |> static_supervisor.start()
 
   let es_name = process.new_name("game_es_" <> id)
+  let reactor_name = process.new_name("game_reactor_" <> id)
+  let reactor_query = reactor.make_query(es_name)
 
   let assert Ok(es_spec) =
     eventsourcing.supervised(
@@ -33,7 +36,7 @@ pub fn start() {
       handle: aggregate.handle,
       apply: aggregate.apply,
       empty_state: entity.initial(),
-      queries: [],
+      queries: [#(reactor_name, reactor_query)],
       snapshot_config: None,
     )
 
